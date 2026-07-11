@@ -150,7 +150,7 @@ a {
 }
 
 .nav-link:hover, .nav-link.active {
-    color: #528c3d;
+    color: #2791c5;
 }
 
 .nav-link::after {
@@ -160,7 +160,7 @@ a {
     left: 0;
     width: 0;
     height: 2px;
-    background: #528c3d;
+    background: #2791c5;
     transition: var(--transition);
 }
 
@@ -191,18 +191,49 @@ a {
     margin-top: 80px;
 }
 
-/* Hero Section */
 .hero {
     position: relative;
-    min-height: calc(100vh - 80px);
+    min-height: 40vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6rem 2rem;
-    background: linear-gradient(rgba(10, 20, 40, 0.4), rgba(10, 20, 40, 0.75)), url('hero-bg.jpg') no-repeat center center/cover;
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
     text-align: center;
     overflow: hidden;
     color: #ffffff;
+}
+
+.hero-home {
+    min-height: calc(100vh - 80px);
+    padding: 6rem 2rem 4rem 2rem;
+}
+
+.hero-home .hero-container {
+    max-width: 1000px;
+}
+
+.hero-image-wrapper {
+    margin-top: 3rem;
+    width: 100%;
+    max-width: 900px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+}
+
+.hero-image-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+.hero-img-full {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
 }
 
 .hero-container {
