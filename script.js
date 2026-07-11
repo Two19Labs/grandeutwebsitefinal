@@ -149,13 +149,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 setTimeout(() => {
                     btn.textContent = 'Submitted Successfully!';
-                    btn.style.backgroundColor = '#10B981';
+                    btn.style.backgroundColor = '#0f1d3a';
                     contactForm.reset();
                     
                     // Show a message in place of "Thanks for submitting!"
                     const successMessage = document.createElement('div');
                     successMessage.className = 'form-success-alert';
-                    successMessage.innerHTML = '<p style="color: #065f46; background: #d1fae5; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-weight: 600; text-align: center;">Thank you! Your submission has been received.</p>';
+                    successMessage.innerHTML = '<p style="color: #0f1d3a; background: #dbeafe; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-weight: 600; text-align: center;">Thank you! Your submission has been received.</p>';
                     contactForm.appendChild(successMessage);
                     
                     setTimeout(() => {

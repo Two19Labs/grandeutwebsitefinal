@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --primary: #059669;
-    --primary-rgb: 5, 150, 105;
-    --primary-light: #34d399;
-    --primary-dark: #047857;
+    --primary: #0f1d3a;
+    --primary-rgb: 15, 29, 58;
+    --primary-light: #1e3a6e;
+    --primary-dark: #0a1428;
     --dark: #0f172a;
     --dark-rgb: 15, 23, 42;
     --light-bg: #f8fafc;
@@ -574,7 +574,7 @@ a {
 .tag-default { background: #e2e8f0; color: #475569; }
 .tag-finance { background: #fee2e2; color: #991b1b; }
 .tag-marketing { background: #fef3c7; color: #92400e; }
-.tag-strategy { background: #d1fae5; color: #065f46; }
+.tag-strategy { background: #dbeafe; color: #0f1d3a; }
 .tag-impact { background: #e0f2fe; color: #075985; }
 
 /* Contact Page split layout */
