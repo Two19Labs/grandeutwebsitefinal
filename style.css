@@ -199,7 +199,7 @@ a {
     align-items: center;
     justify-content: center;
     padding: 6rem 2rem;
-    background: linear-gradient(rgba(10, 20, 40, 0.6), rgba(10, 20, 40, 0.85)), url('hero-bg.jpg') no-repeat center 25%/cover;
+    background: linear-gradient(rgba(10, 20, 40, 0.4), rgba(10, 20, 40, 0.75)), url('hero-bg.jpg') no-repeat center center/cover;
     text-align: center;
     overflow: hidden;
     color: #ffffff;
