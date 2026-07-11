@@ -98,6 +98,21 @@ a {
     font-size: 1.25rem;
 }
 
+.logo-img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    background: transparent;
+}
+
+.footer-logo-img {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+    background: transparent;
+    filter: brightness(10);
+}
+
 .logo-text {
     display: flex;
     flex-direction: column;
@@ -528,7 +543,7 @@ a {
 }
 
 .avatar-placeholder::after {
-    content: '180DC';
+    content: 'Grandeur';
     font-family: 'Outfit', sans-serif;
     font-weight: 800;
     font-size: 2rem;
