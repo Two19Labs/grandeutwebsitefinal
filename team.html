@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team | 180DC SSCBS</title>
+    <meta name="description" content="Meet the mentors, executive board, advisory, and core committee members of 180 Degrees Consulting SSCBS.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo-container" id="logo-link">
+                <div class="logo-placeholder">180</div>
+                <div class="logo-text">
+                    <span class="brand-name">180Degrees</span>
+                    <span class="branch-name">Consulting SSCBS</span>
+                </div>
+            </a>
+            <button class="menu-toggle" aria-label="Toggle Navigation" id="menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="about-us.html" class="nav-link">About Us</a></li>
+                <li><a href="what-we-do.html" class="nav-link">What We Do</a></li>
+                <li><a href="achievements.html" class="nav-link">Achievements</a></li>
+                <li><a href="team.html" class="nav-link active">Team</a></li>
+                <li><a href="alumni.html" class="nav-link">Alumni</a></li>
+                <li><a href="contact-us.html" class="nav-link">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-container">
+                <h1>Our Team</h1>
+                <p>Meet the passionate students driving social change through strategic consulting at SSCBS.</p>
+            </div>
+        </section>
+
+        <!-- Mentors Section -->
+        <section class="section" style="background-color: white;">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Meet the Mentors</h2>
+                    <p>Our guiding lights whose academic and institutional support anchors the chapter.</p>
+                </div>
+                <div class="grid grid-4">
+                    <div class="team-card">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Dr. Poonam Verma</h3>
+                            <span class="team-role">Principal</span>
+                        </div>
+                    </div>
+                    <div class="team-card">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Dr. Amit Kumar</h3>
+                            <span class="team-role">Faculty Advisor</span>
+                        </div>
+                    </div>
+                    <div class="team-card">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Dr. Neeraj Sehrawat</h3>
+                            <span class="team-role">Faculty Advisor</span>
+                        </div>
+                    </div>
+                    <div class="team-card">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Mr. Deepak Tiwari</h3>
+                            <span class="team-role">Faculty Advisor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Members Section with dynamic search and filter -->
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Chapter Members</h2>
+                    <p>Explore our active student consultants and leaders across different levels.</p>
+                </div>
+
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">All Members</button>
+                    <button class="filter-btn" data-filter="board">Executive Board</button>
+                    <button class="filter-btn" data-filter="advisory">Advisory Committee</button>
+                    <button class="filter-btn" data-filter="core">Core Committee</button>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search members by name or role...">
+                </div>
+
+                <div class="team-grid" id="team-members-grid">
+                    <!-- Executive Board -->
+                    <div class="team-card" data-category="board">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Manav Mahajan</h3>
+                            <span class="team-role">President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="board">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Saanvi Garg</h3>
+                            <span class="team-role">Vice President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="board">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Aishwarya Pande</h3>
+                            <span class="team-role">Coordinator</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="board">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Vanya Aggarwal</h3>
+                            <span class="team-role">Coordinator</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="board">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Amanjyot Singh</h3>
+                            <span class="team-role">Director of Ext. Relations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="board">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Raj Agarwal</h3>
+                            <span class="team-role">Director of Operations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="board">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Samyak Kataria</h3>
+                            <span class="team-role">Director of R&D</span>
+                        </div>
+                    </div>
+
+                    <!-- Advisory Committee -->
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Arushi Gupta</h3>
+                            <span class="team-role">Director of Operations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Samarth Bhardwaj</h3>
+                            <span class="team-role">Director of R&D</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Gaurang Rathi</h3>
+                            <span class="team-role">Director of Ext. Relations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Himani Dawar</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Parth Batra</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Kavin Krishnan</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Manav Bhola</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Samyaa Goyal</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Shikhar Gupta</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Aryan Batra</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Navyansh Pant</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Shreya Mangla</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Tanaya Tank</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Utkarsh Jain</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Vanshuli Agarwal</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="advisory">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Vidit Jain</h3>
+                            <span class="team-role">Advisory Member</span>
+                        </div>
+                    </div>
+
+                    <!-- Core Committee -->
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Aditya Bagla</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Arnav Garg</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Arnav Walia</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Gaurav Gupta</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Prakshi Jain</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Harshit Jalan</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Japneet Kaur</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Shreya Jain</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Chirag Bhagat</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="core">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Komal Somani</h3>
+                            <span class="team-role">Core Consultant</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="footer-logo">
+                    <div class="logo-placeholder">180</div>
+                    <span class="brand-name">180Degrees Consulting</span>
+                </a>
+                <p>Empowering social change through strategic consulting and developing the next generation of impact leaders.</p>
+                <span class="footer-motto">IDEATE. CONSULT. IMPACT.</span>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about-us.html">About Us</a></li>
+                    <li><a href="what-we-do.html">What We Do</a></li>
+                    <li><a href="achievements.html">Achievements</a></li>
+                    <li><a href="team.html">Team</a></li>
+                    <li><a href="alumni.html">Alumni</a></li>
+                    <li><a href="contact-us.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h3>Get In Touch</h3>
+                <span><strong>Address:</strong> Shaheed Sukhdev College of Business Studies, PSP Area – IV, Sector-16, Rohini, Delhi - 110089</span>
+                <span><strong>Email:</strong> <a href="mailto:cbs@180dc.org" style="color: var(--primary-light);">cbs@180dc.org</a></span>
+                <span><strong>Contacts:</strong> Aishwarya Pande (95999 26679)<br>Vanya Aggarwal (79734 53784)</span>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 180 Degrees Consulting SSCBS. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

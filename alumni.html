@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni | 180DC SSCBS</title>
+    <meta name="description" content="View the batch-wise alumni network of 180 Degrees Consulting SSCBS. Search and filter through past members.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo-container" id="logo-link">
+                <div class="logo-placeholder">180</div>
+                <div class="logo-text">
+                    <span class="brand-name">180Degrees</span>
+                    <span class="branch-name">Consulting SSCBS</span>
+                </div>
+            </a>
+            <button class="menu-toggle" aria-label="Toggle Navigation" id="menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="about-us.html" class="nav-link">About Us</a></li>
+                <li><a href="what-we-do.html" class="nav-link">What We Do</a></li>
+                <li><a href="achievements.html" class="nav-link">Achievements</a></li>
+                <li><a href="team.html" class="nav-link">Team</a></li>
+                <li><a href="alumni.html" class="nav-link active">Alumni</a></li>
+                <li><a href="contact-us.html" class="nav-link">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-container">
+                <h1>Alumni Network</h1>
+                <p>Our members go on to build exceptional careers in top-tier management consulting firms, investment banks, and startup ecosystems globally.</p>
+            </div>
+        </section>
+
+        <!-- Alumni List Section -->
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Meet Our Alumni</h2>
+                    <p>Our growing network of leaders who continue to shape industries worldwide.</p>
+                </div>
+
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">All Batches</button>
+                    <button class="filter-btn" data-filter="2025">Batch of 2025</button>
+                    <button class="filter-btn" data-filter="2024">Batch of 2024</button>
+                    <button class="filter-btn" data-filter="2023">Batch of 2023</button>
+                    <button class="filter-btn" data-filter="2022">Batch of 2022</button>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search alumni by name or role...">
+                </div>
+
+                <div class="team-grid" id="alumni-grid">
+                    <!-- Batch of 2025 -->
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Shreya Rohtagi</h3>
+                            <span class="team-role">President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Bhavika Rajora</h3>
+                            <span class="team-role">Vice President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Rudraksh Bhandari</h3>
+                            <span class="team-role">Director of Operations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Rajat Gunecha</h3>
+                            <span class="team-role">Director of Ext. Relations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Riya Chadha</h3>
+                            <span class="team-role">Director of R&D</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Amogh Dobriyal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Ananyaa Jaggi</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Ananya Bhalla</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Jyotika Malhotra</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Ishan Anand</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Falak Kalra</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Divyanshi Shukla</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Nitin S.</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Shitz Dhar</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Palak Singhal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2025">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Kanishk Chatwal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+
+                    <!-- Batch of 2024 -->
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Sidhant Surana</h3>
+                            <span class="team-role">President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Purab Jain</h3>
+                            <span class="team-role">Vice President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Prabhleen Kaur</h3>
+                            <span class="team-role">Director of Operations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Aman Burnwal</h3>
+                            <span class="team-role">Director of Outreach</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Suvanshi Aggarwal</h3>
+                            <span class="team-role">Director of R&D</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Sooryansh Sharma</h3>
+                            <span class="team-role">Director of Ext. Relations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Ayush Madhogarhia</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Nandini Aggarwal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Navya Goel</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Pallika Dewan</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Riya Bansal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Saksham Singru</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2024">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Veer Kohli</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+
+                    <!-- Batch of 2023 -->
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Pulkit Sehgal</h3>
+                            <span class="team-role">President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Arshia Mittal</h3>
+                            <span class="team-role">Vice President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Sarthak Bindal</h3>
+                            <span class="team-role">General Secretary</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Maanit Agrawal</h3>
+                            <span class="team-role">Director of Outreach</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Manan Khurana</h3>
+                            <span class="team-role">Director of Ext. Relations</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Shivam Agarwal</h3>
+                            <span class="team-role">Director of Marketing</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Arindam Neogi</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Ramanjeet Singh</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Manvi Bhatt</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Kunal Kataria</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Saumil Nagpal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Raavi Jain</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Aryan Chowdhary</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2023">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Parv Jindal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+
+                    <!-- Batch of 2022 -->
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Khushi Gupta</h3>
+                            <span class="team-role">President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Akshat Karnani</h3>
+                            <span class="team-role">Vice President</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Aryan Bharadwaj</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Sudarsh Kansal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Anmol Bansal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Ishaan Jain</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Rachit Gupta</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Rinie Kaushal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                    <div class="team-card" data-category="2022">
+                        <div class="avatar-placeholder"></div>
+                        <div class="team-info">
+                            <h3 class="team-name">Rudra Agarwal</h3>
+                            <span class="team-role">Alumni Member</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="footer-logo">
+                    <div class="logo-placeholder">180</div>
+                    <span class="brand-name">180Degrees Consulting</span>
+                </a>
+                <p>Empowering social change through strategic consulting and developing the next generation of impact leaders.</p>
+                <span class="footer-motto">IDEATE. CONSULT. IMPACT.</span>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about-us.html">About Us</a></li>
+                    <li><a href="what-we-do.html">What We Do</a></li>
+                    <li><a href="achievements.html">Achievements</a></li>
+                    <li><a href="team.html">Team</a></li>
+                    <li><a href="alumni.html">Alumni</a></li>
+                    <li><a href="contact-us.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h3>Get In Touch</h3>
+                <span><strong>Address:</strong> Shaheed Sukhdev College of Business Studies, PSP Area – IV, Sector-16, Rohini, Delhi - 110089</span>
+                <span><strong>Email:</strong> <a href="mailto:cbs@180dc.org" style="color: var(--primary-light);">cbs@180dc.org</a></span>
+                <span><strong>Contacts:</strong> Aishwarya Pande (95999 26679)<br>Vanya Aggarwal (79734 53784)</span>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 180 Degrees Consulting SSCBS. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
