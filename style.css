@@ -206,34 +206,47 @@ a {
 
 .hero-home {
     min-height: calc(100vh - 80px);
-    padding: 6rem 2rem 4rem 2rem;
+    padding: 6rem 2rem;
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('hero-team.jpg') no-repeat center center/contain;
+    background-color: var(--primary-dark);
 }
 
 .hero-home .hero-container {
-    max-width: 1000px;
+    max-width: 850px;
 }
 
-.hero-image-wrapper {
-    margin-top: 3rem;
-    width: 100%;
-    max-width: 900px;
+.hero-content-card {
+    background: rgba(10, 20, 40, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 3.5rem 3rem;
     border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: var(--transition);
-}
-
-.hero-image-wrapper:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-}
-
-.hero-img-full {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     width: 100%;
-    height: auto;
-    display: block;
-    object-fit: contain;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content-card {
+        padding: 2.5rem 1.5rem;
+        gap: 1.25rem;
+    }
 }
 
 .hero-container {
