@@ -57,15 +57,15 @@ a {
     left: 0;
     width: 100%;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(15, 29, 58, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(var(--dark-rgb), 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     transition: var(--transition);
 }
 
 .header.scrolled {
-    background: #ffffff;
+    background: #0f1d3a;
     box-shadow: var(--shadow-md);
 }
 
@@ -144,13 +144,13 @@ a {
 .nav-link {
     font-size: 0.95rem;
     font-weight: 500;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.75);
     position: relative;
     padding: 0.25rem 0;
 }
 
 .nav-link:hover, .nav-link.active {
-    color: var(--primary);
+    color: #ffffff;
 }
 
 .nav-link::after {
@@ -160,7 +160,7 @@ a {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--primary);
+    background: #ffffff;
     transition: var(--transition);
 }
 
@@ -182,7 +182,7 @@ a {
     display: block;
     width: 25px;
     height: 2px;
-    background: var(--dark);
+    background: #ffffff;
     transition: var(--transition);
 }
 
@@ -802,10 +802,10 @@ a {
         top: 100%;
         left: 0;
         width: 100%;
-        background: white;
+        background: #0f1d3a;
         padding: 2rem;
         box-shadow: var(--shadow-lg);
-        border-top: 1px solid var(--border);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         gap: 1.5rem;
         align-items: flex-start;
     }
