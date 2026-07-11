@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Hub | Grandeur SSCBS</title>
+    <meta name="description" content="Access reports, publications, casebooks, and business frameworks produced by the members of Grandeur, Consulting & Knowledge Cell of SSCBS.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo-container" id="logo-link">
+                <img src="logo.png" alt="Grandeur - The Consulting and Knowledge Cell of SSCBS" class="logo-img">
+            </a>
+            <button class="menu-toggle" aria-label="Toggle Navigation" id="menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="about-us.html" class="nav-link">About Us</a></li>
+                <li><a href="what-we-do.html" class="nav-link">What We Do</a></li>
+                <li><a href="knowledge-hub.html" class="nav-link active">Knowledge Hub</a></li>
+                <li><a href="achievements.html" class="nav-link">Achievements</a></li>
+                <li><a href="team.html" class="nav-link">Team</a></li>
+                <li><a href="alumni.html" class="nav-link">Alumni</a></li>
+                <li><a href="contact-us.html" class="nav-link">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-container">
+                <h1>Knowledge Hub</h1>
+                <p>Reports, publications, casebooks, and frameworks produced by Grandeur members. Free and open-access for the entire student and consulting community.</p>
+            </div>
+        </section>
+
+        <!-- Stats and Filter Section -->
+        <section class="section">
+            <div class="section-container">
+                <div class="resources-stats">
+                    <div>
+                        <h2>Open-Access Research and Resources</h2>
+                        <p>Everything here is compiled through live client engagements, competition cases, and deep-dive industry reviews.</p>
+                    </div>
+                    <div class="resources-badge" id="resource-count-badge">
+                        12 Resources Available
+                    </div>
+                </div>
+
+                <div class="filter-container">
+                    <button class="filter-btn resource-filter-btn active" data-filter="all">All Resources</button>
+                    <button class="filter-btn resource-filter-btn" data-filter="Industry Report">Industry Reports</button>
+                    <button class="filter-btn resource-filter-btn" data-filter="Company Report">Company Reports</button>
+                </div>
+
+                <div class="search-bar" style="margin-bottom: 3rem;">
+                    <input type="text" class="search-input resource-search-input" placeholder="Search publications by title or sector...">
+                </div>
+
+                <div class="grid grid-3" id="resources-list-grid">
+                    <!-- Resource 1 -->
+                    <div class="resource-card-item" data-category="Industry Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Industry Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Industry Primer 2026</h3>
+                            <p>Grandeur's flagship industry primer covering key sectors, business frameworks, and market insights to prepare you for consulting and case competitions.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Grandeur Cell</span>
+                                <a href="#" onclick="alert('Industry Primer 2026 is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 2 -->
+                    <div class="resource-card-item" data-category="Industry Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Industry Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Indian EdTech Industry Report</h3>
+                            <p>A comprehensive analysis of India's EdTech revolution - covering market growth, post-pandemic hurdles, sector snapshots, evolving tech landscape, investor trends, and future outlook. January 2025.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('Indian EdTech Industry Report is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 3 -->
+                    <div class="resource-card-item" data-category="Industry Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Industry Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Pharmaceutical Industry Analysis</h3>
+                            <p>An in-depth analysis of India's pharmaceutical sector covering SWOT, Porter's Five Forces, major trends, COVID impact, revenue model, government initiatives, and key market players.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('Pharmaceutical Industry Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 4 -->
+                    <div class="resource-card-item" data-category="Company Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Company Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Meesho - Company Analysis</h3>
+                            <p>A detailed breakdown of Meesho's journey from Fashnear to a social commerce giant - covering its business model, revenue streams, financials, competitor analysis, and traffic rankings.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('Meesho Company Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 5 -->
+                    <div class="resource-card-item" data-category="Company Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Company Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Meta - Company Analysis</h3>
+                            <p>A structured company analysis of Meta Platforms covering its timeline, business and revenue models, industry analysis, SWOT, future outlook, and financial statements.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('Meta Company Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 6 -->
+                    <div class="resource-card-item" data-category="Company Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Company Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Groww - Company Report</h3>
+                            <p>An analysis of Groww's business model, PESTEL framework, competitor landscape, and future prospects in India's share market and FinTech sector.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('Groww Company Report is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 7 -->
+                    <div class="resource-card-item" data-category="Industry Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Industry Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>AI in Health Industry</h3>
+                            <p>A deep dive into how AI is transforming healthcare — covering medical diagnosis, drug discovery, clinical operations, mental health applications, regulatory landscape, and market growth projections to 2030.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('AI in Health Industry Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 8 -->
+                    <div class="resource-card-item" data-category="Industry Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Industry Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>E-Commerce Industry Analysis</h3>
+                            <p>A comprehensive look at India's e-commerce sector — Porter's Five Forces, SWOT analysis, revenue models, growth trends, COVID-19 impact, government initiatives, and setup cost breakdown.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('E-Commerce Industry Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 9 -->
+                    <div class="resource-card-item" data-category="Industry Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Industry Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Gaming Industry Analysis</h3>
+                            <p>An in-depth analysis of the global gaming industry covering market size projections to 2030, Porter's Five Forces, revenue models, setup costs, key investments, and the impact of COVID-19 on consumer behaviour.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('Gaming Industry Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 10 -->
+                    <div class="resource-card-item" data-category="Company Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Company Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>Flipkart - Company Analysis</h3>
+                            <p>A detailed profile of India's largest e-commerce retailer — founders' journey, SWOT analysis, competitive strengths, supply chain breakdown, and industry comparison against Amazon and IndiaMart.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('Flipkart Company Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 11 -->
+                    <div class="resource-card-item" data-category="Company Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Company Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>GlaxoSmithKline (GSK) - Company Analysis</h3>
+                            <p>A structured analysis of GSK covering its history, CEO profile, SWOT, value chain (primary and secondary activities), competitive advantages, and group turnover breakdown by business and geography.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('GSK Company Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource 12 -->
+                    <div class="resource-card-item" data-category="Company Report">
+                        <div class="resource-card">
+                            <div class="resource-meta">
+                                <span class="resource-tag">Company Report</span>
+                                <span class="resource-type">PDF</span>
+                            </div>
+                            <h3>MediBuddy - Company Analysis</h3>
+                            <p>An analysis of India's leading digital healthcare platform — founders, history, services offered, SWOT, funding rounds, competitive landscape, and comparison against Practo, Tata 1mg, and Netmeds.</p>
+                            <div class="resource-footer">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Research Dept</span>
+                                <a href="#" onclick="alert('MediBuddy Company Analysis is a placeholder.'); return false;" class="resource-link">Read Here →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="section" style="background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), rgba(var(--primary-rgb), 0.02)); text-align: center;">
+            <div class="section-container" style="max-width: 800px; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+                <h2>Contribute to the Hub</h2>
+                <p>Grandeur members regularly research and publish insights on developing industries and market strategies. To request a specific sector report or collaborate, get in touch with us.</p>
+                <a href="contact-us.html" class="btn btn-primary">Submit Your Request</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="footer-logo">
+                    <img src="logo-white.png" alt="Grandeur" class="footer-logo-img">
+                </a>
+                <p>Empowering social change through strategic consulting and developing the next generation of impact leaders.</p>
+                <span class="footer-motto">IDEATE. CONSULT. IMPACT.</span>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about-us.html">About Us</a></li>
+                    <li><a href="what-we-do.html">What We Do</a></li>
+                    <li><a href="knowledge-hub.html">Knowledge Hub</a></li>
+                    <li><a href="achievements.html">Achievements</a></li>
+                    <li><a href="team.html">Team</a></li>
+                    <li><a href="alumni.html">Alumni</a></li>
+                    <li><a href="contact-us.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h3>Get In Touch</h3>
+                <span><strong>Address:</strong> Shaheed Sukhdev College of Business Studies, PSP Area – IV, Sector-16, Rohini, Delhi - 110089</span>
+                <span><strong>Email:</strong> <a href="mailto:grandeur.consulting@sscbsdu.ac.in" style="color: var(--primary-light);">grandeur.consulting@sscbsdu.ac.in</a></span>
+                <span><strong>Contacts:</strong> Sambhav Jain (Coordinator)<br>Shrivats Tiwari (Coordinator)</span>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Grandeur SSCBS. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

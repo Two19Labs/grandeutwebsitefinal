@@ -198,4 +198,110 @@ document.addEventListener('DOMContentLoaded', () => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
     }
+
+    // 6. Achievements Slideshow
+    const slidesWrapper = document.querySelector('.slides-wrapper');
+    const slides = document.querySelectorAll('.achieve-slide');
+    const prevBtn = document.querySelector('.slider-btn.prev');
+    const nextBtn = document.querySelector('.slider-btn.next');
+    const dotsContainer = document.querySelector('.slider-dots');
+
+    if (slidesWrapper && slides.length > 0) {
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        // Create dots dynamically
+        slides.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.className = `slider-dot ${idx === 0 ? 'active' : ''}`;
+            dot.setAttribute('data-slide', idx);
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.slider-dot');
+
+        const updateSlider = (idx) => {
+            slidesWrapper.style.transform = `translateX(-${idx * 25}%)`;
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[idx].classList.add('active');
+            currentSlide = idx;
+        };
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                let next = (currentSlide + 1) % totalSlides;
+                updateSlider(next);
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                let prev = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateSlider(prev);
+            });
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.getAttribute('data-slide'), 10);
+                updateSlider(idx);
+            });
+        });
+
+        // Auto-rotation every 6 seconds
+        setInterval(() => {
+            let next = (currentSlide + 1) % totalSlides;
+            updateSlider(next);
+        }, 6000);
+    }
+
+    // 7. Knowledge Hub Resources Filtering & Searching
+    const resourceFilterButtons = document.querySelectorAll('.resource-filter-btn');
+    const resourceCards = document.querySelectorAll('.resource-card-item');
+    const resourceSearchInput = document.querySelector('.resource-search-input');
+
+    const filterResources = () => {
+        const activeFilterBtn = document.querySelector('.resource-filter-btn.active');
+        const filterValue = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
+        const searchValue = resourceSearchInput ? resourceSearchInput.value.toLowerCase().trim() : '';
+
+        let visibleCount = 0;
+
+        resourceCards.forEach(card => {
+            const category = card.getAttribute('data-category');
+            const title = card.querySelector('h3') ? card.querySelector('h3').textContent.toLowerCase() : '';
+            const description = card.querySelector('p') ? card.querySelector('p').textContent.toLowerCase() : '';
+
+            const matchesFilter = filterValue === 'all' || category === filterValue;
+            const matchesSearch = title.includes(searchValue) || description.includes(searchValue);
+
+            if (matchesFilter && matchesSearch) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Update counts in UI if elements exist
+        const countBadge = document.getElementById('resource-count-badge');
+        if (countBadge) {
+            countBadge.textContent = `${visibleCount} ${visibleCount === 1 ? 'Resource' : 'Resources'} Available`;
+        }
+    };
+
+    if (resourceFilterButtons.length > 0) {
+        resourceFilterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                resourceFilterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                filterResources();
+            });
+        });
+    }
+
+    if (resourceSearchInput) {
+        resourceSearchInput.addEventListener('input', filterResources);
+    }
 });
+
