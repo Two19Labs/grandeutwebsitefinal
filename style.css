@@ -151,7 +151,7 @@ a {
 }
 
 .nav-link:hover, .nav-link.active {
-    color: #2791c5;
+    color: var(--primary);
 }
 
 .nav-link::after {
@@ -161,7 +161,7 @@ a {
     left: 0;
     width: 0;
     height: 2px;
-    background: #2791c5;
+    background: var(--primary);
     transition: var(--transition);
 }
 
