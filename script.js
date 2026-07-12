@@ -263,5 +263,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resourceSearchInput) {
         resourceSearchInput.addEventListener('input', filterResources);
     }
+
+    // 8. Alumni Filtering & Searching
+    const alumniFilterButtons = document.querySelectorAll('.alumni-filter-btn');
+    const alumniCards = document.querySelectorAll('#alumni-grid .team-card');
+    const alumniSearchInput = document.querySelector('.alumni-search-input');
+
+    const filterAlumni = () => {
+        const activeFilterBtn = document.querySelector('.alumni-filter-btn.active');
+        const filterValue = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
+        const searchValue = alumniSearchInput ? alumniSearchInput.value.toLowerCase().trim() : '';
+
+        alumniCards.forEach(card => {
+            const category = card.getAttribute('data-category');
+            const name = card.querySelector('.team-name') ? card.querySelector('.team-name').textContent.toLowerCase() : '';
+            const roles = Array.from(card.querySelectorAll('.team-role')).map(role => role.textContent.toLowerCase()).join(' ');
+
+            const matchesFilter = filterValue === 'all' || category === filterValue;
+            const matchesSearch = name.includes(searchValue) || roles.includes(searchValue);
+
+            if (matchesFilter && matchesSearch) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    };
+
+    if (alumniFilterButtons.length > 0) {
+        alumniFilterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                alumniFilterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                filterAlumni();
+            });
+        });
+    }
+
+    if (alumniSearchInput) {
+        alumniSearchInput.addEventListener('input', filterAlumni);
+    }
 });
 
