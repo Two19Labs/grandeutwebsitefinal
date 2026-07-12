@@ -303,5 +303,55 @@ document.addEventListener('DOMContentLoaded', () => {
     if (alumniSearchInput) {
         alumniSearchInput.addEventListener('input', filterAlumni);
     }
+
+    // 9. About Slider (Home Page Auto-Swiping Cards)
+    const aboutSlides = document.querySelectorAll('.about-slide');
+    const aboutDots = document.querySelectorAll('.about-slider-dot');
+    
+    if (aboutSlides.length > 0) {
+        let currentAboutSlide = 0;
+        let aboutInterval;
+
+        const updateAboutSlider = (idx) => {
+            aboutSlides.forEach((slide, sIdx) => {
+                if (sIdx === idx) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            aboutDots.forEach((dot, dIdx) => {
+                if (dIdx === idx) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            currentAboutSlide = idx;
+        };
+
+        const startAboutTimer = () => {
+            clearInterval(aboutInterval);
+            aboutInterval = setInterval(() => {
+                let next = (currentAboutSlide + 1) % aboutSlides.length;
+                updateAboutSlider(next);
+            }, 3000);
+        };
+
+        // Add dot click handlers
+        aboutDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.getAttribute('data-slide'), 10);
+                updateAboutSlider(idx);
+                // Restart timer so it doesn't swipe immediately after manual click
+                startAboutTimer();
+            });
+        });
+
+        // Initialize timer
+        startAboutTimer();
+    }
 });
 
