@@ -1207,3 +1207,96 @@ a {
     font-size: 0.9rem;
 }
 
+/* Collaborators & Clients Marquee Slider */
+.marquee-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 2.5rem 0;
+    background-color: var(--light-bg);
+}
+
+.mask-horizontal-fade {
+    mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+}
+
+.marquee-content {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    animation: marquee 30s linear infinite;
+}
+
+.marquee-content:hover {
+    animation-play-state: paused;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.collab-card {
+    margin: 0 1.25rem;
+    padding: 2.5rem 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-width: 280px;
+    height: 240px;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.collab-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(var(--primary-rgb), 0.3);
+}
+
+.collab-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    height: 110px;
+    width: 100%;
+}
+
+.collab-logo {
+    height: 100px;
+    width: 100px;
+    object-fit: contain;
+    transition: var(--transition);
+}
+
+.collab-logo.mamaearth {
+    height: 60px;
+    width: 60px;
+}
+
+.collab-logo.honasa {
+    height: 80px;
+    width: 80px;
+}
+
+.collab-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dark);
+    font-family: 'Outfit', sans-serif;
+    text-align: center;
+}
+
+
