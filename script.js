@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Team Filtering & Searching
     const filterButtons = document.querySelectorAll('.filter-btn');
-    const teamCards = document.querySelectorAll('.team-card');
     const searchInput = document.querySelector('.search-input');
 
     const filterTeam = () => {
@@ -77,18 +76,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const filterValue = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
         const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-        teamCards.forEach(card => {
-            const category = card.getAttribute('data-category');
-            const name = card.querySelector('.team-name') ? card.querySelector('.team-name').textContent.toLowerCase() : '';
-            const role = card.querySelector('.team-role') ? card.querySelector('.team-role').textContent.toLowerCase() : '';
+        const sections = document.querySelectorAll('.hierarchy-section');
+        sections.forEach(section => {
+            let visibleCardsInSection = 0;
+            const cards = section.querySelectorAll('.team-card');
+            
+            cards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                const name = card.querySelector('.team-name') ? card.querySelector('.team-name').textContent.toLowerCase() : '';
+                const role = card.querySelector('.team-role') ? card.querySelector('.team-role').textContent.toLowerCase() : '';
 
-            const matchesFilter = filterValue === 'all' || category === filterValue;
-            const matchesSearch = name.includes(searchValue) || role.includes(searchValue);
+                const matchesFilter = filterValue === 'all' || category === filterValue;
+                const matchesSearch = name.includes(searchValue) || role.includes(searchValue);
 
-            if (matchesFilter && matchesSearch) {
-                card.style.display = 'block';
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = 'block';
+                    visibleCardsInSection++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Toggle section visibility based on card matches
+            if (visibleCardsInSection > 0) {
+                section.style.display = 'block';
             } else {
-                card.style.display = 'none';
+                section.style.display = 'none';
             }
         });
     };
