@@ -67,59 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(statsSection);
     }
 
-    // 4. Team Filtering & Searching
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const searchInput = document.querySelector('.search-input');
-
-    const filterTeam = () => {
-        const activeFilterBtn = document.querySelector('.filter-btn.active');
-        const filterValue = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
-        const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-        const sections = document.querySelectorAll('.hierarchy-section');
-        sections.forEach(section => {
-            let visibleCardsInSection = 0;
-            const cards = section.querySelectorAll('.team-card');
-            
-            cards.forEach(card => {
-                const category = card.getAttribute('data-category');
-                const name = card.querySelector('.team-name') ? card.querySelector('.team-name').textContent.toLowerCase() : '';
-                const role = card.querySelector('.team-role') ? card.querySelector('.team-role').textContent.toLowerCase() : '';
-
-                const matchesFilter = filterValue === 'all' || category === filterValue;
-                const matchesSearch = name.includes(searchValue) || role.includes(searchValue);
-
-                if (matchesFilter && matchesSearch) {
-                    card.style.display = 'block';
-                    visibleCardsInSection++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            // Toggle section visibility based on card matches
-            if (visibleCardsInSection > 0) {
-                section.style.display = 'block';
-            } else {
-                section.style.display = 'none';
-            }
-        });
-    };
-
-    if (filterButtons.length > 0) {
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                filterTeam();
-            });
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('input', filterTeam);
-    }
-
     // 5. Contact Form Validation
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
