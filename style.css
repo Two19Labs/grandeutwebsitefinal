@@ -207,7 +207,7 @@ a {
 .hero-home {
     min-height: calc(100vh - 80px);
     padding: 6rem 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('hero-team.jpg') no-repeat center center/contain;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('hero-team.jpg') no-repeat center center/cover;
     background-color: #000000;
 }
 
