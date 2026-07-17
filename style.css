@@ -1753,4 +1753,254 @@ a {
     }
 }
 
+/* ==========================================
+   NEW SERVICE CARDS & INTERACTIVE MARQUEE
+   ========================================== */
+
+/* Service Cards Bento Grid & Design */
+.services-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.service-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px; /* Less boxy, smooth curves */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                border-color 0.3s ease;
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(15, 29, 58, 0.08);
+    border-color: rgba(var(--primary-rgb), 0.25);
+}
+
+.service-image-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.service-placeholder-gradient {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.service-card:hover .service-placeholder-gradient {
+    transform: scale(1.05);
+}
+
+/* Grid blueprint overlay for premium feel */
+.service-image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Diagonal scanning light animation */
+.service-image-container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 55%
+    );
+    transform: rotate(45deg);
+    transition: transform 0.6s ease;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.service-card:hover .service-image-container::after {
+    transform: translate(25%, 25%) rotate(45deg);
+}
+
+/* Vibrant abstract gradient backgrounds */
+.gradient-1 { background: linear-gradient(135deg, #0f1d3a 0%, #1e40af 50%, #3b82f6 100%); } /* Market Research */
+.gradient-2 { background: linear-gradient(135deg, #065f46 0%, #059669 50%, #34d399 100%); } /* Financial Planning */
+.gradient-3 { background: linear-gradient(135deg, #701a75 0%, #a21caf 50%, #f472b6 100%); } /* Growth Marketing */
+.gradient-4 { background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #a78bfa 100%); } /* Strategic Advisory */
+.gradient-5 { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #60a5fa 100%); } /* Sector Analysis */
+.gradient-6 { background: linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #fb923c 100%); } /* Operational Excellence */
+.gradient-7 { background: linear-gradient(135deg, #111827 0%, #374151 50%, #9ca3af 100%); } /* Publications & Research */
+
+/* Abstract shapes inside the image container */
+.service-placeholder-svg {
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    opacity: 0.25;
+    transform: rotate(-10deg);
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.service-card:hover .service-placeholder-svg {
+    transform: rotate(-5deg) scale(1.1);
+}
+
+.service-card-icon-floating {
+    font-size: 3.5rem;
+    z-index: 4;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.service-card:hover .service-card-icon-floating {
+    transform: scale(1.15) translateY(-5px);
+}
+
+.service-card-content {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.service-card-content h3 {
+    font-size: 1.3rem;
+    color: var(--dark);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+.service-card:hover .service-card-content h3 {
+    color: var(--primary-light);
+}
+
+.service-card-content p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.service-card-footer {
+    margin-top: auto;
+}
+
+.service-link {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.service-link i {
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-link {
+    color: var(--primary-light);
+}
+
+.service-card:hover .service-link i {
+    transform: translateX(6px);
+}
+
+/* Bento Grid Spans for index.html */
+@media (min-width: 992px) {
+    .service-card-wide {
+        grid-column: span 2;
+        flex-direction: row;
+    }
+    
+    .service-card-wide .service-image-container {
+        width: 45%;
+        height: 100%;
+    }
+    
+    .service-card-wide .service-card-content {
+        width: 55%;
+    }
+}
+
+@media (max-width: 991px) {
+    .services-bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .services-bento-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Clients Marquee Updates */
+.marquee-container {
+    overflow-x: auto;
+    cursor: grab;
+    user-select: none;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.marquee-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.marquee-container:active {
+    cursor: grabbing;
+}
+
+/* Timeline Circle Symmetry Fixes */
+.timeline-item.left::after {
+    right: -10px;
+    left: auto;
+}
+
+.timeline-item.right::after {
+    left: -10px;
+    right: auto;
+}
+
+/* Mobile Timeline Align Fix */
+@media (max-width: 768px) {
+    .timeline::after {
+        left: 29px !important;
+    }
+    .timeline-item::after,
+    .timeline-item.right::after {
+        left: 21px !important;
+        right: auto !important;
+    }
+}
+
+
 

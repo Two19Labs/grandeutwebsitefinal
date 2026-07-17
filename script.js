@@ -353,5 +353,118 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize timer
         startAboutTimer();
     }
+
+    // 10. Interactive Collaborators Marquee
+    const marqueeContainer = document.querySelector('.marquee-container');
+    const marqueeContent = document.querySelector('.marquee-content');
+
+    if (marqueeContainer && marqueeContent) {
+        // Remove CSS animation so JS can control scroll position
+        marqueeContent.classList.remove('autoplay-css');
+        
+        let isDown = false;
+        let startX;
+        let scrollLeftVal;
+        let autoScrollSpeed = 0.8; // Pixels per frame
+        let isInteracting = false;
+        let interactionTimeout;
+        
+        // We have duplicated elements, so half of scrollWidth is the loop point
+        let halfWidth = marqueeContent.scrollWidth / 2;
+        
+        // Recalculate widths on load and resize
+        const recalculateWidth = () => {
+            halfWidth = marqueeContent.scrollWidth / 2;
+        };
+        window.addEventListener('load', recalculateWidth);
+        window.addEventListener('resize', recalculateWidth);
+        
+        // Auto-scroll loop
+        function step() {
+            if (!isDown && !isInteracting) {
+                marqueeContainer.scrollLeft += autoScrollSpeed;
+                
+                // Loop scroll position
+                if (marqueeContainer.scrollLeft >= halfWidth) {
+                    marqueeContainer.scrollLeft = 0;
+                }
+            }
+            requestAnimationFrame(step);
+        }
+        
+        // Start auto-scroll
+        requestAnimationFrame(step);
+        
+        // Reset interaction flag after a delay
+        function resetInteractionTimer() {
+            clearTimeout(interactionTimeout);
+            interactionTimeout = setTimeout(() => {
+                isInteracting = false;
+            }, 3000); // Resume auto-scroll after 3 seconds of inactivity
+        }
+        
+        // Drag-to-scroll event handlers
+        marqueeContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            isInteracting = true;
+            startX = e.pageX - marqueeContainer.offsetLeft;
+            scrollLeftVal = marqueeContainer.scrollLeft;
+            clearTimeout(interactionTimeout);
+        });
+        
+        marqueeContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+            if (isInteracting) resetInteractionTimer();
+        });
+        
+        marqueeContainer.addEventListener('mouseup', () => {
+            isDown = false;
+            if (isInteracting) resetInteractionTimer();
+        });
+        
+        marqueeContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - marqueeContainer.offsetLeft;
+            const walk = (x - startX) * 1.5; // Scroll speed multiplier
+            let targetScroll = scrollLeftVal - walk;
+            
+            // Loop bounds while dragging
+            if (targetScroll >= halfWidth) {
+                targetScroll = targetScroll - halfWidth;
+                startX = x; // Reset start coordinates to prevent jump
+                scrollLeftVal = targetScroll;
+            } else if (targetScroll <= 0) {
+                targetScroll = halfWidth + targetScroll;
+                startX = x;
+                scrollLeftVal = targetScroll;
+            }
+            
+            marqueeContainer.scrollLeft = targetScroll;
+        });
+        
+        // Mouse wheel horizontal scrolling
+        marqueeContainer.addEventListener('wheel', (e) => {
+            isInteracting = true;
+            // Check if user is scrolling vertically or horizontally
+            const scrollDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            
+            let targetScroll = marqueeContainer.scrollLeft + scrollDelta;
+            
+            // Loop bounds while wheel scrolling
+            if (targetScroll >= halfWidth) {
+                targetScroll = targetScroll - halfWidth;
+            } else if (targetScroll <= 0) {
+                targetScroll = halfWidth + targetScroll;
+            }
+            
+            marqueeContainer.scrollLeft = targetScroll;
+            resetInteractionTimer();
+            e.preventDefault(); // Prevent page scroll
+        }, { passive: false });
+    }
 });
+
+
+
 
