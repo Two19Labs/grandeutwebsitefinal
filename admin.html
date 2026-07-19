@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console | Grandeur SSCBS</title>
+    <meta name="description" content="Admin management console for Grandeur SSCBS website.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+    <!-- Top Admin Header -->
+    <header class="admin-header">
+        <div class="admin-header-container">
+            <a href="index.html" class="admin-logo">
+                <img src="logo-white.png" alt="Grandeur SSCBS" class="admin-logo-img">
+                <span class="admin-badge">Admin Portal</span>
+            </a>
+            <div class="admin-user-actions" id="admin-user-actions" style="display: none;">
+                <span class="admin-session-status"><span class="status-indicator online"></span> Authenticated</span>
+                <a href="index.html" class="btn btn-outline btn-sm" target="_blank" id="btn-view-site">View Website ↗</a>
+                <button class="btn btn-primary btn-sm" id="btn-logout">Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <!-- 1. LOGIN VIEW -->
+        <section class="admin-auth-section" id="login-view">
+            <div class="admin-auth-card">
+                <div class="admin-auth-header">
+                    <img src="logo.png" alt="Grandeur Logo" class="auth-logo">
+                    <h2>Grandeur Management Console</h2>
+                    <p>Enter the admin passcode to manage website content, recruitment drives, and cell members.</p>
+                </div>
+
+                <form id="admin-login-form" class="admin-auth-form" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="admin-passcode">Admin Passcode</label>
+                        <div class="passcode-input-wrapper">
+                            <input type="password" id="admin-passcode" class="form-input" placeholder="Enter passcode" required autofocus autocomplete="current-password">
+                            <button type="button" class="btn-toggle-pass" id="toggle-pass-visibility" aria-label="Toggle Password Visibility">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="auth-error-alert" id="auth-error" style="display: none;">
+                        ⚠️ Invalid passcode. Please try again.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-login">Sign In to Console</button>
+                    
+                    <div class="auth-hint-box">
+                        <small>💡 <strong>Default Demo Passcode:</strong> <code>123456</code></small>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2. DASHBOARD VIEW -->
+        <section class="admin-dashboard-section" id="dashboard-view" style="display: none;">
+            <div class="admin-dashboard-layout">
+                <!-- Sidebar -->
+                <aside class="admin-sidebar">
+                    <nav class="admin-nav">
+                        <button class="admin-nav-item active" data-tab="tab-overview">
+                            <span class="nav-icon">📊</span> Overview
+                        </button>
+                        <button class="admin-nav-item" data-tab="tab-recruitment">
+                            <span class="nav-icon">📢</span> Recruitment & Banners
+                        </button>
+                        <button class="admin-nav-item" data-tab="tab-team">
+                            <span class="nav-icon">👥</span> Team Members
+                        </button>
+                        <button class="admin-nav-item" data-tab="tab-knowledge">
+                            <span class="nav-icon">📚</span> Knowledge Hub
+                        </button>
+                        <button class="admin-nav-item" data-tab="tab-achievements">
+                            <span class="nav-icon">🏆</span> Achievements
+                        </button>
+                        <button class="admin-nav-item" data-tab="tab-inbox">
+                            <span class="nav-icon">📬</span> Contact Inbox <span class="badge-count" id="inbox-count-badge">0</span>
+                        </button>
+                    </nav>
+                    
+                    <div class="sidebar-footer-info">
+                        <p><strong>Grandeur CMS v1.0</strong></p>
+                        <small>Supabase Connector Ready</small>
+                    </div>
+                </aside>
+
+                <!-- Content Panels -->
+                <div class="admin-content-area">
+                    
+                    <!-- TAB 1: OVERVIEW -->
+                    <div class="tab-panel active" id="tab-overview">
+                        <div class="panel-header">
+                            <div>
+                                <h1>Dashboard Overview</h1>
+                                <p>Quick summary of Grandeur website status and active controls.</p>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon icon-gold">📢</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Recruitment Status</span>
+                                    <h3 class="stat-value" id="stat-recruitment-status">Closed</h3>
+                                    <span class="stat-sub" id="stat-recruitment-sub">No active drive</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-blue">👥</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Active Team Members</span>
+                                    <h3 class="stat-value" id="stat-team-count">0</h3>
+                                    <span class="stat-sub">Across all tiers</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-green">📚</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Knowledge Primers</span>
+                                    <h3 class="stat-value" id="stat-primers-count">0</h3>
+                                    <span class="stat-sub">Published research</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-purple">📬</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Contact Inquiries</span>
+                                    <h3 class="stat-value" id="stat-inbox-count">0</h3>
+                                    <span class="stat-sub">Messages received</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overview-quick-actions">
+                            <h2>Quick Actions</h2>
+                            <div class="quick-buttons-row">
+                                <button class="btn btn-outline" id="quick-toggle-recruitment">🔄 Toggle Recruitment ON/OFF</button>
+                                <button class="btn btn-primary" id="quick-add-member">➕ Add New Team Member</button>
+                                <a href="index.html" target="_blank" class="btn btn-outline">🌐 Preview Website</a>
+                            </div>
+                        </div>
+
+                        <div class="supabase-status-banner">
+                            <div class="banner-icon">⚡</div>
+                            <div>
+                                <h4>Backend Integration Notice</h4>
+                                <p>This console is operating on real-time client state with persistence enabled. It is fully pre-configured to sync seamlessly with Supabase once your API credentials are linked.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: RECRUITMENT & BANNERS -->
+                    <div class="tab-panel" id="tab-recruitment">
+                        <div class="panel-header">
+                            <div>
+                                <h1>Recruitment & Global Announcement Settings</h1>
+                                <p>Control recruitment forms, active status banners, and website header notices.</p>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3>Recruitment Portal Status</h3>
+                                    <p>Toggle whether Grandeur is currently accepting new member applications.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="switch-recruitment-active">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="card-body">
+                                <form id="form-recruitment-settings">
+                                    <div class="form-group">
+                                        <label for="recruitment-title">Drive / Campaign Title</label>
+                                        <input type="text" id="recruitment-title" class="form-input" placeholder="e.g. Grandeur Recruitment Drive 2026">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="recruitment-description">Announcement Summary</label>
+                                        <textarea id="recruitment-description" class="form-textarea" rows="3" placeholder="Brief instructions or message for applicants..."></textarea>
+                                    </div>
+                                    <div class="grid grid-2" style="gap: 1.5rem;">
+                                        <div class="form-group">
+                                            <label for="recruitment-form-url">Application Link (Google Form / Unstop URL)</label>
+                                            <input type="url" id="recruitment-form-url" class="form-input" placeholder="https://forms.google.com/...">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="recruitment-deadline">Deadline Text / Date</label>
+                                            <input type="text" id="recruitment-deadline" class="form-input" placeholder="e.g. August 15, 2026 - 11:59 PM IST">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="btn-save-recruitment">Save Recruitment Settings</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="admin-card" style="margin-top: 2rem;">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3>Global Header Announcement Banner</h3>
+                                    <p>Display an alert bar at the very top of all website pages.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="switch-banner-active">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="card-body">
+                                <form id="form-banner-settings">
+                                    <div class="form-group">
+                                        <label for="banner-text">Banner Announcement Message</label>
+                                        <input type="text" id="banner-text" class="form-input" placeholder="e.g. 🚀 Grandeur Recruitments 2026 are officially open!">
+                                    </div>
+                                    <div class="grid grid-2" style="gap: 1.5rem;">
+                                        <div class="form-group">
+                                            <label for="banner-btn-text">Button Text</label>
+                                            <input type="text" id="banner-btn-text" class="form-input" placeholder="e.g. Apply Now">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="banner-btn-url">Button Link Target</label>
+                                            <input type="text" id="banner-btn-url" class="form-input" placeholder="e.g. contact-us.html or https://...">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="btn-save-banner">Save Announcement Banner</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: TEAM MEMBERS -->
+                    <div class="tab-panel" id="tab-team">
+                        <div class="panel-header flex-between">
+                            <div>
+                                <h1>Team Members Manager</h1>
+                                <p>Add, update, reorder, or remove team members across all organizational tiers.</p>
+                            </div>
+                            <button class="btn btn-primary" id="btn-open-add-member-modal">➕ Add New Member</button>
+                        </div>
+
+                        <!-- Filter Bar -->
+                        <div class="admin-filter-bar">
+                            <div class="filter-group">
+                                <label>Filter Tier:</label>
+                                <select id="filter-team-tier" class="form-select">
+                                    <option value="all">All Tiers</option>
+                                    <option value="faculty">Faculty In-Charge</option>
+                                    <option value="board">President & Vice President</option>
+                                    <option value="senior">Senior Consultants / Advisory</option>
+                                    <option value="junior">Junior Consultants / Members</option>
+                                </select>
+                            </div>
+                            <div class="search-group">
+                                <input type="text" id="search-team-input" class="form-input" placeholder="🔍 Search member by name or role...">
+                            </div>
+                        </div>
+
+                        <!-- Team Cards Table / List -->
+                        <div class="admin-card">
+                            <div class="table-responsive">
+                                <table class="admin-table" id="team-members-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Member</th>
+                                            <th>Role / Position</th>
+                                            <th>Tier Category</th>
+                                            <th>LinkedIn</th>
+                                            <th style="text-align: right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="team-table-body">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: KNOWLEDGE HUB -->
+                    <div class="tab-panel" id="tab-knowledge">
+                        <div class="panel-header flex-between">
+                            <div>
+                                <h1>Knowledge Hub & Primers</h1>
+                                <p>Manage research publications, sector primers, and consulting frameworks.</p>
+                            </div>
+                            <button class="btn btn-primary" id="btn-open-add-primer-modal">➕ Add New Primer</button>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Category</th>
+                                            <th>Date</th>
+                                            <th>Read Time</th>
+                                            <th style="text-align: right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="knowledge-table-body">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: ACHIEVEMENTS -->
+                    <div class="tab-panel" id="tab-achievements">
+                        <div class="panel-header flex-between">
+                            <div>
+                                <h1>Achievements & Competition Victories</h1>
+                                <p>Manage case fest podium finishes and national competitive awards.</p>
+                            </div>
+                            <button class="btn btn-primary" id="btn-open-add-achievement-modal">➕ Add Achievement</button>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Event / Host Institute</th>
+                                            <th>Position / Rank</th>
+                                            <th>Team Name</th>
+                                            <th>Year</th>
+                                            <th style="text-align: right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="achievements-table-body">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 6: INBOX -->
+                    <div class="tab-panel" id="tab-inbox">
+                        <div class="panel-header">
+                            <div>
+                                <h1>Contact Form Inquiries Inbox</h1>
+                                <p>View inquiries submitted by prospective clients, partners, and applicants.</p>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <div id="inbox-list-container">
+                                <!-- Rendered dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MEMBER MODAL -->
+    <div class="admin-modal-overlay" id="modal-member" style="display: none;">
+        <div class="admin-modal">
+            <div class="modal-header">
+                <h3 id="modal-member-title">Add Team Member</h3>
+                <button class="modal-close" id="btn-close-member-modal">&times;</button>
+            </div>
+            <form id="form-member-modal" onsubmit="return false;">
+                <input type="hidden" id="member-edit-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="member-name">Full Name *</label>
+                        <input type="text" id="member-name" class="form-input" placeholder="e.g. Sambhav Jain" required>
+                    </div>
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label for="member-role">Position / Role *</label>
+                            <input type="text" id="member-role" class="form-input" placeholder="e.g. President" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="member-tier">Tier Category *</label>
+                            <select id="member-tier" class="form-select" required>
+                                <option value="faculty">Faculty In-Charge</option>
+                                <option value="board">President & Vice President</option>
+                                <option value="senior">Senior Consultant</option>
+                                <option value="junior">Junior Consultant</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="member-photo">Photo URL (or placeholder path)</label>
+                        <input type="text" id="member-photo" class="form-input" placeholder="hero-team.jpg or https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="member-linkedin">LinkedIn Profile URL</label>
+                        <input type="url" id="member-linkedin" class="form-input" placeholder="https://linkedin.com/in/username">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-member-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-member">Save Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -463,7 +463,170 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault(); // Prevent page scroll
         }, { passive: false });
     }
+
+    // ----------------------------------------------------------------------
+    // 6. GRANDEUR CMS DYNAMIC SYNCHRONIZATION & ADMIN ACCESS SHORTCUT
+    // ----------------------------------------------------------------------
+
+    // Admin Access Keyboard Shortcut (Ctrl + Shift + A)
+    window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+            e.preventDefault();
+            window.location.href = 'admin.html';
+        }
+    });
+
+    function syncGrandeurCMS() {
+        const dataStr = localStorage.getItem('grandeur_admin_store');
+        if (!dataStr) return;
+
+        try {
+            const store = JSON.parse(dataStr);
+
+            // A. Global Banner Render
+            let bannerEl = document.getElementById('grandeur-global-banner');
+            if (store.banner && store.banner.active) {
+                if (!bannerEl) {
+                    bannerEl = document.createElement('div');
+                    bannerEl.id = 'grandeur-global-banner';
+                    bannerEl.className = 'global-announcement-banner';
+                    document.body.prepend(bannerEl);
+                }
+                const btnHtml = store.banner.btnText ? 
+                    `<a href="${store.banner.btnUrl || '#'}" class="banner-btn">${escapeHtml(store.banner.btnText)}</a>` : '';
+                bannerEl.innerHTML = `
+                    <div class="banner-content">
+                        <span>${escapeHtml(store.banner.text)}</span>
+                        ${btnHtml}
+                    </div>
+                `;
+            } else if (bannerEl) {
+                bannerEl.remove();
+            }
+
+            // B. Recruitment State Hooks
+            if (store.recruitment) {
+                const recElements = document.querySelectorAll('.recruitment-cta-btn, .recruitment-notice');
+                recElements.forEach(el => {
+                    if (store.recruitment.active) {
+                        el.style.display = 'inline-block';
+                        if (el.tagName === 'A' && store.recruitment.formUrl) {
+                            el.href = store.recruitment.formUrl;
+                        }
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+            }
+
+            // C. Dynamic Team Rendering on team.html
+            const teamHierarchy = document.querySelector('.team-hierarchy');
+            if (teamHierarchy && store.team && store.team.length > 0) {
+                renderDynamicTeamGrid(store.team, teamHierarchy);
+            }
+
+        } catch (e) {
+            console.error("CMS Sync Error:", e);
+        }
+    }
+
+    function renderDynamicTeamGrid(teamMembers, container) {
+        // Group by tier
+        const tiers = {
+            board: { title: "President & Vice President", members: [] },
+            senior: { title: "Senior Advisory & Consultants", members: [] },
+            junior: { title: "Junior Consultants & Members", members: [] }
+        };
+
+        teamMembers.forEach(m => {
+            if (tiers[m.tier]) {
+                tiers[m.tier].members.push(m);
+            }
+        });
+
+        // Build HTML
+        let html = '';
+        Object.keys(tiers).forEach(tierKey => {
+            const tierData = tiers[tierKey];
+            if (tierData.members.length > 0) {
+                html += `
+                    <div class="hierarchy-section" data-tier="${tierKey}" style="margin-bottom: 3rem;">
+                        <h4 class="tier-title" style="text-align: center; margin-bottom: 2rem; color: var(--gold, #d4af37); font-size: 1.5rem;">${tierData.title}</h4>
+                        <div class="team-grid tier-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto;">
+                            ${tierData.members.map(m => {
+                                const initials = m.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                                const avatarHtml = m.photo ? 
+                                    `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; border: 2px solid var(--gold, #d4af37);">` :
+                                    `<div class="avatar-placeholder" style="width: 100px; height: 100px; border-radius: 50%; background: #1e293b; color: #d4af37; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; margin: 0 auto 1rem; border: 2px solid #d4af37;">${initials}</div>`;
+
+                                const linkedinHtml = m.linkedin ? `
+                                    <div class="team-social" style="margin-top: 0.75rem;">
+                                        <a href="${escapeHtml(m.linkedin)}" class="social-link" target="_blank" aria-label="LinkedIn Profile" style="color: #d4af37;">
+                                            LinkedIn ↗
+                                        </a>
+                                    </div>
+                                ` : '';
+
+                                return `
+                                    <div class="team-card" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 1.75rem 1.25rem; text-align: center; transition: transform 0.3s ease;">
+                                        ${avatarHtml}
+                                        <div class="team-info">
+                                            <h3 class="team-name" style="font-size: 1.2rem; margin-bottom: 0.3rem;">${escapeHtml(m.name)}</h3>
+                                            <span class="team-role" style="color: #94a3b8; font-size: 0.9rem;">${escapeHtml(m.role)}</span>
+                                            ${linkedinHtml}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (html) container.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Contact form saver to CMS inbox
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            const nameVal = document.getElementById('name')?.value || '';
+            const emailVal = document.getElementById('email')?.value || '';
+            const subjectVal = document.getElementById('subject')?.value || 'General Inquiry';
+            const messageVal = document.getElementById('message')?.value || '';
+
+            if (nameVal && emailVal && messageVal) {
+                const dataStr = localStorage.getItem('grandeur_admin_store');
+                if (dataStr) {
+                    try {
+                        const store = JSON.parse(dataStr);
+                        if (!store.inbox) store.inbox = [];
+                        store.inbox.unshift({
+                            id: "in_" + Date.now(),
+                            name: nameVal,
+                            email: emailVal,
+                            subject: subjectVal,
+                            message: messageVal,
+                            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        });
+                        localStorage.setItem('grandeur_admin_store', JSON.stringify(store));
+                    } catch(err){}
+                }
+            }
+        });
+    }
+
+    // Execute sync
+    syncGrandeurCMS();
+    window.addEventListener('grandeur_store_updated', syncGrandeurCMS);
 });
+
 
 
 
