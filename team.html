@@ -85,6 +85,9 @@
                             };
 
                             members.forEach(m => {
+                                // Strictly skip any alumni member
+                                if (m.role && m.role.toLowerCase().includes('batch of')) return;
+
                                 const key = (m.tier || 'core').toLowerCase();
                                 if (tiers[key]) tiers[key].members.push(m);
                                 else tiers.core.members.push(m);
@@ -132,7 +135,7 @@
                         }
 
                         try {
-                            const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?select=*&order=created_at.asc', {
+                            const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?tier=neq.alumni&order=created_at.asc', {
                                 headers: {
                                     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
                                     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs'

@@ -13,11 +13,12 @@ const HEADERS = {
 };
 
 window.GrandeurDB = {
-    // 1. TEAM MEMBERS CRUD (Current Team)
+    // 1. TEAM MEMBERS CRUD (Current Team Only)
     async getTeamMembers() {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?tier=neq.board&order=created_at.asc`, { headers: HEADERS });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=*&order=created_at.asc`, { headers: HEADERS });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        return await res.json();
+        const rows = await res.json();
+        return (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
     },
 
     async insertTeamMember(data) {
@@ -178,12 +179,13 @@ window.GrandeurDB = {
         return res.ok;
     },
 
-    // 7. ALUMNI MEMBERS
+    // 7. ALUMNI MEMBERS (Alumni Only)
     async getAlumniMembers() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?tier=eq.board&order=created_at.asc`, { headers: HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=*&order=created_at.asc`, { headers: HEADERS });
             if (!res.ok) return [];
-            return await res.json();
+            const rows = await res.json();
+            return (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
         } catch(e) { return []; }
     },
 
@@ -216,4 +218,4 @@ window.GrandeurDB = {
     }
 };
 
-console.log("✅ GrandeurDB Native REST Engine loaded with Alumni module!");
+console.log("✅ GrandeurDB Engine loaded with Bulletproof Zero-Overlap Filter!");
