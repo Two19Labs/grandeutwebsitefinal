@@ -55,8 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const statNumbers = document.querySelectorAll('.stat-number[data-target]');
 
     if (statNumbers.length > 0) {
-        const countUp = (element) => {
-            if (element.dataset.animated) return;
+        // Set initial display to 0 immediately to prevent flash of final target numbers
+        statNumbers.forEach(element => {
+            const prefix = element.getAttribute('data-prefix') || '';
+            const suffix = element.getAttribute('data-suffix') || '';
+            element.textContent = prefix + '0' + suffix;
+        });
+
+        const animateCounter = (element) => {
+            if (element.dataset.animated === "true") return;
             element.dataset.animated = "true";
 
             const targetAttr = element.getAttribute('data-target');
@@ -64,29 +71,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = parseInt(targetAttr, 10);
             if (isNaN(target)) return;
 
-            const duration = 2000; // ms
-            const stepTime = 30; // ms
-            const steps = duration / stepTime;
-            const increment = target / steps;
-            let current = 0;
+            const prefix = element.getAttribute('data-prefix') || '';
+            const suffix = element.getAttribute('data-suffix') || '';
+            const duration = 1800; // ms
+            let startTime = null;
 
-            element.textContent = '0' + (element.getAttribute('data-suffix') || '');
+            const step = (timestamp) => {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease-out cubic: starts fast and smoothly slows down at the target
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentCount = Math.floor(easeOut * target);
 
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    element.textContent = target.toLocaleString() + (element.getAttribute('data-suffix') || '');
-                    clearInterval(timer);
+                element.textContent = prefix + currentCount.toLocaleString() + suffix;
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
                 } else {
-                    element.textContent = Math.floor(current).toLocaleString() + (element.getAttribute('data-suffix') || '');
+                    element.textContent = prefix + target.toLocaleString() + suffix;
                 }
-            }, stepTime);
+            };
+
+            requestAnimationFrame(step);
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    countUp(entry.target);
+                    animateCounter(entry.target);
                     observer.unobserve(entry.target);
                 }
             });
@@ -437,6 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateAboutSlider(next);
                 startAboutTimer();
             });
+        const aboutSliderContainer = document.querySelector('.about-slider-container');
+        if (aboutSliderContainer) {
+            aboutSliderContainer.addEventListener('mouseenter', () => clearInterval(aboutInterval));
+            aboutSliderContainer.addEventListener('mouseleave', startAboutTimer);
         }
 
         // Initialize timer
