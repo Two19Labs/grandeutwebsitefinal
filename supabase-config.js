@@ -1,14 +1,9 @@
 /* ==========================================================================
    Grandeur SSCBS - Supabase Integration Configuration
-   ==========================================================================
-   Instructions:
-   1. Go to your Supabase Dashboard: https://database.new
-   2. Navigate to Project Settings -> API
-   3. Copy your 'Project URL' and 'anon/public' Key below:
    ========================================================================== */
 
-const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_REF.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+const SUPABASE_URL = 'https://mtycgxndnaxdusqsvqqs.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs';
 
 // Initialize Supabase Client
 const supabaseClient = (window.supabase && SUPABASE_URL.includes('supabase.co')) ? 
