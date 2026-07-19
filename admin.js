@@ -3,6 +3,9 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    let cachedTeam = [];
+    let cachedPrimers = [];
+
     function getSupabase() {
         if (window.supabaseClient) return window.supabaseClient;
         if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
@@ -30,8 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         team: [],
         inbox: []
     };
-
-    let cachedTeam = [];
 
     function getStore() {
         const data = localStorage.getItem('grandeur_admin_store');
@@ -128,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    let cachedTeam = [];
-    let cachedPrimers = [];
+    cachedTeam = [];
+    cachedPrimers = [];
 
     // DASHBOARD RENDER
     async function renderDashboard() {
