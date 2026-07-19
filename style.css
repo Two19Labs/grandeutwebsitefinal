@@ -1695,32 +1695,42 @@ a {
     letter-spacing: 0.5px;
 }
 
-.about-slider-dots {
+.about-slider-arrow {
     position: absolute;
-    bottom: 4.25rem;
-    right: 1.75rem;
-    display: flex;
-    gap: 0.6rem;
-    z-index: 10;
-}
-
-.about-slider-dot {
-    width: 10px;
-    height: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(15, 29, 58, 0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: var(--transition);
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.about-slider-dot:hover {
-    background: rgba(255, 255, 255, 0.8);
+.about-slider-arrow:hover {
+    background: var(--primary);
+    color: var(--accent-yellow);
+    border-color: var(--accent-yellow);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-.about-slider-dot.active {
-    background: var(--accent-yellow);
-    transform: scale(1.2);
-    box-shadow: 0 0 8px rgba(251, 197, 35, 0.6);
+.about-slider-arrow.about-prev {
+    left: 1.25rem;
+}
+
+.about-slider-arrow.about-next {
+    right: 1.25rem;
 }
 
 /* Responsiveness for mobile screen sizes */
@@ -1747,9 +1757,16 @@ a {
         padding: 0.75rem 1.25rem;
         font-size: 0.9rem;
     }
-    .about-slider-dots {
-        bottom: 3.5rem;
-        right: 1.25rem;
+    .about-slider-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+    }
+    .about-slider-arrow.about-prev {
+        left: 0.75rem;
+    }
+    .about-slider-arrow.about-next {
+        right: 0.75rem;
     }
 }
 
@@ -1903,7 +1920,7 @@ a {
     color: var(--text-muted);
     font-size: 0.95rem;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
     flex-grow: 1;
 }
 

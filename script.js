@@ -33,11 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Stats Counter Animation
     const statsSection = document.querySelector('.stats-section');
-    const statNumbers = document.querySelectorAll('.stat-number');
+    const statNumbers = document.querySelectorAll('.stat-number[data-target]');
 
     if (statsSection && statNumbers.length > 0) {
         const countUp = (element) => {
-            const target = parseInt(element.getAttribute('data-target'), 10);
+            const targetAttr = element.getAttribute('data-target');
+            if (!targetAttr) return;
+            const target = parseInt(targetAttr, 10);
+            if (isNaN(target)) return;
+
             const duration = 2000; // ms
             const stepTime = 30; // ms
             const steps = duration / stepTime;
@@ -62,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.3 });
+        }, { threshold: 0.1 });
 
         observer.observe(statsSection);
     }
@@ -306,7 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 9. About Slider (Home Page Auto-Swiping Cards)
     const aboutSlides = document.querySelectorAll('.about-slide');
-    const aboutDots = document.querySelectorAll('.about-slider-dot');
+    const prevAboutBtn = document.getElementById('about-prev-btn');
+    const nextAboutBtn = document.getElementById('about-next-btn');
     
     if (aboutSlides.length > 0) {
         let currentAboutSlide = 0;
@@ -321,14 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            aboutDots.forEach((dot, dIdx) => {
-                if (dIdx === idx) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
-            });
-
             currentAboutSlide = idx;
         };
 
@@ -340,15 +337,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
         };
 
-        // Add dot click handlers
-        aboutDots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                const idx = parseInt(dot.getAttribute('data-slide'), 10);
-                updateAboutSlider(idx);
-                // Restart timer so it doesn't swipe immediately after manual click
+        if (prevAboutBtn) {
+            prevAboutBtn.addEventListener('click', () => {
+                let prev = (currentAboutSlide - 1 + aboutSlides.length) % aboutSlides.length;
+                updateAboutSlider(prev);
                 startAboutTimer();
             });
-        });
+        }
+
+        if (nextAboutBtn) {
+            nextAboutBtn.addEventListener('click', () => {
+                let next = (currentAboutSlide + 1) % aboutSlides.length;
+                updateAboutSlider(next);
+                startAboutTimer();
+            });
+        }
 
         // Initialize timer
         startAboutTimer();
