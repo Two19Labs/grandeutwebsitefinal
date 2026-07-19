@@ -27,6 +27,11 @@
     box-sizing: border-box;
 }
 
+img, svg, video, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -333,7 +338,7 @@ a {
 }
 
 .hero h1 {
-    font-size: 3.25rem;
+    font-size: clamp(2rem, 5vw + 0.5rem, 3.25rem);
     line-height: 1.15;
     color: #ffffff;
     letter-spacing: -0.75px;
@@ -346,7 +351,7 @@ a {
 }
 
 .hero p {
-    font-size: 1.15rem;
+    font-size: clamp(0.95rem, 1.2vw + 0.6rem, 1.15rem);
     color: rgba(255, 255, 255, 0.9);
     max-width: 720px;
     line-height: 1.6;
@@ -440,7 +445,7 @@ a {
 }
 
 .section-header h2 {
-    font-size: 2.25rem;
+    font-size: clamp(1.6rem, 3vw + 0.5rem, 2.25rem);
     position: relative;
     padding-bottom: 0.75rem;
 }
@@ -459,7 +464,7 @@ a {
 
 .section-header p {
     color: var(--text-muted);
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 1vw + 0.5rem, 1.1rem);
     max-width: 600px;
 }
 
@@ -1103,6 +1108,10 @@ a {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1122,10 +1131,6 @@ a {
         margin-bottom: 2rem;
     }
     
-    .section-header h2 {
-        font-size: 1.75rem;
-    }
-    
     .nav-container {
         padding: 0.75rem 1.25rem;
     }
@@ -1143,16 +1148,8 @@ a {
     }
     
     .hero {
-        padding: 4rem 1.25rem;
+        padding: 4rem 1.25rem 3.5rem;
         min-height: 35vh;
-    }
-    
-    .hero h1 {
-        font-size: 2.25rem;
-    }
-    
-    .hero p {
-        font-size: 1.05rem;
     }
     
     .nav-links {
@@ -1166,22 +1163,23 @@ a {
         padding: 0 2rem;
         box-shadow: var(--shadow-lg);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        gap: 1.5rem;
+        gap: 1.25rem;
         align-items: flex-start;
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
         max-height: 0;
-        overflow: hidden;
+        overflow-y: auto;
         transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease, padding 0.3s ease;
+        z-index: 999;
     }
     
     .nav-links.active {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
-        max-height: 500px;
-        padding: 2rem;
+        max-height: calc(100vh - 70px);
+        padding: 1.5rem 2rem 2rem;
     }
     
     .nav-links .nav-link {
@@ -1245,6 +1243,10 @@ a {
         transform: translateX(-50%);
     }
     
+    .contact-form-container {
+        padding: 1.75rem 1.25rem;
+    }
+    
     /* Collaborator cards marquee scaling */
     .collab-card {
         min-width: 200px;
@@ -1298,7 +1300,34 @@ a {
     
     .slider-dots {
         bottom: 1rem;
-        right: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem 1rem !important;
+    }
+    .stat-number {
+        font-size: 2.5rem !important;
+    }
+    .stat-label {
+        font-size: 0.88rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    .hero-buttons .btn {
+        width: 100%;
+    }
+    .card {
+        padding: 1.5rem 1.25rem;
+    }
+}    right: 1.5rem;
     }
 }
 

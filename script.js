@@ -14,10 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelector('.nav-links');
 
     if (menuToggle && navLinks) {
+        const closeMenu = () => {
+            navLinks.classList.remove('active');
+            menuToggle.classList.remove('active');
+            const spans = menuToggle.querySelectorAll('span');
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        };
+
         menuToggle.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             menuToggle.classList.toggle('active');
-            // Toggle hamburger icon animation
             const spans = menuToggle.querySelectorAll('span');
             if (menuToggle.classList.contains('active')) {
                 spans[0].style.transform = 'rotate(45deg) translate(6px, 6px)';
@@ -27,6 +35,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 spans[0].style.transform = 'none';
                 spans[1].style.opacity = '1';
                 spans[2].style.transform = 'none';
+            }
+        });
+
+        // Auto-close menu when clicking a nav link
+        navLinks.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // Auto-close menu when clicking outside header
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && header && !header.contains(e.target)) {
+                closeMenu();
             }
         });
     }
@@ -215,6 +235,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateSlider(idx);
             });
         });
+
+        // Mobile touch swipe gestures
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        slidesWrapper.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        slidesWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 40) {
+                // Swipe Left -> Next slide
+                let next = (currentSlide + 1) % totalSlides;
+                updateSlider(next);
+            } else if (touchEndX - touchStartX > 40) {
+                // Swipe Right -> Prev slide
+                let prev = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateSlider(prev);
+            }
+        }, { passive: true });
 
         // Auto-rotation every 6 seconds
         setInterval(() => {
