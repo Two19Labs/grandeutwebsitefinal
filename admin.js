@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const recruitment = recruitmentData || localStore.recruitment;
         const banner = bannerData || localStore.banner;
         cachedTeam = teamData !== null ? teamData : localStore.team;
-        const inbox = inboxData.length > 0 ? inboxData : localStore.inbox;
+        const inbox = Array.isArray(inboxData) ? inboxData : [];
 
         // Stats
         const statRecruitment = document.getElementById('stat-recruitment-status');
