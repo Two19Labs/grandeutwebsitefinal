@@ -1,13 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Header scroll effect
     const header = document.querySelector('.header');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    });
+    if (header) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    }
 
     // 2. Mobile Menu Toggle
     const menuToggle = document.querySelector('.menu-toggle');
@@ -18,23 +20,27 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks.classList.remove('active');
             menuToggle.classList.remove('active');
             const spans = menuToggle.querySelectorAll('span');
-            spans[0].style.transform = 'none';
-            spans[1].style.opacity = '1';
-            spans[2].style.transform = 'none';
+            if (spans.length >= 3) {
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
         };
 
         menuToggle.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             menuToggle.classList.toggle('active');
             const spans = menuToggle.querySelectorAll('span');
-            if (menuToggle.classList.contains('active')) {
-                spans[0].style.transform = 'rotate(45deg) translate(6px, 6px)';
-                spans[1].style.opacity = '0';
-                spans[2].style.transform = 'rotate(-45deg) translate(6px, -6px)';
-            } else {
-                spans[0].style.transform = 'none';
-                spans[1].style.opacity = '1';
-                spans[2].style.transform = 'none';
+            if (spans.length >= 3) {
+                if (menuToggle.classList.contains('active')) {
+                    spans[0].style.transform = 'rotate(45deg) translate(6px, 6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translate(6px, -6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
             }
         });
 
@@ -55,13 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const statNumbers = document.querySelectorAll('.stat-number[data-target]');
 
     if (statNumbers.length > 0) {
-        // Set initial display to 0 immediately to prevent flash of final target numbers
-        statNumbers.forEach(element => {
-            const prefix = element.getAttribute('data-prefix') || '';
-            const suffix = element.getAttribute('data-suffix') || '';
-            element.textContent = prefix + '0' + suffix;
-        });
-
         const animateCounter = (element) => {
             if (element.dataset.animated === "true") return;
             element.dataset.animated = "true";
@@ -73,15 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const prefix = element.getAttribute('data-prefix') || '';
             const suffix = element.getAttribute('data-suffix') || '';
-            const duration = 1800; // ms
+            const duration = 2000; // ms
             let startTime = null;
+
+            // Set initial state to 0 as animation starts
+            element.textContent = prefix + '0' + suffix;
 
             const step = (timestamp) => {
                 if (!startTime) startTime = timestamp;
                 const elapsed = timestamp - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                // Ease-out cubic: starts fast and smoothly slows down at the target
+                // Ease-out cubic calculation
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentCount = Math.floor(easeOut * target);
 
@@ -97,16 +99,36 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(step);
         };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    animateCounter(entry.target);
-                    observer.unobserve(entry.target);
+        const checkAndAnimate = () => {
+            statNumbers.forEach(element => {
+                if (element.dataset.animated === "true") return;
+                const rect = element.getBoundingClientRect();
+                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                if (rect.top <= windowHeight * 0.95 && rect.bottom >= 0) {
+                    animateCounter(element);
                 }
             });
-        }, { threshold: 0.1 });
+        };
 
-        statNumbers.forEach(num => observer.observe(num));
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting || entry.intersectionRatio > 0) {
+                        animateCounter(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0, rootMargin: '0px 0px -20px 0px' });
+
+            statNumbers.forEach(num => observer.observe(num));
+        }
+
+        // Run immediate check and add scroll/resize listener fallbacks
+        checkAndAnimate();
+        window.addEventListener('scroll', checkAndAnimate, { passive: true });
+        window.addEventListener('resize', checkAndAnimate, { passive: true });
+        setTimeout(checkAndAnimate, 300);
+        setTimeout(checkAndAnimate, 1000);
     }
 
     // 5. Contact Form Validation
@@ -451,10 +473,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateAboutSlider(next);
                 startAboutTimer();
             });
+        }
+
         const aboutSliderContainer = document.querySelector('.about-slider-container');
         if (aboutSliderContainer) {
             aboutSliderContainer.addEventListener('mouseenter', () => clearInterval(aboutInterval));
             aboutSliderContainer.addEventListener('mouseleave', startAboutTimer);
+
+            let touchStartX = 0;
+            let touchEndX = 0;
+            aboutSliderContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            aboutSliderContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchStartX - touchEndX > 50) {
+                    let next = (currentAboutSlide + 1) % aboutSlides.length;
+                    updateAboutSlider(next);
+                    startAboutTimer();
+                } else if (touchEndX - touchStartX > 50) {
+                    let prev = (currentAboutSlide - 1 + aboutSlides.length) % aboutSlides.length;
+                    updateAboutSlider(prev);
+                    startAboutTimer();
+                }
+            }, { passive: true });
         }
 
         // Initialize timer
@@ -746,9 +789,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Contact form saver to CMS inbox & Supabase
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', async (e) => {
+    const cmsContactForm = document.getElementById('contact-form');
+    if (cmsContactForm) {
+        cmsContactForm.addEventListener('submit', async (e) => {
             const nameVal = document.getElementById('name')?.value || '';
             const emailVal = document.getElementById('email')?.value || '';
             const subjectVal = document.getElementById('subject')?.value || 'General Inquiry';
