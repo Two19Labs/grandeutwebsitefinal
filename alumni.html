@@ -47,26 +47,20 @@
 
         <!-- Alumni List Section -->
         <section class="section">
-            <div class="section-container">
+            <div class="section-container" style="text-align: center;">
                 <div class="section-header">
                     <h2>The Grandeur Legacy</h2>
                     <p>Meet the past members who shaped the vision and legacy of our consulting cell.</p>
                 </div>
 
-
-                <div class="team-grid" id="alumni-grid">
-                    <!-- Dynamic live alumni cards rendered from Supabase -->
+                <div id="dynamic-alumni-container">
+                    <!-- Year Batch Hierarchy categories rendered dynamically from Supabase -->
                 </div>
 
                 <script>
                     (async function loadLiveAlumni() {
-                        const grid = document.getElementById('alumni-grid');
-                        if (!grid) return;
-
-                        function getBatchYearNum(item) {
-                            const match = (item.role || '').match(/20\d\d/);
-                            return match ? parseInt(match[0], 10) : 0;
-                        }
+                        const container = document.getElementById('dynamic-alumni-container');
+                        if (!container) return;
 
                         try {
                             const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?tier=eq.board&order=created_at.asc', {
@@ -79,35 +73,73 @@
                             const alumni = await res.json();
 
                             if (Array.isArray(alumni) && alumni.length > 0) {
-                                // Sort descending by batch year (2025 -> 2024 -> 2023...)
-                                const sorted = [...alumni].sort((a, b) => getBatchYearNum(b) - getBatchYearNum(a));
-
-                                grid.innerHTML = sorted.map(item => {
+                                // Group by Batch Year
+                                const batchesMap = {};
+                                alumni.forEach(item => {
                                     const parts = (item.role || '').split('|');
-                                    let batch = 'Alumni';
-                                    let roleAndPlacement = item.role || '';
+                                    let batchTitle = 'Alumni';
                                     if (parts.length > 1) {
-                                        batch = parts[0].trim();
-                                        roleAndPlacement = parts.slice(1).join('|').trim();
+                                        batchTitle = parts[0].trim();
+                                    } else {
+                                        const match = (item.role || '').match(/20\d\d/);
+                                        batchTitle = match ? `Batch of ${match[0]}` : 'Legacy Alumni';
                                     }
-                                    const roleSubParts = roleAndPlacement.split('•');
-                                    const formerRole = roleSubParts[0] ? roleSubParts[0].trim() : 'Alumnus';
-                                    const placement = roleSubParts[1] ? roleSubParts[1].trim() : '';
+                                    if (!batchTitle.startsWith('Batch of') && batchTitle !== 'Legacy Alumni') {
+                                        batchTitle = `Batch of ${batchTitle}`;
+                                    }
+
+                                    if (!batchesMap[batchTitle]) {
+                                        batchesMap[batchTitle] = [];
+                                    }
+                                    batchesMap[batchTitle].push(item);
+                                });
+
+                                // Sort batch titles descending by year (2025 -> 2024 -> 2023...)
+                                const sortedBatches = Object.keys(batchesMap).sort((a, b) => {
+                                    const yearA = (a.match(/20\d\d/) || [0])[0];
+                                    const yearB = (b.match(/20\d\d/) || [0])[0];
+                                    return parseInt(yearB, 10) - parseInt(yearA, 10);
+                                });
+
+                                container.innerHTML = sortedBatches.map(batchTitle => {
+                                    const members = batchesMap[batchTitle];
+                                    const cardsHtml = members.map(item => {
+                                        const parts = (item.role || '').split('|');
+                                        let roleAndPlacement = parts.length > 1 ? parts.slice(1).join('|').trim() : item.role || '';
+                                        const roleSubParts = roleAndPlacement.split('•');
+                                        const formerRole = roleSubParts[0] ? roleSubParts[0].trim() : 'Alumnus';
+                                        const placement = roleSubParts[1] ? roleSubParts[1].trim() : '';
+
+                                        return `
+                                            <div class="team-card">
+                                                ${item.photo ? `<img src="${item.photo}" alt="${item.name}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin: 1rem auto 0.5rem; border: 3px solid var(--primary-light); display: block;">` : `<div class="avatar-placeholder" style="width: 110px; height: 110px; border-radius: 50%; margin: 1rem auto 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🎓</div>`}
+                                                <div class="team-info">
+                                                    <h3 class="team-name">${item.name}</h3>
+                                                    <span class="team-role" style="font-weight:600;">${formerRole}</span>
+                                                    ${placement ? `<span class="team-role" style="color: var(--primary-light); margin-top: 0.25rem;">${placement}</span>` : ''}
+                                                    ${item.linkedin ? `<a href="${item.linkedin}" target="_blank" rel="noopener noreferrer" style="color:#0077b5; font-size:0.85rem; font-weight:600; margin-top:0.5rem; display:inline-flex; align-items:center; gap:0.2rem; text-decoration:none;">LinkedIn ↗</a>` : ''}
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('');
 
                                     return `
-                                        <div class="team-card">
-                                            ${item.photo ? `<img src="${item.photo}" alt="${item.name}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; border: 3px solid var(--primary-light);">` : `<div class="avatar-placeholder">🎓</div>`}
-                                            <div class="team-info">
-                                                <h3 class="team-name">${item.name}</h3>
-                                                <span class="team-role">${batch} &bull; ${formerRole}</span>
-                                                ${placement ? `<span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">${placement}</span>` : ''}
-                                                ${item.linkedin ? `<a href="${item.linkedin}" target="_blank" rel="noopener noreferrer" style="color:var(--primary-light); font-size:0.85rem; font-weight:600; margin-top:0.4rem; display:inline-block; text-decoration:underline;">LinkedIn Profile ↗</a>` : ''}
+                                        <div class="hierarchy-section" style="margin-bottom: 3.5rem;">
+                                            <h4 class="tier-title" style="margin-bottom: 1.5rem;">${batchTitle}</h4>
+                                            <div class="team-grid tier-grid-1">
+                                                ${cardsHtml}
                                             </div>
                                         </div>
                                     `;
                                 }).join('');
                             } else {
-                                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem;">No alumni listed yet. Add alumni members from the Admin Console.</p>';
+                                container.innerHTML = `
+                                    <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted); background: #ffffff; border: 1px dashed var(--border); border-radius: 16px; max-width: 600px; margin: 2rem auto;">
+                                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎓</div>
+                                        <h3 style="color: var(--dark); margin-bottom: 0.5rem;">No Alumni Members Listed Yet</h3>
+                                        <p style="font-size: 0.95rem;">Use the Grandeur Admin Console to add alumni members, batch years, roles, and placements.</p>
+                                    </div>
+                                `;
                             }
                         } catch(e) {
                             console.error("Error loading dynamic alumni:", e);
