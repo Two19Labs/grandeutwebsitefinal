@@ -487,13 +487,9 @@
                         <input type="text" id="primer-read-time" class="form-input" placeholder="e.g. 5 min read or 15 pages">
                     </div>
                     <div class="form-group">
-                        <label for="primer-pdf-file">Upload Document / File (PDF, Doc, Image)</label>
-                        <input type="file" id="primer-pdf-file" class="form-input" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*" style="padding: 0.4rem;">
-                        <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Upload PDF or document file directly from your device.</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="primer-pdf-url">Document Link / File URL (Optional)</label>
-                        <input type="text" id="primer-pdf-url" class="form-input" placeholder="https://drive.google.com/... or uploaded Data URL">
+                        <label for="primer-pdf-url">Report Link (Google Drive, Canva, etc.) *</label>
+                        <input type="url" id="primer-pdf-url" class="form-input" placeholder="https://drive.google.com/file/d/..." required>
+                        <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Paste the link where the report/document is hosted (Google Drive, Canva, Notion, etc.)</small>
                     </div>
                 </div>
                 <div class="modal-footer">

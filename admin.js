@@ -489,36 +489,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnClosePrimerModal = document.getElementById('btn-close-primer-modal');
     const btnCancelPrimerModal = document.getElementById('btn-cancel-primer-modal');
     const formPrimerModal = document.getElementById('form-primer-modal');
-    const primerPdfFile = document.getElementById('primer-pdf-file');
-    const primerPdfUrl = document.getElementById('primer-pdf-url');
-
-    let primerFileLoading = false;
-
-    if (primerPdfFile) {
-        primerPdfFile.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                primerFileLoading = true;
-                const saveBtn = document.getElementById('btn-save-primer');
-                if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '📄 Reading file...'; }
-                showToast(`⏳ Reading file: ${file.name} (${(file.size / 1024).toFixed(0)}KB)...`);
-
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    if (primerPdfUrl) primerPdfUrl.value = evt.target.result;
-                    primerFileLoading = false;
-                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
-                    showToast(`✅ File ready: ${file.name}`);
-                };
-                reader.onerror = function() {
-                    primerFileLoading = false;
-                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
-                    showToast(`❌ Failed to read file: ${file.name}`);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
 
     function renderKnowledgeTable(primersList = cachedPrimers) {
         if (!knowledgeTableBody) return;
@@ -532,12 +502,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><strong>${escapeHtml(item.title)}</strong></td>
                 <td><span class="tier-badge tier-core">${escapeHtml(item.category)}</span></td>
                 <td>${escapeHtml(item.date_label || item.year || '2026')}</td>
-                <td>${item.read_time ? escapeHtml(item.read_time) : 'PDF Document'}</td>
+                <td>${item.read_time ? escapeHtml(item.read_time) : '—'}</td>
                 <td style="text-align: right;">
                     <div class="action-btns-group" style="justify-content: flex-end;">
-                        ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" class="btn-icon" title="View Document" style="text-decoration:none;">📄</a>` : ''}
-                        <button class="btn-icon" onclick="editKnowledgePrimer('${item.id}')" title="Edit Publication">✏️</button>
-                        <button class="btn-icon delete" onclick="deleteKnowledgePrimer('${item.id}')" title="Delete Publication">🗑️</button>
+                        ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" class="btn-icon" title="Open Report" style="text-decoration:none;">🔗</a>` : ''}
+                        <button class="btn-icon" onclick="editKnowledgePrimer('${item.id}')" title="Edit">✏️</button>
+                        <button class="btn-icon delete" onclick="deleteKnowledgePrimer('${item.id}')" title="Delete">🗑️</button>
                     </div>
                 </td>
             </tr>
@@ -554,23 +524,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputReadTime = document.getElementById('primer-read-time');
         const inputPdfUrl = document.getElementById('primer-pdf-url');
 
-        if (primerPdfFile) primerPdfFile.value = '';
-
         if (primer) {
             modalTitle.textContent = "Edit Publication";
             inputId.value = primer.id;
             inputTitle.value = primer.title || "";
             inputCategory.value = primer.category || "Industry Report";
             inputDate.value = primer.date_label || primer.year || "2026";
-            inputReadTime.value = primer.read_time || "5 min read";
+            inputReadTime.value = primer.read_time || "";
             inputPdfUrl.value = primer.pdf_url || "";
         } else {
-            modalTitle.textContent = "Add Knowledge Primer / Publication";
+            modalTitle.textContent = "Add Publication";
             inputId.value = "";
             inputTitle.value = "";
             inputCategory.value = "Industry Report";
             inputDate.value = "2026";
-            inputReadTime.value = "5 min read";
+            inputReadTime.value = "";
             inputPdfUrl.value = "";
         }
         modalPrimer.style.display = 'flex';
@@ -587,12 +555,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formPrimerModal) {
         formPrimerModal.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            if (primerFileLoading) {
-                showToast('⏳ Please wait — file is still loading...');
-                return;
-            }
-
             const editId = document.getElementById('primer-edit-id').value;
             const title = document.getElementById('primer-title').value.trim();
             const category = document.getElementById('primer-category').value;
@@ -601,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pdf_url = document.getElementById('primer-pdf-url').value.trim();
 
             if (!pdf_url) {
-                showToast('⚠️ Please upload a file or paste a document URL before saving.');
+                showToast('⚠️ Please paste a report link.');
                 return;
             }
 
@@ -617,14 +579,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch(err) {
                     console.error("Primer save error:", err);
-                    showToast(`⚠️ Error saving publication: ${err.message}`);
+                    showToast(`⚠️ Error saving: ${err.message}`);
                     if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
                     return;
                 }
             }
 
             if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
-            showToast(`✅ Saved publication: ${title}`);
+            showToast(`✅ Published: ${title}`);
             closePrimerModal();
             await renderDashboard();
         });
