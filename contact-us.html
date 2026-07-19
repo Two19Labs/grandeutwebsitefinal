@@ -53,7 +53,7 @@
                     <div class="card" id="contact-form-card" style="padding: 2.5rem; min-height: 480px; display: flex; flex-direction: column; justify-content: center;">
                         <div id="contact-form-wrapper">
                             <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Send Us a Message</h2>
-                            <form id="contact-form" class="contact-form">
+                            <form id="contact-form" class="contact-form" onsubmit="return handleContactSubmit(event);">
                                 <div class="form-group">
                                     <label for="name" class="form-label">Full Name *</label>
                                     <input type="text" id="name" name="name" class="form-input" placeholder="e.g. Sambhav Jain" required>
@@ -94,6 +94,94 @@
                             </button>
                         </div>
                     </div>
+
+                    <script>
+                        async function handleContactSubmit(e) {
+                            if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                            const nameInput = document.getElementById('name');
+                            const emailInput = document.getElementById('email');
+                            const messageInput = document.getElementById('message');
+                            const subjectInput = document.getElementById('subject');
+                            
+                            if (!nameInput || !emailInput || !messageInput) return false;
+
+                            const name = nameInput.value.trim();
+                            const email = emailInput.value.trim();
+                            const message = messageInput.value.trim();
+                            const subject = subjectInput ? subjectInput.value : 'General Inquiry';
+
+                            if (!name || !email || !message) {
+                                alert("Please fill out all required fields.");
+                                return false;
+                            }
+
+                            const btn = document.querySelector('#contact-form button[type="submit"]');
+                            let originalText = "Send Message ↗";
+                            if (btn) {
+                                originalText = btn.textContent;
+                                btn.disabled = true;
+                                btn.textContent = 'Sending Message...';
+                            }
+
+                            const inquiryData = { name, email, subject, message };
+                            let success = false;
+
+                            try {
+                                const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/contact_inquiries', {
+                                    method: 'POST',
+                                    headers: {
+                                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                        'Content-Type': 'application/json',
+                                        'Prefer': 'return=representation'
+                                    },
+                                    body: JSON.stringify(inquiryData)
+                                });
+                                if (res.ok) success = true;
+                            } catch (err) {
+                                console.error("Inquiry submit error:", err);
+                            }
+
+                            if (btn) {
+                                btn.disabled = false;
+                                btn.textContent = originalText;
+                            }
+
+                            if (success) {
+                                const form = document.getElementById('contact-form');
+                                if (form) form.reset();
+                                const wrapper = document.getElementById('contact-form-wrapper');
+                                const successState = document.getElementById('contact-success-state');
+                                if (wrapper && successState) {
+                                    wrapper.style.display = 'none';
+                                    successState.style.display = 'block';
+                                }
+                            } else {
+                                alert("⚠️ Unable to submit message. Please try again.");
+                            }
+
+                            return false;
+                        }
+
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const btnSendAnother = document.getElementById('btn-send-another');
+                            if (btnSendAnother) {
+                                btnSendAnother.addEventListener('click', () => {
+                                    const wrapper = document.getElementById('contact-form-wrapper');
+                                    const successState = document.getElementById('contact-success-state');
+                                    const form = document.getElementById('contact-form');
+                                    if (form) form.reset();
+                                    if (wrapper && successState) {
+                                        successState.style.display = 'none';
+                                        wrapper.style.display = 'block';
+                                    }
+                                });
+                            }
+                        });
+                    </script>
 
                     <!-- Info side -->
                     <div style="display: flex; flex-direction: column; gap: 1.25rem; justify-content: center;">

@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loginView) loginView.style.display = 'none';
             if (dashboardView) dashboardView.style.display = 'block';
             if (adminUserActions) adminUserActions.style.display = 'flex';
+            restoreActiveTab();
             renderDashboard();
         } else {
             if (loginView) loginView.style.display = 'flex';
@@ -113,21 +114,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // TAB NAVIGATION
+    // TAB NAVIGATION WITH PERSISTENCE
     const tabButtons = document.querySelectorAll('.admin-nav-item');
     const tabPanels = document.querySelectorAll('.tab-panel');
+
+    function activateTab(tabId) {
+        if (!tabId) return;
+        const targetBtn = document.querySelector(`.admin-nav-item[data-tab="${tabId}"]`);
+        const targetPanel = document.getElementById(tabId);
+        if (!targetPanel) return;
+
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+
+        if (targetBtn) targetBtn.classList.add('active');
+        targetPanel.classList.add('active');
+        localStorage.setItem('grandeur_admin_active_tab', tabId);
+        if (history.replaceState) {
+            history.replaceState(null, null, '#' + tabId);
+        } else {
+            location.hash = tabId;
+        }
+    }
 
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const targetTab = btn.getAttribute('data-tab');
-            tabButtons.forEach(b => b.classList.remove('active'));
-            tabPanels.forEach(p => p.classList.remove('active'));
-
-            btn.classList.add('active');
-            const targetPanel = document.getElementById(targetTab);
-            if (targetPanel) targetPanel.classList.add('active');
+            activateTab(targetTab);
         });
     });
+
+    function restoreActiveTab() {
+        const hashTab = location.hash.replace('#', '');
+        const savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-overview';
+        activateTab(savedTab);
+    }
 
     cachedTeam = [];
     cachedPrimers = [];

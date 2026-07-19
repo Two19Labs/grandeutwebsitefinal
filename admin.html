@@ -65,6 +65,17 @@
                             if (lv) lv.style.display = 'none';
                             if (dv) dv.style.display = 'block';
                             if (ua) ua.style.display = 'flex';
+
+                            const hashTab = location.hash.replace('#', '');
+                            const savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-overview';
+                            const activeBtn = document.querySelector(`.admin-nav-item[data-tab="${savedTab}"]`);
+                            const activePanel = document.getElementById(savedTab);
+                            if (activePanel) {
+                                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                                document.querySelectorAll('.admin-nav-item').forEach(b => b.classList.remove('active'));
+                                if (activeBtn) activeBtn.classList.add('active');
+                                activePanel.classList.add('active');
+                            }
                         }
 
                         const form = document.getElementById('admin-login-form');
