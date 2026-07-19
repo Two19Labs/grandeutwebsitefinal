@@ -70,7 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }, { threshold: 0.1 });
 
-        statNumbers.forEach(num => observer.observe(num));
+        statNumbers.forEach(num => {
+            if (!num.dataset.animated) {
+                num.textContent = '0' + (num.getAttribute('data-suffix') || '');
+            }
+            observer.observe(num);
+        });
     }
 
     // 5. Contact Form Validation
