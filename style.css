@@ -111,7 +111,7 @@ a {
     width: auto;
     object-fit: contain;
     background: transparent;
-    filter: brightness(10);
+    filter: none;
 }
 
 .logo-text {
