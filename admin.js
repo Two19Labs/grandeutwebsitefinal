@@ -351,6 +351,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancelMemberModal = document.getElementById('btn-cancel-member-modal');
     const formMemberModal = document.getElementById('form-member-modal');
 
+    // Image File Upload Reader
+    const photoFileInput = document.getElementById('member-photo-file');
+    const photoHiddenInput = document.getElementById('member-photo');
+    const photoPreviewImg = document.getElementById('photo-preview-img');
+    const photoPreviewIcon = document.getElementById('photo-preview-icon');
+
+    if (photoFileInput) {
+        photoFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const dataUrl = evt.target.result;
+                    if (photoHiddenInput) photoHiddenInput.value = dataUrl;
+                    updatePhotoPreview(dataUrl);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    function updatePhotoPreview(url) {
+        if (url && photoPreviewImg && photoPreviewIcon) {
+            photoPreviewImg.src = url;
+            photoPreviewImg.style.display = 'block';
+            photoPreviewIcon.style.display = 'none';
+        } else if (photoPreviewImg && photoPreviewIcon) {
+            photoPreviewImg.src = '';
+            photoPreviewImg.style.display = 'none';
+            photoPreviewIcon.style.display = 'block';
+        }
+    }
+
     function openMemberModal(member = null) {
         if (!modalMember) return;
         const modalTitle = document.getElementById('modal-member-title');
@@ -361,6 +394,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputPhoto = document.getElementById('member-photo');
         const inputLinkedin = document.getElementById('member-linkedin');
 
+        if (photoFileInput) photoFileInput.value = '';
+
         if (member) {
             modalTitle.textContent = "Edit Team Member";
             inputId.value = member.id;
@@ -369,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputTier.value = member.tier;
             inputPhoto.value = member.photo || "";
             inputLinkedin.value = member.linkedin || "";
+            updatePhotoPreview(member.photo);
         } else {
             modalTitle.textContent = "Add Team Member";
             inputId.value = "";
@@ -377,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputTier.value = "coordinators";
             inputPhoto.value = "";
             inputLinkedin.value = "";
+            updatePhotoPreview("");
         }
         modalMember.style.display = 'flex';
     }
