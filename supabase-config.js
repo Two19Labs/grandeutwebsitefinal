@@ -160,6 +160,16 @@ window.GrandeurDB = {
         } catch(e) { return []; }
     },
 
+    async insertContactInquiry(data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries`, {
+            method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return await res.json();
+    },
+
     async deleteContactInquiry(id) {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?id=eq.${id}`, {
             method: 'DELETE',

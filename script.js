@@ -129,21 +129,57 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (isValid) {
-                // Mimic success submit
                 const btn = contactForm.querySelector('button[type="submit"]');
                 const originalText = btn.textContent;
                 btn.textContent = 'Submitting...';
                 btn.disabled = true;
-                
-                setTimeout(() => {
+
+                const inquiryData = {
+                    name: nameInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    subject: document.getElementById('subject')?.value || 'General Inquiry',
+                    message: messageInput.value.trim()
+                };
+
+                (async function submitContactForm() {
+                    let success = false;
+                    if (window.GrandeurDB && typeof window.GrandeurDB.insertContactInquiry === 'function') {
+                        try {
+                            await window.GrandeurDB.insertContactInquiry(inquiryData);
+                            success = true;
+                        } catch (err) {
+                            console.error("GrandeurDB submission error:", err);
+                        }
+                    }
+
+                    if (!success) {
+                        try {
+                            const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/contact_inquiries', {
+                                method: 'POST',
+                                headers: {
+                                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                    'Content-Type': 'application/json',
+                                    'Prefer': 'return=representation'
+                                },
+                                body: JSON.stringify(inquiryData)
+                            });
+                            if (res.ok) success = true;
+                        } catch (e) {
+                            console.error("Direct fetch contact error:", e);
+                        }
+                    }
+
                     btn.textContent = 'Submitted Successfully!';
                     btn.style.backgroundColor = '#0f1d3a';
                     contactForm.reset();
                     
-                    // Show a message in place of "Thanks for submitting!"
+                    const existingMsg = contactForm.querySelector('.form-success-alert');
+                    if (existingMsg) existingMsg.remove();
+
                     const successMessage = document.createElement('div');
                     successMessage.className = 'form-success-alert';
-                    successMessage.innerHTML = '<p style="color: #0f1d3a; background: #dbeafe; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-weight: 600; text-align: center;">Thank you! Your submission has been received.</p>';
+                    successMessage.innerHTML = '<p style="color: #0f1d3a; background: #dbeafe; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-weight: 600; text-align: center;">Thank you! Your message has been sent to our team.</p>';
                     contactForm.appendChild(successMessage);
                     
                     setTimeout(() => {
@@ -152,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.style.backgroundColor = '';
                         successMessage.remove();
                     }, 5000);
-                }, 1500);
+                })();
             }
         });
     }

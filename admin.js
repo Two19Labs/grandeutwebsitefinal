@@ -619,20 +619,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('inbox-list-container');
         if (!container) return;
         if (inboxList.length === 0) {
-            container.innerHTML = `<p style="text-align:center; color:var(--admin-text-muted); padding:2rem;">No messages in inbox.</p>`;
+            container.innerHTML = `<p style="text-align:center; color:var(--admin-text-muted); padding:3rem;">📬 No contact inquiries yet. Messages submitted via the "Contact Us" page will appear here instantly.</p>`;
             return;
         }
         container.innerHTML = inboxList.map(item => `
-            <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:10px; padding:1.25rem; margin-bottom:1rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                    <strong style="color:var(--admin-gold);">${escapeHtml(item.name)} &lt;${escapeHtml(item.email)}&gt;</strong>
-                    <small style="color:var(--admin-text-muted);">${escapeHtml(item.date || new Date(item.created_at || Date.now()).toLocaleDateString())}</small>
+            <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:10px; padding:1.25rem; margin-bottom:1rem; position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                    <div>
+                        <strong style="color:var(--admin-gold); font-size:1.05rem;">${escapeHtml(item.name)}</strong>
+                        <a href="mailto:${escapeHtml(item.email)}" style="color:var(--admin-accent-blue); font-size:0.9rem; margin-left:0.5rem; text-decoration:underline;">&lt;${escapeHtml(item.email)}&gt;</a>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <small style="color:var(--admin-text-muted);">${escapeHtml(item.date || new Date(item.created_at || Date.now()).toLocaleString())}</small>
+                        <button class="btn-icon delete" onclick="deleteContactInquiry('${item.id}')" title="Delete Inquiry" style="padding:4px 8px;">🗑️</button>
+                    </div>
                 </div>
-                <h4 style="margin-bottom:0.5rem;">Subject: ${escapeHtml(item.subject)}</h4>
-                <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5;">${escapeHtml(item.message)}</p>
+                <h4 style="margin-bottom:0.5rem; color:#f8fafc; font-size:0.98rem;">📌 Subject: ${escapeHtml(item.subject)}</h4>
+                <p style="color:var(--admin-text-muted); font-size:0.93rem; line-height:1.6; white-space:pre-wrap; background:rgba(0,0,0,0.25); padding:0.85rem; border-radius:6px; border:1px solid rgba(255,255,255,0.05); margin:0;">${escapeHtml(item.message)}</p>
             </div>
         `).join('');
     }
+
+    window.deleteContactInquiry = async function(id) {
+        if (confirm("Are you sure you want to delete this inquiry from the inbox?")) {
+            if (window.GrandeurDB) {
+                try {
+                    await window.GrandeurDB.deleteContactInquiry(id);
+                } catch(err) {
+                    console.error("Inquiry delete error:", err);
+                    showToast(`⚠️ Delete failed: ${err.message}`);
+                    return;
+                }
+            }
+            showToast("🗑️ Removed inquiry from inbox");
+            await renderDashboard();
+        }
+    };
 
     function escapeHtml(str) {
         if (!str) return '';
