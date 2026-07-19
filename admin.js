@@ -1,10 +1,10 @@
 /* ==========================================================================
-   Grandeur SSCBS - Admin Console JavaScript (Supabase Integrated)
+   Grandeur SSCBS - Admin Console JavaScript (Pure Supabase Live Engine)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
-    // 1. DEFAULT DATA STORE INITIALIZATION (FALLBACK)
+    // 1. DEFAULT DATA STORE INITIALIZATION
     // ----------------------------------------------------------------------
     const DEFAULT_STORE = {
         recruitment: {
@@ -20,27 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
             btnText: "Apply Now",
             btnUrl: "contact-us.html"
         },
-        team: [
-            { id: "tm_1", name: "Mr. Tushar Marwaha", role: "Faculty In-Charge", tier: "faculty", photo: "", linkedin: "#" },
-            { id: "tm_2", name: "Dr. Sushmita", role: "Faculty In-Charge", tier: "faculty", photo: "", linkedin: "#" },
-            { id: "tm_3", name: "Sambhav Jain", role: "President", tier: "board", photo: "hero-team.jpg", linkedin: "https://linkedin.com" },
-            { id: "tm_4", name: "Shrivats Tiwari", role: "Vice President", tier: "board", photo: "", linkedin: "https://linkedin.com" },
-            { id: "tm_5", name: "Ananya Roy", role: "Senior Director - Advisory", tier: "senior", photo: "", linkedin: "https://linkedin.com" },
-            { id: "tm_6", name: "Rohan Verma", role: "Senior Associate", tier: "senior", photo: "", linkedin: "https://linkedin.com" },
-            { id: "tm_7", name: "Devansh Gupta", role: "Junior Analyst", tier: "junior", photo: "", linkedin: "https://linkedin.com" },
-            { id: "tm_8", name: "Kavya Sharma", role: "Junior Consultant", tier: "junior", photo: "", linkedin: "https://linkedin.com" }
-        ],
-        knowledge: [
-            { id: "kn_1", title: "EV Ecosystem in India: 2026 Primer", category: "Automotive & CleanTech", date: "July 2026", readTime: "8 min read" },
-            { id: "kn_2", title: "Q2 2026 D2C Brand Growth Benchmark", category: "Retail & Consumer", date: "June 2026", readTime: "12 min read" }
-        ],
-        achievements: [
-            { id: "ac_1", event: "National Strategy Challenge - IIT Bombay", position: "🏆 1st Rank", team: "Team Apex", year: "2026" },
-            { id: "ac_2", event: "Global Business Case Fest - Univ of Melbourne", position: "🥇 Winner", team: "Grandeur Alpha", year: "2025" }
-        ],
-        inbox: [
-            { id: "in_1", name: "Corporate Partner", email: "partnerships@krafton.com", subject: "Live Project Collaboration Q3", date: "July 18, 2026", message: "Hi Grandeur team, we would like to explore a consulting engagement with your cell for Q3 market strategy." }
-        ]
+        team: [],
+        knowledge: [],
+        achievements: [],
+        inbox: []
     };
 
     let cachedTeam = [];
@@ -137,15 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------------------
-    // 4. DASHBOARD RENDER & DATA BINDING (SUPABASE + LOCAL FALLBACK)
+    // 4. DASHBOARD RENDER & DATA BINDING (PURE SUPABASE + LOCAL FALLBACK)
     // ----------------------------------------------------------------------
     async function renderDashboard() {
         let recruitmentData = null;
         let bannerData = null;
-        let teamData = [];
+        let teamData = null;
         let inboxData = [];
-        let knowledgeData = [];
-        let achievementsData = [];
 
         if (window.supabaseClient) {
             try {
@@ -155,31 +136,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { data: ban } = await window.supabaseClient.from('announcements').select('*').single();
                 if (ban) bannerData = { active: ban.active, text: ban.text, btnText: ban.btn_text, btnUrl: ban.btn_url };
 
-                const { data: tm } = await window.supabaseClient.from('team_members').select('*').order('created_at', { ascending: true });
+                const { data: tm, error: tmErr } = await window.supabaseClient.from('team_members').select('*').order('created_at', { ascending: true });
+                if (tmErr) console.error("Supabase team_members fetch error:", tmErr);
                 if (tm) teamData = tm;
 
                 const { data: inb } = await window.supabaseClient.from('contact_inquiries').select('*').order('created_at', { ascending: false });
                 if (inb) inboxData = inb;
-
-                const { data: kn } = await window.supabaseClient.from('knowledge_primers').select('*');
-                if (kn) knowledgeData = kn;
-
-                const { data: ac } = await window.supabaseClient.from('achievements').select('*');
-                if (ac) achievementsData = ac;
             } catch (err) {
-                console.warn("Supabase fetch error in admin dashboard:", err);
+                console.warn("Supabase dashboard fetch warning:", err);
             }
         }
 
         const localStore = getStore();
 
-        // Merge state
         const recruitment = recruitmentData || localStore.recruitment;
         const banner = bannerData || localStore.banner;
-        cachedTeam = teamData.length > 0 ? teamData : localStore.team;
+        cachedTeam = teamData !== null ? teamData : localStore.team;
         const inbox = inboxData.length > 0 ? inboxData : localStore.inbox;
-        const knowledge = knowledgeData.length > 0 ? knowledgeData : localStore.knowledge;
-        const achievements = achievementsData.length > 0 ? achievementsData : localStore.achievements;
 
         // 4.1 Overview Stats
         const statRecruitment = document.getElementById('stat-recruitment-status');
@@ -199,16 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const statTeamCount = document.getElementById('stat-team-count');
         if (statTeamCount) statTeamCount.textContent = cachedTeam.length;
 
-        const statPrimersCount = document.getElementById('stat-primers-count');
-        if (statPrimersCount) statPrimersCount.textContent = knowledge.length;
-
         const statInboxCount = document.getElementById('stat-inbox-count');
         if (statInboxCount) statInboxCount.textContent = inbox.length;
 
         const inboxBadge = document.getElementById('inbox-count-badge');
         if (inboxBadge) inboxBadge.textContent = inbox.length;
 
-        // 4.2 Populate Recruitment Settings
+        // Populate Form Controls
         const switchRecruitment = document.getElementById('switch-recruitment-active');
         if (switchRecruitment) switchRecruitment.checked = recruitment.active;
 
@@ -224,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputRecDeadline = document.getElementById('recruitment-deadline');
         if (inputRecDeadline) inputRecDeadline.value = recruitment.deadline || "";
 
-        // 4.3 Populate Banner Settings
         const switchBanner = document.getElementById('switch-banner-active');
         if (switchBanner) switchBanner.checked = banner.active;
 
@@ -237,15 +206,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputBannerBtnUrl = document.getElementById('banner-btn-url');
         if (inputBannerBtnUrl) inputBannerBtnUrl.value = banner.btnUrl || "";
 
-        // Render Tables
+        // Render Admin Views
         renderTeamTable(cachedTeam);
-        renderKnowledgeTable(knowledge);
-        renderAchievementsTable(achievements);
         renderInboxList(inbox);
     }
 
     // ----------------------------------------------------------------------
-    // 5. RECRUITMENT & BANNER FORMS (SUPABASE WRITES)
+    // 5. RECRUITMENT & BANNER SETTINGS
     // ----------------------------------------------------------------------
     const switchRecruitment = document.getElementById('switch-recruitment-active');
     if (switchRecruitment) {
@@ -282,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             store.recruitment = { active, title, description, formUrl, deadline };
             saveStore(store);
             renderDashboard();
-            showToast("✅ Recruitment settings updated in Supabase!");
+            showToast("✅ Recruitment settings updated!");
         });
     }
 
@@ -320,23 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             store.banner = { active, text, btnText, btnUrl };
             saveStore(store);
             renderDashboard();
-            showToast("✅ Announcement banner updated in Supabase!");
-        });
-    }
-
-    const quickToggleRec = document.getElementById('quick-toggle-recruitment');
-    if (quickToggleRec) {
-        quickToggleRec.addEventListener('click', async () => {
-            const currentActive = document.getElementById('switch-recruitment-active').checked;
-            const newActive = !currentActive;
-            if (window.supabaseClient) {
-                await window.supabaseClient.from('recruitment_settings').upsert({ id: 1, active: newActive });
-            }
-            const store = getStore();
-            store.recruitment.active = newActive;
-            saveStore(store);
-            renderDashboard();
-            showToast(`Recruitment status toggled to: ${newActive ? 'ACTIVE' : 'CLOSED'}`);
+            showToast("✅ Announcement banner saved!");
         });
     }
 
@@ -359,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (filtered.length === 0) {
-            teamTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No team members match the filter.</td></tr>`;
+            teamTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No team members found. Click "Add New Member" to add one.</td></tr>`;
             return;
         }
 
@@ -425,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputId.value = "";
             inputName.value = "";
             inputRole.value = "";
-            inputTier.value = "junior";
+            inputTier.value = "coordinators";
             inputPhoto.value = "";
             inputLinkedin.value = "";
         }
@@ -458,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.supabaseClient) {
                 try {
                     let sbError = null;
-                    if (editId && !editId.startsWith('tm_')) {
+                    if (editId) {
                         const { error } = await window.supabaseClient.from('team_members').update({
                             name, role, tier, photo, linkedin
                         }).eq('id', editId);
@@ -471,27 +422,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (sbError) {
-                        console.error("Supabase Error:", sbError);
-                        showToast(`⚠️ Supabase Error: ${sbError.message || sbError.details || 'Row Level Security policy blocked insert.'}`);
+                        console.error("Supabase team member save error:", sbError);
+                        showToast(`⚠️ Supabase Error: ${sbError.message || sbError.details || 'Check SQL RLS settings'}`);
+                        return;
                     }
                 } catch(err) {
-                    console.error("Supabase team member save error:", err);
+                    console.error("Supabase save error:", err);
                 }
             }
 
-            // Also update local store
-            const store = getStore();
-            if (editId) {
-                const idx = store.team.findIndex(m => m.id === editId);
-                if (idx !== -1) store.team[idx] = { id: editId, name, role, tier, photo, linkedin };
-            } else {
-                store.team.push({ id: "tm_" + Date.now(), name, role, tier, photo, linkedin });
-            }
-            saveStore(store);
-
-            showToast(`✅ Saved member: ${name}`);
+            showToast(`✅ Saved team member: ${name}`);
             closeMemberModal();
             renderDashboard();
+            window.dispatchEvent(new Event('grandeur_store_updated'));
         });
     }
 
@@ -503,92 +446,26 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteTeamMember = async function(id) {
         const member = cachedTeam.find(m => m.id === id);
         if (member && confirm(`Are you sure you want to remove ${member.name} from the team?`)) {
-            if (window.supabaseClient && !id.startsWith('tm_')) {
+            if (window.supabaseClient) {
                 try {
-                    await window.supabaseClient.from('team_members').delete().eq('id', id);
+                    const { error } = await window.supabaseClient.from('team_members').delete().eq('id', id);
+                    if (error) {
+                        console.error("Supabase delete error:", error);
+                        showToast(`⚠️ Delete failed: ${error.message}`);
+                        return;
+                    }
                 } catch(err) {
-                    console.error("Supabase team member delete error:", err);
+                    console.error("Supabase delete error:", err);
                 }
             }
-            const store = getStore();
-            store.team = store.team.filter(m => m.id !== id);
-            saveStore(store);
-            renderDashboard();
             showToast(`Removed team member: ${member.name}`);
+            renderDashboard();
+            window.dispatchEvent(new Event('grandeur_store_updated'));
         }
     };
 
     // ----------------------------------------------------------------------
-    // 7. KNOWLEDGE HUB & ACHIEVEMENTS TABLE RENDERING
-    // ----------------------------------------------------------------------
-    function renderKnowledgeTable(knowledgeList = []) {
-        const tbody = document.getElementById('knowledge-table-body');
-        if (!tbody) return;
-        if (knowledgeList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--admin-text-muted);">No primers added.</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = knowledgeList.map(k => `
-            <tr>
-                <td><strong>${escapeHtml(k.title)}</strong></td>
-                <td><span class="tier-badge tier-senior">${escapeHtml(k.category)}</span></td>
-                <td>${escapeHtml(k.date_label || k.date || '')}</td>
-                <td>${escapeHtml(k.read_time || k.readTime || '')}</td>
-                <td>
-                    <div class="action-btns-group">
-                        <button class="btn-icon delete" onclick="deleteKnowledge('${k.id}')">🗑️</button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    window.deleteKnowledge = async function(id) {
-        if (window.supabaseClient && !id.startsWith('kn_')) {
-            await window.supabaseClient.from('knowledge_primers').delete().eq('id', id);
-        }
-        const store = getStore();
-        store.knowledge = store.knowledge.filter(k => k.id !== id);
-        saveStore(store);
-        renderDashboard();
-        showToast("Removed primer item.");
-    };
-
-    function renderAchievementsTable(achievementsList = []) {
-        const tbody = document.getElementById('achievements-table-body');
-        if (!tbody) return;
-        if (achievementsList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--admin-text-muted);">No achievements listed.</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = achievementsList.map(a => `
-            <tr>
-                <td><strong>${escapeHtml(a.event_name || a.event || '')}</strong></td>
-                <td><span class="tier-badge tier-board">${escapeHtml(a.position)}</span></td>
-                <td>${escapeHtml(a.team_name || a.team || '')}</td>
-                <td>${escapeHtml(a.year)}</td>
-                <td>
-                    <div class="action-btns-group">
-                        <button class="btn-icon delete" onclick="deleteAchievement('${a.id}')">🗑️</button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    window.deleteAchievement = async function(id) {
-        if (window.supabaseClient && !id.startsWith('ac_')) {
-            await window.supabaseClient.from('achievements').delete().eq('id', id);
-        }
-        const store = getStore();
-        store.achievements = store.achievements.filter(a => a.id !== id);
-        saveStore(store);
-        renderDashboard();
-        showToast("Removed achievement record.");
-    };
-
-    // ----------------------------------------------------------------------
-    // 8. CONTACT INBOX RENDER
+    // 7. INBOX RENDER
     // ----------------------------------------------------------------------
     function renderInboxList(inboxList = []) {
         const container = document.getElementById('inbox-list-container');
@@ -609,9 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    // ----------------------------------------------------------------------
-    // 9. UTILS & TOAST SYSTEM
-    // ----------------------------------------------------------------------
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");

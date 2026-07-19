@@ -553,23 +553,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderDynamicTeamGrid(teamMembers, container) {
-        // Group by tier
+        if (!container) return;
+        if (!teamMembers || teamMembers.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 4rem 1rem; color: #94a3b8; background: rgba(30, 41, 59, 0.4); border: 1px dashed rgba(212, 175, 55, 0.3); border-radius: 16px; max-width: 600px; margin: 2rem auto;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👥</div>
+                    <h3 style="color: #f8fafc; margin-bottom: 0.5rem;">No Active Team Members Listed</h3>
+                    <p style="font-size: 0.95rem;">Use the Grandeur Admin Console to add team members, photos, and roles.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Group by 6 official tiers
         const tiers = {
             faculty: { title: "Faculty In-Charge", members: [] },
             board: { title: "President & Vice President", members: [] },
-            coordinators: { title: "Co-ordinators & Directors", members: [] },
+            coordinators: { title: "Co-ordinators", members: [] },
             advisory: { title: "Advisory Committee", members: [] },
-            senior: { title: "Senior Consultants", members: [] },
-            core: { title: "Core Committee Members", members: [] },
-            junior: { title: "Junior Consultants & Members", members: [] }
+            core: { title: "Core Committee", members: [] },
+            organizing: { title: "Organizing Committee", members: [] }
         };
 
         teamMembers.forEach(m => {
-            const key = (m.tier || 'junior').toLowerCase();
+            const key = (m.tier || 'core').toLowerCase();
             if (tiers[key]) {
                 tiers[key].members.push(m);
             } else {
-                tiers.junior.members.push(m);
+                tiers.core.members.push(m);
             }
         });
 
