@@ -1,16 +1,23 @@
 /* ==========================================================================
-   Grandeur SSCBS - Admin Console JavaScript (Pure Supabase Live Engine)
+   Grandeur SSCBS - Admin Console JavaScript (Supabase Integrated)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ----------------------------------------------------------------------
-    // 1. DEFAULT DATA STORE INITIALIZATION
-    // ----------------------------------------------------------------------
+    function getSupabase() {
+        if (window.supabaseClient) return window.supabaseClient;
+        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+            window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+            return window.supabaseClient;
+        }
+        return null;
+    }
+
+    // Default Fallback
     const DEFAULT_STORE = {
         recruitment: {
             active: false,
             title: "Grandeur Recruitment Drive 2026",
-            description: "Join the premier Consulting & Knowledge Cell of SSCBS. We are hiring proactive thinkers, analysts, and strategists.",
+            description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
             formUrl: "https://forms.google.com/",
             deadline: "August 20, 2026 - 11:59 PM IST"
         },
@@ -21,8 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btnUrl: "contact-us.html"
         },
         team: [],
-        knowledge: [],
-        achievements: [],
         inbox: []
     };
 
@@ -42,9 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.dispatchEvent(new Event('grandeur_store_updated'));
     }
 
-    // ----------------------------------------------------------------------
-    // 2. AUTHENTICATION (PASSCODE: 123456)
-    // ----------------------------------------------------------------------
+    // AUTHENTICATION
     const DEMO_PASSCODE = "123456";
     const loginView = document.getElementById('login-view');
     const dashboardView = document.getElementById('dashboard-view');
@@ -84,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (val === DEMO_PASSCODE) {
                 sessionStorage.setItem('grandeur_admin_authenticated', 'true');
                 if (authErrorAlert) authErrorAlert.style.display = 'none';
-                showToast("✅ Successfully authenticated! Welcome to Grandeur Admin.");
+                showToast("✅ Successfully authenticated!");
                 checkAuthSession();
             } else {
                 if (authErrorAlert) authErrorAlert.style.display = 'block';
@@ -101,9 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ----------------------------------------------------------------------
-    // 3. DASHBOARD TAB NAVIGATION
-    // ----------------------------------------------------------------------
+    // TAB NAVIGATION
     const tabButtons = document.querySelectorAll('.admin-nav-item');
     const tabPanels = document.querySelectorAll('.tab-panel');
 
@@ -119,31 +120,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ----------------------------------------------------------------------
-    // 4. DASHBOARD RENDER & DATA BINDING (PURE SUPABASE + LOCAL FALLBACK)
-    // ----------------------------------------------------------------------
+    // DASHBOARD RENDER
     async function renderDashboard() {
+        const client = getSupabase();
         let recruitmentData = null;
         let bannerData = null;
         let teamData = null;
         let inboxData = [];
 
-        if (window.supabaseClient) {
+        if (client) {
             try {
-                const { data: rec } = await window.supabaseClient.from('recruitment_settings').select('*').single();
+                const { data: rec } = await client.from('recruitment_settings').select('*').single();
                 if (rec) recruitmentData = { active: rec.active, title: rec.title, description: rec.description, formUrl: rec.form_url, deadline: rec.deadline };
 
-                const { data: ban } = await window.supabaseClient.from('announcements').select('*').single();
+                const { data: ban } = await client.from('announcements').select('*').single();
                 if (ban) bannerData = { active: ban.active, text: ban.text, btnText: ban.btn_text, btnUrl: ban.btn_url };
 
-                const { data: tm, error: tmErr } = await window.supabaseClient.from('team_members').select('*').order('created_at', { ascending: true });
+                const { data: tm, error: tmErr } = await client.from('team_members').select('*').order('created_at', { ascending: true });
                 if (tmErr) console.error("Supabase team_members fetch error:", tmErr);
                 if (tm) teamData = tm;
 
-                const { data: inb } = await window.supabaseClient.from('contact_inquiries').select('*').order('created_at', { ascending: false });
+                const { data: inb } = await client.from('contact_inquiries').select('*').order('created_at', { ascending: false });
                 if (inb) inboxData = inb;
             } catch (err) {
-                console.warn("Supabase dashboard fetch warning:", err);
+                console.warn("Supabase fetch warning:", err);
             }
         }
 
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cachedTeam = teamData !== null ? teamData : localStore.team;
         const inbox = inboxData.length > 0 ? inboxData : localStore.inbox;
 
-        // 4.1 Overview Stats
+        // Stats
         const statRecruitment = document.getElementById('stat-recruitment-status');
         const statRecruitmentSub = document.getElementById('stat-recruitment-sub');
         if (statRecruitment) {
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inboxBadge = document.getElementById('inbox-count-badge');
         if (inboxBadge) inboxBadge.textContent = inbox.length;
 
-        // Populate Form Controls
+        // Controls
         const switchRecruitment = document.getElementById('switch-recruitment-active');
         if (switchRecruitment) switchRecruitment.checked = recruitment.active;
 
@@ -206,20 +206,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputBannerBtnUrl = document.getElementById('banner-btn-url');
         if (inputBannerBtnUrl) inputBannerBtnUrl.value = banner.btnUrl || "";
 
-        // Render Admin Views
         renderTeamTable(cachedTeam);
         renderInboxList(inbox);
     }
 
-    // ----------------------------------------------------------------------
-    // 5. RECRUITMENT & BANNER SETTINGS
-    // ----------------------------------------------------------------------
+    // FORMS SUBMISSION
     const switchRecruitment = document.getElementById('switch-recruitment-active');
     if (switchRecruitment) {
         switchRecruitment.addEventListener('change', async () => {
             const active = switchRecruitment.checked;
-            if (window.supabaseClient) {
-                await window.supabaseClient.from('recruitment_settings').upsert({ id: 1, active: active });
+            const client = getSupabase();
+            if (client) {
+                await client.from('recruitment_settings').upsert({ id: 1, active: active });
             }
             const store = getStore();
             store.recruitment.active = active;
@@ -239,8 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const formUrl = document.getElementById('recruitment-form-url').value;
             const deadline = document.getElementById('recruitment-deadline').value;
 
-            if (window.supabaseClient) {
-                await window.supabaseClient.from('recruitment_settings').upsert({
+            const client = getSupabase();
+            if (client) {
+                await client.from('recruitment_settings').upsert({
                     id: 1, active, title, description, form_url: formUrl, deadline
                 });
             }
@@ -257,8 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (switchBanner) {
         switchBanner.addEventListener('change', async () => {
             const active = switchBanner.checked;
-            if (window.supabaseClient) {
-                await window.supabaseClient.from('announcements').upsert({ id: 1, active: active });
+            const client = getSupabase();
+            if (client) {
+                await client.from('announcements').upsert({ id: 1, active: active });
             }
             const store = getStore();
             store.banner.active = active;
@@ -277,8 +277,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const btnText = document.getElementById('banner-btn-text').value;
             const btnUrl = document.getElementById('banner-btn-url').value;
 
-            if (window.supabaseClient) {
-                await window.supabaseClient.from('announcements').upsert({
+            const client = getSupabase();
+            if (client) {
+                await client.from('announcements').upsert({
                     id: 1, active, text, btn_text: btnText, btn_url: btnUrl
                 });
             }
@@ -291,9 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ----------------------------------------------------------------------
-    // 6. TEAM MEMBERS MANAGER (SUPABASE CRUD)
-    // ----------------------------------------------------------------------
+    // TEAM CRUD
     const teamTableBody = document.getElementById('team-table-body');
     const filterTierSelect = document.getElementById('filter-team-tier');
     const searchTeamInput = document.getElementById('search-team-input');
@@ -345,7 +344,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterTierSelect) filterTierSelect.addEventListener('change', () => renderTeamTable());
     if (searchTeamInput) searchTeamInput.addEventListener('input', () => renderTeamTable());
 
-    // Modal Handling
     const modalMember = document.getElementById('modal-member');
     const btnOpenAddMember = document.getElementById('btn-open-add-member-modal');
     const quickAddMember = document.getElementById('quick-add-member');
@@ -406,34 +404,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const photo = document.getElementById('member-photo').value.trim();
             const linkedin = document.getElementById('member-linkedin').value.trim();
 
-            if (window.supabaseClient) {
+            const client = getSupabase();
+            if (client) {
                 try {
                     let sbError = null;
                     if (editId) {
-                        const { error } = await window.supabaseClient.from('team_members').update({
+                        const { error } = await client.from('team_members').update({
                             name, role, tier, photo, linkedin
                         }).eq('id', editId);
                         sbError = error;
                     } else {
-                        const { error } = await window.supabaseClient.from('team_members').insert([
+                        const { error } = await client.from('team_members').insert([
                             { name, role, tier, photo, linkedin }
                         ]);
                         sbError = error;
                     }
 
                     if (sbError) {
-                        console.error("Supabase team member save error:", sbError);
-                        showToast(`⚠️ Supabase Error: ${sbError.message || sbError.details || 'Check SQL RLS settings'}`);
+                        console.error("Supabase Error:", sbError);
+                        showToast(`⚠️ Error: ${sbError.message || 'Check database settings'}`);
                         return;
                     }
                 } catch(err) {
-                    console.error("Supabase save error:", err);
+                    console.error("Supabase error:", err);
                 }
             }
 
             showToast(`✅ Saved team member: ${name}`);
             closeMemberModal();
-            renderDashboard();
+            await renderDashboard();
             window.dispatchEvent(new Event('grandeur_store_updated'));
         });
     }
@@ -446,9 +445,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteTeamMember = async function(id) {
         const member = cachedTeam.find(m => m.id === id);
         if (member && confirm(`Are you sure you want to remove ${member.name} from the team?`)) {
-            if (window.supabaseClient) {
+            const client = getSupabase();
+            if (client) {
                 try {
-                    const { error } = await window.supabaseClient.from('team_members').delete().eq('id', id);
+                    const { error } = await client.from('team_members').delete().eq('id', id);
                     if (error) {
                         console.error("Supabase delete error:", error);
                         showToast(`⚠️ Delete failed: ${error.message}`);
@@ -459,14 +459,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             showToast(`Removed team member: ${member.name}`);
-            renderDashboard();
+            await renderDashboard();
             window.dispatchEvent(new Event('grandeur_store_updated'));
         }
     };
 
-    // ----------------------------------------------------------------------
-    // 7. INBOX RENDER
-    // ----------------------------------------------------------------------
+    // INBOX RENDER
     function renderInboxList(inboxList = []) {
         const container = document.getElementById('inbox-list-container');
         if (!container) return;

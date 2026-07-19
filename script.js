@@ -476,22 +476,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function getSupabase() {
+        if (window.supabaseClient) return window.supabaseClient;
+        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+            window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+            return window.supabaseClient;
+        }
+        return null;
+    }
+
     async function syncGrandeurCMS() {
+        const client = getSupabase();
         // Try fetching from Supabase if client is active
-        if (window.supabaseClient) {
+        if (client) {
             try {
                 // Fetch Announcement Banner
-                const { data: bannerData } = await window.supabaseClient.from('announcements').select('*').single();
+                const { data: bannerData } = await client.from('announcements').select('*').single();
                 if (bannerData) renderBanner(bannerData.active, bannerData.text, bannerData.btn_text, bannerData.btn_url);
 
                 // Fetch Recruitment Settings
-                const { data: recData } = await window.supabaseClient.from('recruitment_settings').select('*').single();
+                const { data: recData } = await client.from('recruitment_settings').select('*').single();
                 if (recData) applyRecruitmentState(recData.active, recData.form_url);
 
                 // Fetch Team Members
                 const teamHierarchy = document.querySelector('.team-hierarchy');
                 if (teamHierarchy) {
-                    const { data: teamData, error: teamErr } = await window.supabaseClient.from('team_members').select('*').order('created_at', { ascending: true });
+                    const { data: teamData, error: teamErr } = await client.from('team_members').select('*').order('created_at', { ascending: true });
                     if (teamErr) console.error("Supabase team fetch error on site:", teamErr);
                     renderDynamicTeamGrid(teamData || [], teamHierarchy);
                 }
