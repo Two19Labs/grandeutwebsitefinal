@@ -158,6 +158,8 @@
                                         </div>
                                     `;
                                 }).join('');
+                            } else {
+                                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem;">No alumni listed yet. Add alumni members from the Admin Console.</p>';
                             }
                         } catch(e) {
                             console.error("Error loading dynamic alumni:", e);
