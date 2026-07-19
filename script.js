@@ -555,14 +555,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderDynamicTeamGrid(teamMembers, container) {
         // Group by tier
         const tiers = {
+            faculty: { title: "Faculty In-Charge", members: [] },
             board: { title: "President & Vice President", members: [] },
-            senior: { title: "Senior Advisory & Consultants", members: [] },
+            coordinators: { title: "Co-ordinators & Directors", members: [] },
+            advisory: { title: "Advisory Committee", members: [] },
+            senior: { title: "Senior Consultants", members: [] },
+            core: { title: "Core Committee Members", members: [] },
             junior: { title: "Junior Consultants & Members", members: [] }
         };
 
         teamMembers.forEach(m => {
-            if (tiers[m.tier]) {
-                tiers[m.tier].members.push(m);
+            const key = (m.tier || 'junior').toLowerCase();
+            if (tiers[key]) {
+                tiers[key].members.push(m);
+            } else {
+                tiers.junior.members.push(m);
             }
         });
 
@@ -572,29 +579,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const tierData = tiers[tierKey];
             if (tierData.members.length > 0) {
                 html += `
-                    <div class="hierarchy-section" data-tier="${tierKey}" style="margin-bottom: 3rem;">
-                        <h4 class="tier-title" style="text-align: center; margin-bottom: 2rem; color: var(--gold, #d4af37); font-size: 1.5rem;">${tierData.title}</h4>
-                        <div class="team-grid tier-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto;">
+                    <div class="hierarchy-section" data-tier="${tierKey}" style="margin-bottom: 3.5rem;">
+                        <h4 class="tier-title" style="text-align: center; margin-bottom: 2rem; color: var(--gold, #d4af37); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">${tierData.title}</h4>
+                        <div class="team-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto;">
                             ${tierData.members.map(m => {
                                 const initials = m.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                                 const avatarHtml = m.photo ? 
-                                    `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; border: 2px solid var(--gold, #d4af37);">` :
-                                    `<div class="avatar-placeholder" style="width: 100px; height: 100px; border-radius: 50%; background: #1e293b; color: #d4af37; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; margin: 0 auto 1rem; border: 2px solid #d4af37;">${initials}</div>`;
+                                    `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; border: 3px solid var(--gold, #d4af37); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);">` :
+                                    `<div class="avatar-placeholder" style="width: 110px; height: 110px; border-radius: 50%; background: #1e293b; color: #d4af37; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid #d4af37; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);">${initials}</div>`;
 
                                 const linkedinHtml = m.linkedin ? `
-                                    <div class="team-social" style="margin-top: 0.75rem;">
-                                        <a href="${escapeHtml(m.linkedin)}" class="social-link" target="_blank" aria-label="LinkedIn Profile" style="color: #d4af37;">
+                                    <div class="team-social" style="margin-top: 0.85rem;">
+                                        <a href="${escapeHtml(m.linkedin)}" class="social-link" target="_blank" aria-label="LinkedIn Profile" style="color: #d4af37; font-size: 0.9rem; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem;">
                                             LinkedIn ↗
                                         </a>
                                     </div>
                                 ` : '';
 
                                 return `
-                                    <div class="team-card" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 1.75rem 1.25rem; text-align: center; transition: transform 0.3s ease;">
+                                    <div class="team-card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 14px; padding: 2rem 1.25rem; text-align: center; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
                                         ${avatarHtml}
                                         <div class="team-info">
-                                            <h3 class="team-name" style="font-size: 1.2rem; margin-bottom: 0.3rem;">${escapeHtml(m.name)}</h3>
-                                            <span class="team-role" style="color: #94a3b8; font-size: 0.9rem;">${escapeHtml(m.role)}</span>
+                                            <h3 class="team-name" style="font-size: 1.25rem; margin-bottom: 0.35rem; color: #ffffff;">${escapeHtml(m.name)}</h3>
+                                            <span class="team-role" style="color: #94a3b8; font-size: 0.95rem; font-weight: 500;">${escapeHtml(m.role)}</span>
                                             ${linkedinHtml}
                                         </div>
                                     </div>

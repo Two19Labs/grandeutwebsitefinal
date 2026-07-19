@@ -457,16 +457,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (window.supabaseClient) {
                 try {
+                    let sbError = null;
                     if (editId && !editId.startsWith('tm_')) {
-                        // Supabase UUID update
-                        await window.supabaseClient.from('team_members').update({
+                        const { error } = await window.supabaseClient.from('team_members').update({
                             name, role, tier, photo, linkedin
                         }).eq('id', editId);
+                        sbError = error;
                     } else {
-                        // Supabase Insert
-                        await window.supabaseClient.from('team_members').insert([
+                        const { error } = await window.supabaseClient.from('team_members').insert([
                             { name, role, tier, photo, linkedin }
                         ]);
+                        sbError = error;
+                    }
+
+                    if (sbError) {
+                        console.error("Supabase Error:", sbError);
+                        showToast(`⚠️ Supabase Error: ${sbError.message || sbError.details || 'Row Level Security policy blocked insert.'}`);
                     }
                 } catch(err) {
                     console.error("Supabase team member save error:", err);
