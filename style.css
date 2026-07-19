@@ -2051,6 +2051,73 @@ a {
     color: var(--gold, #d4af37) !important;
 }
 
+/* ==========================================================================
+   Social Media Icon Buttons & Connect Card
+   ========================================================================== */
+.social-icons-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.social-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #0f172a;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.social-icon-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+}
+
+.social-icon-btn:hover {
+    transform: translateY(-3px) scale(1.08);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.social-icon-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Brand Colors on Hover */
+.social-icon-btn.instagram:hover {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    color: #ffffff;
+}
+
+.social-icon-btn.facebook:hover {
+    background: #1877f2;
+    color: #ffffff;
+}
+
+.social-icon-btn.twitter:hover {
+    background: #000000;
+    color: #ffffff;
+}
+
+.social-icon-btn.linkedin:hover {
+    background: #0077b5;
+    color: #ffffff;
+}
+
+.social-icon-btn.linktree:hover {
+    background: #43e660;
+    color: #000000;
+}
+
+
 
 
 

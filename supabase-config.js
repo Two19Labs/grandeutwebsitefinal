@@ -85,7 +85,78 @@ window.GrandeurDB = {
             body: JSON.stringify({ id: 1, ...data })
         });
         return res.ok;
+    },
+
+    // 4. KNOWLEDGE PRIMERS
+    async getKnowledgePrimers() {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=*&order=created_at.desc`, { headers: HEADERS });
+            if (!res.ok) return [];
+            return await res.json();
+        } catch(e) { return []; }
+    },
+
+    async insertKnowledgePrimer(data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers`, {
+            method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return await res.json();
+    },
+
+    async deleteKnowledgePrimer(id) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: HEADERS
+        });
+        return res.ok;
+    },
+
+    // 5. ACHIEVEMENTS
+    async getAchievements() {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=*&order=created_at.desc`, { headers: HEADERS });
+            if (!res.ok) return [];
+            return await res.json();
+        } catch(e) { return []; }
+    },
+
+    async insertAchievement(data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements`, {
+            method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return await res.json();
+    },
+
+    async deleteAchievement(id) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: HEADERS
+        });
+        return res.ok;
+    },
+
+    // 6. CONTACT INQUIRIES (INBOX)
+    async getContactInquiries() {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?select=*&order=created_at.desc`, { headers: HEADERS });
+            if (!res.ok) return [];
+            return await res.json();
+        } catch(e) { return []; }
+    },
+
+    async deleteContactInquiry(id) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: HEADERS
+        });
+        return res.ok;
     }
 };
 
-console.log("✅ GrandeurDB Native REST Engine initialized!");
+console.log("✅ GrandeurDB Native REST Engine fully loaded for all 6 modules!");

@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 recruitmentData = await window.GrandeurDB.getRecruitment();
                 bannerData = await window.GrandeurDB.getBanner();
                 teamData = await window.GrandeurDB.getTeamMembers();
+                inboxData = await window.GrandeurDB.getContactInquiries();
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
             }
