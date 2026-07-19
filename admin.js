@@ -122,28 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DASHBOARD RENDER
     async function renderDashboard() {
-        const client = getSupabase();
         let recruitmentData = null;
         let bannerData = null;
         let teamData = null;
         let inboxData = [];
 
-        if (client) {
+        if (window.GrandeurDB) {
             try {
-                const { data: rec } = await client.from('recruitment_settings').select('*').single();
-                if (rec) recruitmentData = { active: rec.active, title: rec.title, description: rec.description, formUrl: rec.form_url, deadline: rec.deadline };
-
-                const { data: ban } = await client.from('announcements').select('*').single();
-                if (ban) bannerData = { active: ban.active, text: ban.text, btnText: ban.btn_text, btnUrl: ban.btn_url };
-
-                const { data: tm, error: tmErr } = await client.from('team_members').select('*').order('created_at', { ascending: true });
-                if (tmErr) console.error("Supabase team_members fetch error:", tmErr);
-                if (tm) teamData = tm;
-
-                const { data: inb } = await client.from('contact_inquiries').select('*').order('created_at', { ascending: false });
-                if (inb) inboxData = inb;
+                recruitmentData = await window.GrandeurDB.getRecruitment();
+                bannerData = await window.GrandeurDB.getBanner();
+                teamData = await window.GrandeurDB.getTeamMembers();
             } catch (err) {
-                console.warn("Supabase fetch warning:", err);
+                console.warn("GrandeurDB fetch warning:", err);
             }
         }
 
@@ -215,9 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (switchRecruitment) {
         switchRecruitment.addEventListener('change', async () => {
             const active = switchRecruitment.checked;
-            const client = getSupabase();
-            if (client) {
-                await client.from('recruitment_settings').upsert({ id: 1, active: active });
+            if (window.GrandeurDB) {
+                await window.GrandeurDB.updateRecruitment({ active });
             }
             const store = getStore();
             store.recruitment.active = active;
@@ -237,11 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const formUrl = document.getElementById('recruitment-form-url').value;
             const deadline = document.getElementById('recruitment-deadline').value;
 
-            const client = getSupabase();
-            if (client) {
-                await client.from('recruitment_settings').upsert({
-                    id: 1, active, title, description, form_url: formUrl, deadline
-                });
+            if (window.GrandeurDB) {
+                await window.GrandeurDB.updateRecruitment({ active, title, description, form_url: formUrl, deadline });
             }
 
             const store = getStore();
@@ -256,9 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (switchBanner) {
         switchBanner.addEventListener('change', async () => {
             const active = switchBanner.checked;
-            const client = getSupabase();
-            if (client) {
-                await client.from('announcements').upsert({ id: 1, active: active });
+            if (window.GrandeurDB) {
+                await window.GrandeurDB.updateBanner({ active });
             }
             const store = getStore();
             store.banner.active = active;
@@ -277,11 +262,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const btnText = document.getElementById('banner-btn-text').value;
             const btnUrl = document.getElementById('banner-btn-url').value;
 
-            const client = getSupabase();
-            if (client) {
-                await client.from('announcements').upsert({
-                    id: 1, active, text, btn_text: btnText, btn_url: btnUrl
-                });
+            if (window.GrandeurDB) {
+                await window.GrandeurDB.updateBanner({ active, text, btn_text: btnText, btn_url: btnUrl });
             }
 
             const store = getStore();
@@ -441,29 +423,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const photo = document.getElementById('member-photo').value.trim();
             const linkedin = document.getElementById('member-linkedin').value.trim();
 
-            const client = getSupabase();
-            if (client) {
+            if (window.GrandeurDB) {
                 try {
-                    let sbError = null;
                     if (editId) {
-                        const { error } = await client.from('team_members').update({
-                            name, role, tier, photo, linkedin
-                        }).eq('id', editId);
-                        sbError = error;
+                        await window.GrandeurDB.updateTeamMember(editId, { name, role, tier, photo, linkedin });
                     } else {
-                        const { error } = await client.from('team_members').insert([
-                            { name, role, tier, photo, linkedin }
-                        ]);
-                        sbError = error;
-                    }
-
-                    if (sbError) {
-                        console.error("Supabase Error:", sbError);
-                        showToast(`⚠️ Error: ${sbError.message || 'Check database settings'}`);
-                        return;
+                        await window.GrandeurDB.insertTeamMember({ name, role, tier, photo, linkedin });
                     }
                 } catch(err) {
-                    console.error("Supabase error:", err);
+                    console.error("GrandeurDB save error:", err);
+                    showToast(`⚠️ Error saving: ${err.message}`);
+                    return;
                 }
             }
 
@@ -482,17 +452,13 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteTeamMember = async function(id) {
         const member = cachedTeam.find(m => m.id === id);
         if (member && confirm(`Are you sure you want to remove ${member.name} from the team?`)) {
-            const client = getSupabase();
-            if (client) {
+            if (window.GrandeurDB) {
                 try {
-                    const { error } = await client.from('team_members').delete().eq('id', id);
-                    if (error) {
-                        console.error("Supabase delete error:", error);
-                        showToast(`⚠️ Delete failed: ${error.message}`);
-                        return;
-                    }
+                    await window.GrandeurDB.deleteTeamMember(id);
                 } catch(err) {
-                    console.error("Supabase delete error:", err);
+                    console.error("GrandeurDB delete error:", err);
+                    showToast(`⚠️ Delete failed: ${err.message}`);
+                    return;
                 }
             }
             showToast(`Removed team member: ${member.name}`);

@@ -486,54 +486,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function syncGrandeurCMS() {
-        const client = getSupabase();
-        
-        // 1. Fetch Announcement Banner
-        if (client) {
-            try {
-                const { data: bannerData } = await client.from('announcements').select('*').single();
-                if (bannerData) renderBanner(bannerData.active, bannerData.text, bannerData.btn_text, bannerData.btn_url);
-            } catch (err) {
-                console.warn("Banner fetch warning:", err);
-            }
-        }
-
-        // 2. Fetch Recruitment Settings
-        if (client) {
-            try {
-                const { data: recData } = await client.from('recruitment_settings').select('*').single();
-                if (recData) applyRecruitmentState(recData.active, recData.form_url);
-            } catch (err) {
-                console.warn("Recruitment fetch warning:", err);
-            }
-        }
-
-        // 3. Fetch Team Members
         const teamHierarchy = document.querySelector('.team-hierarchy');
-        if (teamHierarchy) {
-            let renderedFromSupabase = false;
-            if (client) {
-                try {
-                    const { data: teamData, error: teamErr } = await client.from('team_members').select('*').order('created_at', { ascending: true });
-                    if (teamErr) {
-                        console.error("Supabase team fetch error on site:", teamErr);
-                    } else if (teamData) {
-                        renderDynamicTeamGrid(teamData, teamHierarchy);
-                        renderedFromSupabase = true;
-                    }
-                } catch (err) {
-                    console.warn("Supabase team fetch error:", err);
-                }
-            }
 
-            if (!renderedFromSupabase) {
-                const dataStr = localStorage.getItem('grandeur_admin_store');
-                if (dataStr) {
-                    try {
-                        const store = JSON.parse(dataStr);
-                        if (store.team) renderDynamicTeamGrid(store.team, teamHierarchy);
-                    } catch (e) {}
+        if (window.GrandeurDB) {
+            try {
+                const bannerData = await window.GrandeurDB.getBanner();
+                if (bannerData) renderBanner(bannerData.active, bannerData.text, bannerData.btn_text, bannerData.btn_url);
+            } catch (err) { console.warn("Banner fetch warning:", err); }
+
+            try {
+                const recData = await window.GrandeurDB.getRecruitment();
+                if (recData) applyRecruitmentState(recData.active, recData.form_url);
+            } catch (err) { console.warn("Recruitment fetch warning:", err); }
+        }
+
+        if (teamHierarchy && window.GrandeurDB) {
+            try {
+                const teamData = await window.GrandeurDB.getTeamMembers();
+                if (teamData) {
+                    renderDynamicTeamGrid(teamData, teamHierarchy);
+                    return;
                 }
+            } catch (err) {
+                console.error("GrandeurDB team fetch error on site:", err);
+            }
+        }
+
+        if (teamHierarchy) {
+            const dataStr = localStorage.getItem('grandeur_admin_store');
+            if (dataStr) {
+                try {
+                    const store = JSON.parse(dataStr);
+                    if (store.team) renderDynamicTeamGrid(store.team, teamHierarchy);
+                } catch (e) {}
             }
         }
     }
