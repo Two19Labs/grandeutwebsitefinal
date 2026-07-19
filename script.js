@@ -491,8 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Fetch Team Members
                 const teamHierarchy = document.querySelector('.team-hierarchy');
                 if (teamHierarchy) {
-                    const { data: teamData } = await window.supabaseClient.from('team_members').select('*').order('display_order', { ascending: true });
-                    if (teamData && teamData.length > 0) renderDynamicTeamGrid(teamData, teamHierarchy);
+                    const { data: teamData, error: teamErr } = await window.supabaseClient.from('team_members').select('*').order('created_at', { ascending: true });
+                    if (teamErr) console.error("Supabase team fetch error on site:", teamErr);
+                    renderDynamicTeamGrid(teamData || [], teamHierarchy);
                 }
                 return;
             } catch (err) {
