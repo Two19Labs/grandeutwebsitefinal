@@ -84,13 +84,11 @@
                                 return;
                             }
 
-                            grid.innerHTML = primers.map(p => {
+                            grid.innerHTML = primers.map((p, idx) => {
                                 const cat = p.category || 'Industry Report';
                                 const dateStr = p.date_label || p.year || '2026';
                                 const readTime = p.read_time || 'PDF Document';
-                                const linkHref = p.pdf_url ? p.pdf_url : '#';
-                                const linkTarget = p.pdf_url ? '_blank' : '_self';
-                                const linkOnClick = p.pdf_url ? '' : 'onclick="alert(\'Document coming soon.\'); return false;"';
+                                const hasUrl = p.pdf_url && p.pdf_url.length > 0;
 
                                 return `
                                     <div class="resource-card-item" data-category="${cat}">
@@ -103,12 +101,19 @@
                                             <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">${readTime}</p>
                                             <div class="resource-footer">
                                                 <span style="font-size: 0.8rem; color: var(--text-muted);">Grandeur Cell</span>
-                                                <a href="${linkHref}" target="${linkTarget}" ${linkOnClick} class="resource-link">Read / Download ↗</a>
+                                                <a href="${hasUrl && !p.pdf_url.startsWith('data:') ? p.pdf_url : '#'}" 
+                                                   target="_blank" 
+                                                   class="resource-link" 
+                                                   data-primer-idx="${idx}"
+                                                   onclick="openPrimerDoc(event, ${idx})">Read / Download ↗</a>
                                             </div>
                                         </div>
                                     </div>
                                 `;
                             }).join('');
+
+                            // Store primers data for click handler
+                            window.__khPrimers = primers;
                         }
 
                         try {
@@ -126,6 +131,51 @@
                             console.error("Knowledge Hub load error:", e);
                         }
                     })();
+
+                    // Global click handler for primer documents
+                    function openPrimerDoc(event, idx) {
+                        event.preventDefault();
+                        const primers = window.__khPrimers;
+                        if (!primers || !primers[idx]) {
+                            alert('Document coming soon.');
+                            return;
+                        }
+                        const pdfUrl = primers[idx].pdf_url;
+                        if (!pdfUrl || pdfUrl.length === 0) {
+                            alert('Document coming soon.');
+                            return;
+                        }
+
+                        // Regular HTTP(S) URL — open directly
+                        if (pdfUrl.startsWith('http://') || pdfUrl.startsWith('https://')) {
+                            window.open(pdfUrl, '_blank');
+                            return;
+                        }
+
+                        // Base64 data URL — convert to blob and open
+                        if (pdfUrl.startsWith('data:')) {
+                            try {
+                                const byteString = atob(pdfUrl.split(',')[1]);
+                                const mimeString = pdfUrl.split(',')[0].split(':')[1].split(';')[0];
+                                const ab = new ArrayBuffer(byteString.length);
+                                const ia = new Uint8Array(ab);
+                                for (let i = 0; i < byteString.length; i++) {
+                                    ia[i] = byteString.charCodeAt(i);
+                                }
+                                const blob = new Blob([ab], { type: mimeString });
+                                const blobUrl = URL.createObjectURL(blob);
+                                window.open(blobUrl, '_blank');
+                            } catch(err) {
+                                console.error('Error opening document:', err);
+                                alert('Unable to open this document. Try downloading it directly.');
+                            }
+                            return;
+                        }
+
+                        // Fallback
+                        window.open(pdfUrl, '_blank');
+                    }
+                    window.openPrimerDoc = openPrimerDoc;
                 </script>
             </div>
         </section>

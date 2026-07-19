@@ -492,14 +492,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const primerPdfFile = document.getElementById('primer-pdf-file');
     const primerPdfUrl = document.getElementById('primer-pdf-url');
 
+    let primerFileLoading = false;
+
     if (primerPdfFile) {
         primerPdfFile.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
+                primerFileLoading = true;
+                const saveBtn = document.getElementById('btn-save-primer');
+                if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '📄 Reading file...'; }
+                showToast(`⏳ Reading file: ${file.name} (${(file.size / 1024).toFixed(0)}KB)...`);
+
                 const reader = new FileReader();
                 reader.onload = function(evt) {
                     if (primerPdfUrl) primerPdfUrl.value = evt.target.result;
-                    showToast(`📄 Document loaded: ${file.name}`);
+                    primerFileLoading = false;
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
+                    showToast(`✅ File ready: ${file.name}`);
+                };
+                reader.onerror = function() {
+                    primerFileLoading = false;
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
+                    showToast(`❌ Failed to read file: ${file.name}`);
                 };
                 reader.readAsDataURL(file);
             }
@@ -573,12 +587,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formPrimerModal) {
         formPrimerModal.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            if (primerFileLoading) {
+                showToast('⏳ Please wait — file is still loading...');
+                return;
+            }
+
             const editId = document.getElementById('primer-edit-id').value;
             const title = document.getElementById('primer-title').value.trim();
             const category = document.getElementById('primer-category').value;
             const date_label = document.getElementById('primer-date').value.trim();
             const read_time = document.getElementById('primer-read-time').value.trim();
             const pdf_url = document.getElementById('primer-pdf-url').value.trim();
+
+            if (!pdf_url) {
+                showToast('⚠️ Please upload a file or paste a document URL before saving.');
+                return;
+            }
+
+            const saveBtn = document.getElementById('btn-save-primer');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Saving...'; }
 
             if (window.GrandeurDB) {
                 try {
@@ -590,10 +618,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch(err) {
                     console.error("Primer save error:", err);
                     showToast(`⚠️ Error saving publication: ${err.message}`);
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
                     return;
                 }
             }
 
+            if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Publication'; }
             showToast(`✅ Saved publication: ${title}`);
             closePrimerModal();
             await renderDashboard();
