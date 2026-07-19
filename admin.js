@@ -5,6 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     let cachedTeam = [];
     let cachedPrimers = [];
+    let cachedAlumni = [];
 
     function getSupabase() {
         if (window.supabaseClient) return window.supabaseClient;
@@ -167,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 teamData = await window.GrandeurDB.getTeamMembers();
                 inboxData = await window.GrandeurDB.getContactInquiries();
                 cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
+                cachedAlumni = await window.GrandeurDB.getAlumniMembers();
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
             }
@@ -234,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTeamTable(cachedTeam);
         renderKnowledgeTable(cachedPrimers);
         renderInboxList(inbox);
+        renderAlumniTable(cachedAlumni);
     }
 
     // FORMS SUBMISSION
@@ -673,6 +676,157 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             showToast("🗑️ Removed inquiry from inbox");
+            await renderDashboard();
+        }
+    };
+
+    // ALUMNI NETWORK CRUD
+    const alumniTableBody = document.getElementById('alumni-table-body');
+    const modalAlumni = document.getElementById('modal-alumni');
+    const btnOpenAddAlumni = document.getElementById('btn-open-add-alumni-modal');
+    const btnCloseAlumniModal = document.getElementById('btn-close-alumni-modal');
+    const btnCancelAlumniModal = document.getElementById('btn-cancel-alumni-modal');
+    const formAlumniModal = document.getElementById('form-alumni-modal');
+
+    function renderAlumniTable(alumniList = cachedAlumni) {
+        if (!alumniTableBody) return;
+        if (!alumniList || alumniList.length === 0) {
+            alumniTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No alumni records found. Click "Add Alumni Member" to create one.</td></tr>`;
+            return;
+        }
+
+        alumniTableBody.innerHTML = alumniList.map(item => {
+            const parts = (item.role || '').split('|');
+            let batch = 'Alumni';
+            let roleAndPlacement = item.role || '';
+            if (parts.length > 1) {
+                batch = parts[0].trim();
+                roleAndPlacement = parts.slice(1).join('|').trim();
+            }
+            const roleSubParts = roleAndPlacement.split('•');
+            const formerRole = roleSubParts[0] ? roleSubParts[0].trim() : 'Alumnus';
+            const placement = roleSubParts[1] ? roleSubParts[1].trim() : '—';
+
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(item.name)}</strong></td>
+                    <td><span class="tier-badge tier-core">${escapeHtml(batch)}</span></td>
+                    <td>${escapeHtml(formerRole)}</td>
+                    <td>${escapeHtml(placement)}</td>
+                    <td style="text-align: right;">
+                        <div class="action-btns-group" style="justify-content: flex-end;">
+                            ${item.linkedin ? `<a href="${escapeHtml(item.linkedin)}" target="_blank" class="btn-icon" title="LinkedIn" style="text-decoration:none;">🔗</a>` : ''}
+                            <button class="btn-icon" onclick="editAlumniMember('${item.id}')" title="Edit">✏️</button>
+                            <button class="btn-icon delete" onclick="deleteAlumniMember('${item.id}')" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function openAlumniModal(alumnus = null) {
+        if (!modalAlumni) return;
+        const modalTitle = document.getElementById('modal-alumni-title');
+        const inputId = document.getElementById('alumni-edit-id');
+        const inputName = document.getElementById('alumni-name');
+        const inputBatch = document.getElementById('alumni-batch');
+        const inputFormerRole = document.getElementById('alumni-former-role');
+        const inputPlacement = document.getElementById('alumni-placement');
+        const inputLinkedin = document.getElementById('alumni-linkedin');
+
+        if (alumnus) {
+            modalTitle.textContent = "Edit Alumni Member";
+            inputId.value = alumnus.id;
+            inputName.value = alumnus.name || "";
+            
+            const parts = (alumnus.role || '').split('|');
+            if (parts.length > 1) {
+                inputBatch.value = parts[0].replace(/^Batch of\s*/i, '').trim();
+                const roleSub = parts.slice(1).join('|').trim().split('•');
+                inputFormerRole.value = roleSub[0] ? roleSub[0].trim() : '';
+                inputPlacement.value = roleSub[1] ? roleSub[1].trim() : '';
+            } else {
+                inputBatch.value = "2025";
+                inputFormerRole.value = alumnus.role || "";
+                inputPlacement.value = "";
+            }
+            inputLinkedin.value = alumnus.linkedin || "";
+        } else {
+            modalTitle.textContent = "Add Alumni Member";
+            inputId.value = "";
+            inputName.value = "";
+            inputBatch.value = "2025";
+            inputFormerRole.value = "";
+            inputPlacement.value = "";
+            inputLinkedin.value = "";
+        }
+        modalAlumni.style.display = 'flex';
+    }
+
+    function closeAlumniModal() {
+        if (modalAlumni) modalAlumni.style.display = 'none';
+    }
+
+    if (btnOpenAddAlumni) btnOpenAddAlumni.addEventListener('click', () => openAlumniModal());
+    if (btnCloseAlumniModal) btnCloseAlumniModal.addEventListener('click', closeAlumniModal);
+    if (btnCancelAlumniModal) btnCancelAlumniModal.addEventListener('click', closeAlumniModal);
+
+    if (formAlumniModal) {
+        formAlumniModal.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('alumni-edit-id').value;
+            const name = document.getElementById('alumni-name').value.trim();
+            const batch = document.getElementById('alumni-batch').value.trim();
+            const formerRole = document.getElementById('alumni-former-role').value.trim();
+            const placement = document.getElementById('alumni-placement').value.trim();
+            const linkedin = document.getElementById('alumni-linkedin').value.trim();
+
+            const formattedRole = `Batch of ${batch.replace(/^Batch of\s*/i, '')} | ${formerRole} • ${placement}`;
+
+            const saveBtn = document.getElementById('btn-save-alumni');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Saving...'; }
+
+            if (window.GrandeurDB) {
+                try {
+                    if (editId) {
+                        await window.GrandeurDB.updateAlumniMember(editId, { name, role: formattedRole, linkedin });
+                    } else {
+                        await window.GrandeurDB.insertAlumniMember({ name, role: formattedRole, linkedin });
+                    }
+                } catch(err) {
+                    console.error("Alumni save error:", err);
+                    showToast(`⚠️ Error saving alumni: ${err.message}`);
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Alumni Member'; }
+                    return;
+                }
+            }
+
+            if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Alumni Member'; }
+            showToast(`✅ Saved alumni: ${name}`);
+            closeAlumniModal();
+            await renderDashboard();
+        });
+    }
+
+    window.editAlumniMember = function(id) {
+        const alumnus = cachedAlumni.find(a => a.id === id);
+        if (alumnus) openAlumniModal(alumnus);
+    };
+
+    window.deleteAlumniMember = async function(id) {
+        const alumnus = cachedAlumni.find(a => a.id === id);
+        if (alumnus && confirm(`Are you sure you want to remove "${alumnus.name}" from Alumni?`)) {
+            if (window.GrandeurDB) {
+                try {
+                    await window.GrandeurDB.deleteAlumniMember(id);
+                } catch(err) {
+                    console.error("Alumni delete error:", err);
+                    showToast(`⚠️ Delete failed: ${err.message}`);
+                    return;
+                }
+            }
+            showToast(`Removed alumni: ${alumnus.name}`);
             await renderDashboard();
         }
     };

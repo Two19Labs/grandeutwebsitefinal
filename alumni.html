@@ -107,84 +107,55 @@
 
 
                 <div class="team-grid" id="alumni-grid">
-                    <!-- Batch of 2025 -->
-                    <div class="team-card" data-category="2025">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Kritika Goel</h3>
-                            <span class="team-role">Core Committee Member</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Pursuing Actuarial Science (IFoA)</span>
-                        </div>
-                    </div>
-                    <div class="team-card" data-category="2025">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Aditya Jain</h3>
-                            <span class="team-role">Organizing Committee</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Incoming Strategy Intern</span>
-                        </div>
-                    </div>
-                    <div class="team-card" data-category="2025">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Riya Verma</h3>
-                            <span class="team-role">Research Associate</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Management Trainee</span>
-                        </div>
-                    </div>
-
-                    <!-- Batch of 2024 -->
-                    <div class="team-card" data-category="2024">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Ayushi Saini</h3>
-                            <span class="team-role">Former President</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Trainee Analyst at Axxela / Former GT</span>
-                        </div>
-                    </div>
-                    <div class="team-card" data-category="2024">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Siddharth Goel</h3>
-                            <span class="team-role">Director of Outreach</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">IB Analyst at D. E. Shaw & Co.</span>
-                        </div>
-                    </div>
-                    <div class="team-card" data-category="2024">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Mehak Chhabra</h3>
-                            <span class="team-role">Director of R&D</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Corporate Strategy at Mamaearth</span>
-                        </div>
-                    </div>
-
-                    <!-- Batch of 2023 -->
-                    <div class="team-card" data-category="2023">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Bharat Kukreja</h3>
-                            <span class="team-role">Former President</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Analyst at Bain & Company / IIM C</span>
-                        </div>
-                    </div>
-                    <div class="team-card" data-category="2023">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Devansh Mittal</h3>
-                            <span class="team-role">Vice President</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Business Consultant at Grant Thornton</span>
-                        </div>
-                    </div>
-                    <div class="team-card" data-category="2023">
-                        <div class="avatar-placeholder"></div>
-                        <div class="team-info">
-                            <h3 class="team-name">Prerna Sethi</h3>
-                            <span class="team-role">Director of Operations</span>
-                            <span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">Associate at Boston Consulting Group (BCG)</span>
-                        </div>
-                    </div>
+                    <!-- Dynamic live alumni cards rendered from Supabase -->
                 </div>
+
+                <script>
+                    (async function loadLiveAlumni() {
+                        const grid = document.getElementById('alumni-grid');
+                        if (!grid) return;
+
+                        try {
+                            const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?tier=eq.board&order=created_at.asc', {
+                                headers: {
+                                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs'
+                                }
+                            });
+                            if (!res.ok) return;
+                            const alumni = await res.json();
+
+                            if (Array.isArray(alumni) && alumni.length > 0) {
+                                grid.innerHTML = alumni.map(item => {
+                                    const parts = (item.role || '').split('|');
+                                    let batch = 'Alumni';
+                                    let roleAndPlacement = item.role || '';
+                                    if (parts.length > 1) {
+                                        batch = parts[0].trim();
+                                        roleAndPlacement = parts.slice(1).join('|').trim();
+                                    }
+                                    const roleSubParts = roleAndPlacement.split('•');
+                                    const formerRole = roleSubParts[0] ? roleSubParts[0].trim() : 'Alumnus';
+                                    const placement = roleSubParts[1] ? roleSubParts[1].trim() : '';
+
+                                    return `
+                                        <div class="team-card">
+                                            <div class="avatar-placeholder"></div>
+                                            <div class="team-info">
+                                                <h3 class="team-name">${item.name}</h3>
+                                                <span class="team-role">${batch} &bull; ${formerRole}</span>
+                                                ${placement ? `<span class="team-role" style="font-weight: 600; color: var(--primary-light); margin-top: 0.25rem;">${placement}</span>` : ''}
+                                                ${item.linkedin ? `<a href="${item.linkedin}" target="_blank" rel="noopener noreferrer" style="color:var(--primary-light); font-size:0.85rem; font-weight:600; margin-top:0.4rem; display:inline-block; text-decoration:underline;">LinkedIn Profile ↗</a>` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                            }
+                        } catch(e) {
+                            console.error("Error loading dynamic alumni:", e);
+                        }
+                    })();
+                </script>
             </div>
         </section>
     </main>

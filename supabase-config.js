@@ -13,9 +13,9 @@ const HEADERS = {
 };
 
 window.GrandeurDB = {
-    // 1. TEAM MEMBERS CRUD
+    // 1. TEAM MEMBERS CRUD (Current Team)
     async getTeamMembers() {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=*&order=created_at.asc`, { headers: HEADERS });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?tier=neq.board&order=created_at.asc`, { headers: HEADERS });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         return await res.json();
     },
@@ -176,7 +176,44 @@ window.GrandeurDB = {
             headers: HEADERS
         });
         return res.ok;
+    },
+
+    // 7. ALUMNI MEMBERS
+    async getAlumniMembers() {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?tier=eq.board&order=created_at.asc`, { headers: HEADERS });
+            if (!res.ok) return [];
+            return await res.json();
+        } catch(e) { return []; }
+    },
+
+    async insertAlumniMember(data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members`, {
+            method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify({ ...data, tier: 'board' })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return await res.json();
+    },
+
+    async updateAlumniMember(id, data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: HEADERS,
+            body: JSON.stringify({ ...data, tier: 'board' })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return await res.json();
+    },
+
+    async deleteAlumniMember(id) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: HEADERS
+        });
+        return res.ok;
     }
 };
 
-console.log("✅ GrandeurDB Native REST Engine fully loaded for all 6 modules!");
+console.log("✅ GrandeurDB Native REST Engine loaded with Alumni module!");

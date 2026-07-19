@@ -125,6 +125,9 @@
                         <button class="admin-nav-item" data-tab="tab-inbox">
                             <span class="nav-icon">📬</span> Contact Inbox <span class="badge-count" id="inbox-count-badge">0</span>
                         </button>
+                        <button class="admin-nav-item" data-tab="tab-alumni">
+                            <span class="nav-icon">🎓</span> Alumni Network
+                        </button>
                     </nav>
                     
                     <div class="sidebar-footer-info">
@@ -402,6 +405,36 @@
                         </div>
                     </div>
 
+                    <!-- TAB 7: ALUMNI NETWORK -->
+                    <div class="tab-panel" id="tab-alumni">
+                        <div class="panel-header flex-between">
+                            <div>
+                                <h1>Alumni Network Management</h1>
+                                <p>Add, edit, or remove past members displayed on the Wall of Alumni.</p>
+                            </div>
+                            <button class="btn btn-primary" id="btn-open-add-alumni-modal">➕ Add Alumni Member</button>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Alumnus Name</th>
+                                            <th>Batch Year</th>
+                                            <th>Former Cell Role</th>
+                                            <th>Current Placement / Pursuit</th>
+                                            <th style="text-align: right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="alumni-table-body">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -506,6 +539,47 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline" id="btn-cancel-primer-modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="btn-save-primer">Save Publication</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ALUMNI MODAL -->
+    <div class="admin-modal-overlay" id="modal-alumni" style="display: none;">
+        <div class="admin-modal">
+            <div class="modal-header">
+                <h3 id="modal-alumni-title">Add Alumni Member</h3>
+                <button class="modal-close" id="btn-close-alumni-modal">&times;</button>
+            </div>
+            <form id="form-alumni-modal">
+                <input type="hidden" id="alumni-edit-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="alumni-name">Full Name *</label>
+                        <input type="text" id="alumni-name" class="form-input" placeholder="e.g. Kritika Goel" required>
+                    </div>
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label for="alumni-batch">Batch Year *</label>
+                            <input type="text" id="alumni-batch" class="form-input" placeholder="e.g. 2025 or Batch of 2025" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="alumni-former-role">Former Cell Role *</label>
+                            <input type="text" id="alumni-former-role" class="form-input" placeholder="e.g. Core Committee Member or President" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="alumni-placement">Current Placement / Pursuit *</label>
+                        <input type="text" id="alumni-placement" class="form-input" placeholder="e.g. Analyst at Bain & Company / IIM C" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="alumni-linkedin">LinkedIn Profile URL (Optional)</label>
+                        <input type="url" id="alumni-linkedin" class="form-input" placeholder="https://linkedin.com/in/username">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-alumni-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-alumni">Save Alumni Member</button>
                 </div>
             </form>
         </div>
