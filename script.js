@@ -594,29 +594,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const tierData = tiers[tierKey];
             if (tierData.members.length > 0) {
                 html += `
-                    <div class="hierarchy-section" data-tier="${tierKey}" style="margin-bottom: 3.5rem;">
-                        <h4 class="tier-title" style="text-align: center; margin-bottom: 2rem; color: var(--gold, #d4af37); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">${tierData.title}</h4>
-                        <div class="team-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto;">
+                    <div class="hierarchy-section" data-tier="${tierKey}">
+                        <h4 class="tier-title">${tierData.title}</h4>
+                        <div class="team-grid tier-grid-1">
                             ${tierData.members.map(m => {
-                                const initials = m.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                                const initials = (m.name || 'M').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                                 const avatarHtml = m.photo ? 
-                                    `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; border: 3px solid var(--gold, #d4af37); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);">` :
-                                    `<div class="avatar-placeholder" style="width: 110px; height: 110px; border-radius: 50%; background: #1e293b; color: #d4af37; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid #d4af37; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);">${initials}</div>`;
+                                    `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 1.5rem auto 0.5rem; border: 3px solid var(--primary-light); display: block; box-shadow: var(--shadow-md);">` :
+                                    `<div class="avatar-placeholder" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 1.5rem auto 0.5rem; border: 3px solid var(--primary-light); box-shadow: var(--shadow-md);">${initials}</div>`;
 
                                 const linkedinHtml = m.linkedin ? `
-                                    <div class="team-social" style="margin-top: 0.85rem;">
-                                        <a href="${escapeHtml(m.linkedin)}" class="social-link" target="_blank" aria-label="LinkedIn Profile" style="color: #d4af37; font-size: 0.9rem; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem;">
-                                            LinkedIn ↗
+                                    <div style="margin-top: 0.75rem;">
+                                        <a href="${escapeHtml(m.linkedin)}" target="_blank" style="color: #0077b5; font-size: 0.85rem; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                            <span>LinkedIn</span> ↗
                                         </a>
                                     </div>
                                 ` : '';
 
                                 return `
-                                    <div class="team-card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 14px; padding: 2rem 1.25rem; text-align: center; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+                                    <div class="team-card">
                                         ${avatarHtml}
                                         <div class="team-info">
-                                            <h3 class="team-name" style="font-size: 1.25rem; margin-bottom: 0.35rem; color: #ffffff;">${escapeHtml(m.name)}</h3>
-                                            <span class="team-role" style="color: #94a3b8; font-size: 0.95rem; font-weight: 500;">${escapeHtml(m.role)}</span>
+                                            <h3 class="team-name">${escapeHtml(m.name)}</h3>
+                                            <span class="team-role">${escapeHtml(m.role)}</span>
                                             ${linkedinHtml}
                                         </div>
                                     </div>
