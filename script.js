@@ -487,46 +487,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function syncGrandeurCMS() {
         const client = getSupabase();
-        // Try fetching from Supabase if client is active
+        
+        // 1. Fetch Announcement Banner
         if (client) {
             try {
-                // Fetch Announcement Banner
                 const { data: bannerData } = await client.from('announcements').select('*').single();
                 if (bannerData) renderBanner(bannerData.active, bannerData.text, bannerData.btn_text, bannerData.btn_url);
-
-                // Fetch Recruitment Settings
-                const { data: recData } = await client.from('recruitment_settings').select('*').single();
-                if (recData) applyRecruitmentState(recData.active, recData.form_url);
-
-                // Fetch Team Members
-                const teamHierarchy = document.querySelector('.team-hierarchy');
-                if (teamHierarchy) {
-                    const { data: teamData, error: teamErr } = await client.from('team_members').select('*').order('created_at', { ascending: true });
-                    if (teamErr) console.error("Supabase team fetch error on site:", teamErr);
-                    renderDynamicTeamGrid(teamData || [], teamHierarchy);
-                }
-                return;
             } catch (err) {
-                console.warn("Supabase fetch fallback to local storage:", err);
+                console.warn("Banner fetch warning:", err);
             }
         }
 
-        // Fallback to localStorage
-        const dataStr = localStorage.getItem('grandeur_admin_store');
-        if (!dataStr) return;
-
-        try {
-            const store = JSON.parse(dataStr);
-
-            if (store.banner) renderBanner(store.banner.active, store.banner.text, store.banner.btnText, store.banner.btnUrl);
-            if (store.recruitment) applyRecruitmentState(store.recruitment.active, store.recruitment.formUrl);
-
-            const teamHierarchy = document.querySelector('.team-hierarchy');
-            if (teamHierarchy && store.team && store.team.length > 0) {
-                renderDynamicTeamGrid(store.team, teamHierarchy);
+        // 2. Fetch Recruitment Settings
+        if (client) {
+            try {
+                const { data: recData } = await client.from('recruitment_settings').select('*').single();
+                if (recData) applyRecruitmentState(recData.active, recData.form_url);
+            } catch (err) {
+                console.warn("Recruitment fetch warning:", err);
             }
-        } catch (e) {
-            console.error("CMS Sync Error:", e);
+        }
+
+        // 3. Fetch Team Members
+        const teamHierarchy = document.querySelector('.team-hierarchy');
+        if (teamHierarchy) {
+            let renderedFromSupabase = false;
+            if (client) {
+                try {
+                    const { data: teamData, error: teamErr } = await client.from('team_members').select('*').order('created_at', { ascending: true });
+                    if (teamErr) {
+                        console.error("Supabase team fetch error on site:", teamErr);
+                    } else if (teamData) {
+                        renderDynamicTeamGrid(teamData, teamHierarchy);
+                        renderedFromSupabase = true;
+                    }
+                } catch (err) {
+                    console.warn("Supabase team fetch error:", err);
+                }
+            }
+
+            if (!renderedFromSupabase) {
+                const dataStr = localStorage.getItem('grandeur_admin_store');
+                if (dataStr) {
+                    try {
+                        const store = JSON.parse(dataStr);
+                        if (store.team) renderDynamicTeamGrid(store.team, teamHierarchy);
+                    } catch (e) {}
+                }
+            }
         }
     }
 
