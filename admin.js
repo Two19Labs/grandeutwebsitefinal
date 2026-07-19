@@ -147,7 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function restoreActiveTab() {
         const hashTab = location.hash.replace('#', '');
-        const savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-overview';
+        let savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-team';
+        if (['tab-overview', 'tab-recruitment', 'tab-achievements'].includes(savedTab)) {
+            savedTab = 'tab-team';
+        }
         activateTab(savedTab);
     }
 
