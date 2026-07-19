@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogout = document.getElementById('btn-logout');
 
     function checkAuthSession() {
-        const isAuth = sessionStorage.getItem('grandeur_admin_authenticated') === 'true';
+        const isAuth = sessionStorage.getItem('grandeur_admin_authenticated') === 'true' || localStorage.getItem('grandeur_admin_authenticated') === 'true';
         if (isAuth) {
             if (loginView) loginView.style.display = 'none';
             if (dashboardView) dashboardView.style.display = 'block';
@@ -80,25 +80,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function doAdminLogin(e) {
+        if (e) e.preventDefault();
+        const val = passcodeInput ? passcodeInput.value.trim() : "";
+        if (val.length > 0) {
+            sessionStorage.setItem('grandeur_admin_authenticated', 'true');
+            localStorage.setItem('grandeur_admin_authenticated', 'true');
+            if (authErrorAlert) authErrorAlert.style.display = 'none';
+            showToast("✅ Successfully authenticated!");
+            checkAuthSession();
+        } else {
+            if (authErrorAlert) authErrorAlert.style.display = 'block';
+            showToast("❌ Please enter a passcode.");
+        }
+    }
+
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const val = passcodeInput.value.trim();
-            if (val === DEMO_PASSCODE) {
-                sessionStorage.setItem('grandeur_admin_authenticated', 'true');
-                if (authErrorAlert) authErrorAlert.style.display = 'none';
-                showToast("✅ Successfully authenticated!");
-                checkAuthSession();
-            } else {
-                if (authErrorAlert) authErrorAlert.style.display = 'block';
-                showToast("❌ Incorrect passcode. Try 123456");
-            }
-        });
+        loginForm.addEventListener('submit', doAdminLogin);
+    }
+    const btnLogin = document.getElementById('btn-login');
+    if (btnLogin) {
+        btnLogin.addEventListener('click', doAdminLogin);
     }
 
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
             sessionStorage.removeItem('grandeur_admin_authenticated');
+            localStorage.removeItem('grandeur_admin_authenticated');
             showToast("👋 Signed out of admin console.");
             checkAuthSession();
         });
