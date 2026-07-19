@@ -476,58 +476,80 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function syncGrandeurCMS() {
+    async function syncGrandeurCMS() {
+        // Try fetching from Supabase if client is active
+        if (window.supabaseClient) {
+            try {
+                // Fetch Announcement Banner
+                const { data: bannerData } = await window.supabaseClient.from('announcements').select('*').single();
+                if (bannerData) renderBanner(bannerData.active, bannerData.text, bannerData.btn_text, bannerData.btn_url);
+
+                // Fetch Recruitment Settings
+                const { data: recData } = await window.supabaseClient.from('recruitment_settings').select('*').single();
+                if (recData) applyRecruitmentState(recData.active, recData.form_url);
+
+                // Fetch Team Members
+                const teamHierarchy = document.querySelector('.team-hierarchy');
+                if (teamHierarchy) {
+                    const { data: teamData } = await window.supabaseClient.from('team_members').select('*').order('display_order', { ascending: true });
+                    if (teamData && teamData.length > 0) renderDynamicTeamGrid(teamData, teamHierarchy);
+                }
+                return;
+            } catch (err) {
+                console.warn("Supabase fetch fallback to local storage:", err);
+            }
+        }
+
+        // Fallback to localStorage
         const dataStr = localStorage.getItem('grandeur_admin_store');
         if (!dataStr) return;
 
         try {
             const store = JSON.parse(dataStr);
 
-            // A. Global Banner Render
-            let bannerEl = document.getElementById('grandeur-global-banner');
-            if (store.banner && store.banner.active) {
-                if (!bannerEl) {
-                    bannerEl = document.createElement('div');
-                    bannerEl.id = 'grandeur-global-banner';
-                    bannerEl.className = 'global-announcement-banner';
-                    document.body.prepend(bannerEl);
-                }
-                const btnHtml = store.banner.btnText ? 
-                    `<a href="${store.banner.btnUrl || '#'}" class="banner-btn">${escapeHtml(store.banner.btnText)}</a>` : '';
-                bannerEl.innerHTML = `
-                    <div class="banner-content">
-                        <span>${escapeHtml(store.banner.text)}</span>
-                        ${btnHtml}
-                    </div>
-                `;
-            } else if (bannerEl) {
-                bannerEl.remove();
-            }
+            if (store.banner) renderBanner(store.banner.active, store.banner.text, store.banner.btnText, store.banner.btnUrl);
+            if (store.recruitment) applyRecruitmentState(store.recruitment.active, store.recruitment.formUrl);
 
-            // B. Recruitment State Hooks
-            if (store.recruitment) {
-                const recElements = document.querySelectorAll('.recruitment-cta-btn, .recruitment-notice');
-                recElements.forEach(el => {
-                    if (store.recruitment.active) {
-                        el.style.display = 'inline-block';
-                        if (el.tagName === 'A' && store.recruitment.formUrl) {
-                            el.href = store.recruitment.formUrl;
-                        }
-                    } else {
-                        el.style.display = 'none';
-                    }
-                });
-            }
-
-            // C. Dynamic Team Rendering on team.html
             const teamHierarchy = document.querySelector('.team-hierarchy');
             if (teamHierarchy && store.team && store.team.length > 0) {
                 renderDynamicTeamGrid(store.team, teamHierarchy);
             }
-
         } catch (e) {
             console.error("CMS Sync Error:", e);
         }
+    }
+
+    function renderBanner(active, text, btnText, btnUrl) {
+        let bannerEl = document.getElementById('grandeur-global-banner');
+        if (active) {
+            if (!bannerEl) {
+                bannerEl = document.createElement('div');
+                bannerEl.id = 'grandeur-global-banner';
+                bannerEl.className = 'global-announcement-banner';
+                document.body.prepend(bannerEl);
+            }
+            const btnHtml = btnText ? `<a href="${btnUrl || '#'}" class="banner-btn">${escapeHtml(btnText)}</a>` : '';
+            bannerEl.innerHTML = `
+                <div class="banner-content">
+                    <span>${escapeHtml(text)}</span>
+                    ${btnHtml}
+                </div>
+            `;
+        } else if (bannerEl) {
+            bannerEl.remove();
+        }
+    }
+
+    function applyRecruitmentState(active, formUrl) {
+        const recElements = document.querySelectorAll('.recruitment-cta-btn, .recruitment-notice');
+        recElements.forEach(el => {
+            if (active) {
+                el.style.display = 'inline-block';
+                if (el.tagName === 'A' && formUrl) el.href = formUrl;
+            } else {
+                el.style.display = 'none';
+            }
+        });
     }
 
     function renderDynamicTeamGrid(teamMembers, container) {
@@ -592,16 +614,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // Contact form saver to CMS inbox
+    // Contact form saver to CMS inbox & Supabase
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             const nameVal = document.getElementById('name')?.value || '';
             const emailVal = document.getElementById('email')?.value || '';
             const subjectVal = document.getElementById('subject')?.value || 'General Inquiry';
             const messageVal = document.getElementById('message')?.value || '';
 
             if (nameVal && emailVal && messageVal) {
+                // If Supabase connected
+                if (window.supabaseClient) {
+                    try {
+                        await window.supabaseClient.from('contact_inquiries').insert([
+                            { name: nameVal, email: emailVal, subject: subjectVal, message: messageVal }
+                        ]);
+                    } catch(err) { console.error("Supabase insert error:", err); }
+                }
+
+                // Also save locally
                 const dataStr = localStorage.getItem('grandeur_admin_store');
                 if (dataStr) {
                     try {
