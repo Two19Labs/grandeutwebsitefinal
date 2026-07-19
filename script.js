@@ -170,27 +170,32 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    btn.textContent = 'Submitted Successfully!';
-                    btn.style.backgroundColor = '#0f1d3a';
+                    btn.textContent = originalText;
+                    btn.disabled = false;
                     contactForm.reset();
-                    
-                    const existingMsg = contactForm.querySelector('.form-success-alert');
-                    if (existingMsg) existingMsg.remove();
 
-                    const successMessage = document.createElement('div');
-                    successMessage.className = 'form-success-alert';
-                    successMessage.innerHTML = '<p style="color: #0f1d3a; background: #dbeafe; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-weight: 600; text-align: center;">Thank you! Your message has been sent to our team.</p>';
-                    contactForm.appendChild(successMessage);
-                    
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                        btn.style.backgroundColor = '';
-                        successMessage.remove();
-                    }, 5000);
+                    const wrapper = document.getElementById('contact-form-wrapper');
+                    const successState = document.getElementById('contact-success-state');
+                    if (wrapper && successState) {
+                        wrapper.style.display = 'none';
+                        successState.style.display = 'block';
+                    }
                 })();
             }
         });
+
+        const btnSendAnother = document.getElementById('btn-send-another');
+        if (btnSendAnother) {
+            btnSendAnother.addEventListener('click', () => {
+                const wrapper = document.getElementById('contact-form-wrapper');
+                const successState = document.getElementById('contact-success-state');
+                if (contactForm) contactForm.reset();
+                if (wrapper && successState) {
+                    successState.style.display = 'none';
+                    wrapper.style.display = 'block';
+                }
+            });
+        }
     }
 
     function showError(input, message) {
