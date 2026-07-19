@@ -1,10 +1,10 @@
 /* ==========================================================================
-   Grandeur SSCBS - Admin Console JavaScript
+   Grandeur SSCBS - Admin Console JavaScript (Supabase Integrated)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
-    // 1. DEFAULT DATA STORE INITIALIZATION
+    // 1. DEFAULT DATA STORE INITIALIZATION (FALLBACK)
     // ----------------------------------------------------------------------
     const DEFAULT_STORE = {
         recruitment: {
@@ -43,22 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
+    let cachedTeam = [];
+
     function getStore() {
         const data = localStorage.getItem('grandeur_admin_store');
         if (!data) {
             localStorage.setItem('grandeur_admin_store', JSON.stringify(DEFAULT_STORE));
             return DEFAULT_STORE;
         }
-        try {
-            return JSON.parse(data);
-        } catch(e) {
-            return DEFAULT_STORE;
-        }
+        try { return JSON.parse(data); } catch(e) { return DEFAULT_STORE; }
     }
 
     function saveStore(store) {
         localStorage.setItem('grandeur_admin_store', JSON.stringify(store));
-        // Broadcast custom event for live dynamic updates across tabs
         window.dispatchEvent(new Event('grandeur_store_updated'));
     }
 
@@ -140,19 +137,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------------------
-    // 4. DASHBOARD RENDER & DATA BINDING
+    // 4. DASHBOARD RENDER & DATA BINDING (SUPABASE + LOCAL FALLBACK)
     // ----------------------------------------------------------------------
-    function renderDashboard() {
-        const store = getStore();
+    async function renderDashboard() {
+        let recruitmentData = null;
+        let bannerData = null;
+        let teamData = [];
+        let inboxData = [];
+        let knowledgeData = [];
+        let achievementsData = [];
+
+        if (window.supabaseClient) {
+            try {
+                const { data: rec } = await window.supabaseClient.from('recruitment_settings').select('*').single();
+                if (rec) recruitmentData = { active: rec.active, title: rec.title, description: rec.description, formUrl: rec.form_url, deadline: rec.deadline };
+
+                const { data: ban } = await window.supabaseClient.from('announcements').select('*').single();
+                if (ban) bannerData = { active: ban.active, text: ban.text, btnText: ban.btn_text, btnUrl: ban.btn_url };
+
+                const { data: tm } = await window.supabaseClient.from('team_members').select('*').order('created_at', { ascending: true });
+                if (tm) teamData = tm;
+
+                const { data: inb } = await window.supabaseClient.from('contact_inquiries').select('*').order('created_at', { ascending: false });
+                if (inb) inboxData = inb;
+
+                const { data: kn } = await window.supabaseClient.from('knowledge_primers').select('*');
+                if (kn) knowledgeData = kn;
+
+                const { data: ac } = await window.supabaseClient.from('achievements').select('*');
+                if (ac) achievementsData = ac;
+            } catch (err) {
+                console.warn("Supabase fetch error in admin dashboard:", err);
+            }
+        }
+
+        const localStore = getStore();
+
+        // Merge state
+        const recruitment = recruitmentData || localStore.recruitment;
+        const banner = bannerData || localStore.banner;
+        cachedTeam = teamData.length > 0 ? teamData : localStore.team;
+        const inbox = inboxData.length > 0 ? inboxData : localStore.inbox;
+        const knowledge = knowledgeData.length > 0 ? knowledgeData : localStore.knowledge;
+        const achievements = achievementsData.length > 0 ? achievementsData : localStore.achievements;
 
         // 4.1 Overview Stats
         const statRecruitment = document.getElementById('stat-recruitment-status');
         const statRecruitmentSub = document.getElementById('stat-recruitment-sub');
         if (statRecruitment) {
-            if (store.recruitment.active) {
+            if (recruitment.active) {
                 statRecruitment.textContent = "ACTIVE";
                 statRecruitment.style.color = "var(--admin-accent-green)";
-                if (statRecruitmentSub) statRecruitmentSub.textContent = store.recruitment.title || "Accepting Applications";
+                if (statRecruitmentSub) statRecruitmentSub.textContent = recruitment.title || "Accepting Applications";
             } else {
                 statRecruitment.textContent = "CLOSED";
                 statRecruitment.style.color = "var(--admin-text-muted)";
@@ -161,138 +197,162 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const statTeamCount = document.getElementById('stat-team-count');
-        if (statTeamCount) statTeamCount.textContent = store.team.length;
+        if (statTeamCount) statTeamCount.textContent = cachedTeam.length;
 
         const statPrimersCount = document.getElementById('stat-primers-count');
-        if (statPrimersCount) statPrimersCount.textContent = store.knowledge.length;
+        if (statPrimersCount) statPrimersCount.textContent = knowledge.length;
 
         const statInboxCount = document.getElementById('stat-inbox-count');
-        if (statInboxCount) statInboxCount.textContent = store.inbox.length;
+        if (statInboxCount) statInboxCount.textContent = inbox.length;
 
         const inboxBadge = document.getElementById('inbox-count-badge');
-        if (inboxBadge) inboxBadge.textContent = store.inbox.length;
+        if (inboxBadge) inboxBadge.textContent = inbox.length;
 
         // 4.2 Populate Recruitment Settings
         const switchRecruitment = document.getElementById('switch-recruitment-active');
-        if (switchRecruitment) switchRecruitment.checked = store.recruitment.active;
+        if (switchRecruitment) switchRecruitment.checked = recruitment.active;
 
         const inputRecTitle = document.getElementById('recruitment-title');
-        if (inputRecTitle) inputRecTitle.value = store.recruitment.title || "";
+        if (inputRecTitle) inputRecTitle.value = recruitment.title || "";
 
         const inputRecDesc = document.getElementById('recruitment-description');
-        if (inputRecDesc) inputRecDesc.value = store.recruitment.description || "";
+        if (inputRecDesc) inputRecDesc.value = recruitment.description || "";
 
         const inputRecUrl = document.getElementById('recruitment-form-url');
-        if (inputRecUrl) inputRecUrl.value = store.recruitment.formUrl || "";
+        if (inputRecUrl) inputRecUrl.value = recruitment.formUrl || "";
 
         const inputRecDeadline = document.getElementById('recruitment-deadline');
-        if (inputRecDeadline) inputRecDeadline.value = store.recruitment.deadline || "";
+        if (inputRecDeadline) inputRecDeadline.value = recruitment.deadline || "";
 
         // 4.3 Populate Banner Settings
         const switchBanner = document.getElementById('switch-banner-active');
-        if (switchBanner) switchBanner.checked = store.banner.active;
+        if (switchBanner) switchBanner.checked = banner.active;
 
         const inputBannerText = document.getElementById('banner-text');
-        if (inputBannerText) inputBannerText.value = store.banner.text || "";
+        if (inputBannerText) inputBannerText.value = banner.text || "";
 
         const inputBannerBtnText = document.getElementById('banner-btn-text');
-        if (inputBannerBtnText) inputBannerBtnText.value = store.banner.btnText || "";
+        if (inputBannerBtnText) inputBannerBtnText.value = banner.btnText || "";
 
         const inputBannerBtnUrl = document.getElementById('banner-btn-url');
-        if (inputBannerBtnUrl) inputBannerBtnUrl.value = store.banner.btnUrl || "";
+        if (inputBannerBtnUrl) inputBannerBtnUrl.value = banner.btnUrl || "";
 
-        // 4.4 Render Team Table
-        renderTeamTable();
-
-        // 4.5 Render Knowledge Hub Table
-        renderKnowledgeTable();
-
-        // 4.6 Render Achievements Table
-        renderAchievementsTable();
-
-        // 4.7 Render Inbox
-        renderInboxList();
+        // Render Tables
+        renderTeamTable(cachedTeam);
+        renderKnowledgeTable(knowledge);
+        renderAchievementsTable(achievements);
+        renderInboxList(inbox);
     }
 
     // ----------------------------------------------------------------------
-    // 5. RECRUITMENT & BANNER FORMS
+    // 5. RECRUITMENT & BANNER FORMS (SUPABASE WRITES)
     // ----------------------------------------------------------------------
     const switchRecruitment = document.getElementById('switch-recruitment-active');
     if (switchRecruitment) {
-        switchRecruitment.addEventListener('change', () => {
+        switchRecruitment.addEventListener('change', async () => {
+            const active = switchRecruitment.checked;
+            if (window.supabaseClient) {
+                await window.supabaseClient.from('recruitment_settings').upsert({ id: 1, active: active });
+            }
             const store = getStore();
-            store.recruitment.active = switchRecruitment.checked;
+            store.recruitment.active = active;
             saveStore(store);
             renderDashboard();
-            showToast(`Recruitment Portal is now ${store.recruitment.active ? 'ACTIVE' : 'CLOSED'}`);
+            showToast(`Recruitment Portal is now ${active ? 'ACTIVE' : 'CLOSED'}`);
         });
     }
 
     const formRecruitment = document.getElementById('form-recruitment-settings');
     if (formRecruitment) {
-        formRecruitment.addEventListener('submit', (e) => {
+        formRecruitment.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const active = document.getElementById('switch-recruitment-active').checked;
+            const title = document.getElementById('recruitment-title').value;
+            const description = document.getElementById('recruitment-description').value;
+            const formUrl = document.getElementById('recruitment-form-url').value;
+            const deadline = document.getElementById('recruitment-deadline').value;
+
+            if (window.supabaseClient) {
+                await window.supabaseClient.from('recruitment_settings').upsert({
+                    id: 1, active, title, description, form_url: formUrl, deadline
+                });
+            }
+
             const store = getStore();
-            store.recruitment.title = document.getElementById('recruitment-title').value;
-            store.recruitment.description = document.getElementById('recruitment-description').value;
-            store.recruitment.formUrl = document.getElementById('recruitment-form-url').value;
-            store.recruitment.deadline = document.getElementById('recruitment-deadline').value;
+            store.recruitment = { active, title, description, formUrl, deadline };
             saveStore(store);
             renderDashboard();
-            showToast("✅ Recruitment settings updated successfully!");
+            showToast("✅ Recruitment settings updated in Supabase!");
         });
     }
 
     const switchBanner = document.getElementById('switch-banner-active');
     if (switchBanner) {
-        switchBanner.addEventListener('change', () => {
+        switchBanner.addEventListener('change', async () => {
+            const active = switchBanner.checked;
+            if (window.supabaseClient) {
+                await window.supabaseClient.from('announcements').upsert({ id: 1, active: active });
+            }
             const store = getStore();
-            store.banner.active = switchBanner.checked;
+            store.banner.active = active;
             saveStore(store);
             renderDashboard();
-            showToast(`Header Banner is now ${store.banner.active ? 'ENABLED' : 'DISABLED'}`);
+            showToast(`Header Banner is now ${active ? 'ENABLED' : 'DISABLED'}`);
         });
     }
 
     const formBanner = document.getElementById('form-banner-settings');
     if (formBanner) {
-        formBanner.addEventListener('submit', (e) => {
+        formBanner.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const active = document.getElementById('switch-banner-active').checked;
+            const text = document.getElementById('banner-text').value;
+            const btnText = document.getElementById('banner-btn-text').value;
+            const btnUrl = document.getElementById('banner-btn-url').value;
+
+            if (window.supabaseClient) {
+                await window.supabaseClient.from('announcements').upsert({
+                    id: 1, active, text, btn_text: btnText, btn_url: btnUrl
+                });
+            }
+
             const store = getStore();
-            store.banner.text = document.getElementById('banner-text').value;
-            store.banner.btnText = document.getElementById('banner-btn-text').value;
-            store.banner.btnUrl = document.getElementById('banner-btn-url').value;
+            store.banner = { active, text, btnText, btnUrl };
             saveStore(store);
             renderDashboard();
-            showToast("✅ Announcement banner saved!");
+            showToast("✅ Announcement banner updated in Supabase!");
         });
     }
 
     const quickToggleRec = document.getElementById('quick-toggle-recruitment');
     if (quickToggleRec) {
-        quickToggleRec.addEventListener('click', () => {
+        quickToggleRec.addEventListener('click', async () => {
+            const currentActive = document.getElementById('switch-recruitment-active').checked;
+            const newActive = !currentActive;
+            if (window.supabaseClient) {
+                await window.supabaseClient.from('recruitment_settings').upsert({ id: 1, active: newActive });
+            }
             const store = getStore();
-            store.recruitment.active = !store.recruitment.active;
+            store.recruitment.active = newActive;
             saveStore(store);
             renderDashboard();
-            showToast(`Recruitment status toggled to: ${store.recruitment.active ? 'ACTIVE' : 'CLOSED'}`);
+            showToast(`Recruitment status toggled to: ${newActive ? 'ACTIVE' : 'CLOSED'}`);
         });
     }
 
     // ----------------------------------------------------------------------
-    // 6. TEAM MEMBERS MANAGER (CRUD)
+    // 6. TEAM MEMBERS MANAGER (SUPABASE CRUD)
     // ----------------------------------------------------------------------
     const teamTableBody = document.getElementById('team-table-body');
     const filterTierSelect = document.getElementById('filter-team-tier');
     const searchTeamInput = document.getElementById('search-team-input');
 
-    function renderTeamTable() {
+    function renderTeamTable(membersList = cachedTeam) {
         if (!teamTableBody) return;
-        const store = getStore();
         const tierFilter = filterTierSelect ? filterTierSelect.value : 'all';
         const searchQuery = searchTeamInput ? searchTeamInput.value.toLowerCase().trim() : '';
 
-        const filtered = store.team.filter(m => {
+        const filtered = membersList.filter(m => {
             const matchTier = (tierFilter === 'all') || (m.tier === tierFilter);
             const matchSearch = (m.name.toLowerCase().includes(searchQuery) || m.role.toLowerCase().includes(searchQuery));
             return matchTier && matchSearch;
@@ -306,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
         teamTableBody.innerHTML = filtered.map(m => {
             const initials = m.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
             const avatarHtml = m.photo ? 
-                `<img src="${m.photo}" class="member-avatar-mini" alt="${m.name}">` : 
+                `<img src="${escapeHtml(m.photo)}" class="member-avatar-mini" alt="${escapeHtml(m.name)}">` : 
                 `<div class="member-avatar-mini">${initials}</div>`;
 
             return `
@@ -331,8 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    if (filterTierSelect) filterTierSelect.addEventListener('change', renderTeamTable);
-    if (searchTeamInput) searchTeamInput.addEventListener('input', renderTeamTable);
+    if (filterTierSelect) filterTierSelect.addEventListener('change', () => renderTeamTable());
+    if (searchTeamInput) searchTeamInput.addEventListener('input', () => renderTeamTable());
 
     // Modal Handling
     const modalMember = document.getElementById('modal-member');
@@ -378,7 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnOpenAddMember) btnOpenAddMember.addEventListener('click', () => openMemberModal());
     if (quickAddMember) quickAddMember.addEventListener('click', () => {
-        // Switch to team tab first
         const teamTabBtn = document.querySelector('[data-tab="tab-team"]');
         if (teamTabBtn) teamTabBtn.click();
         openMemberModal();
@@ -387,9 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnCancelMemberModal) btnCancelMemberModal.addEventListener('click', closeMemberModal);
 
     if (formMemberModal) {
-        formMemberModal.addEventListener('submit', (e) => {
+        formMemberModal.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const store = getStore();
             const editId = document.getElementById('member-edit-id').value;
             const name = document.getElementById('member-name').value.trim();
             const role = document.getElementById('member-role').value.trim();
@@ -397,39 +455,56 @@ document.addEventListener('DOMContentLoaded', () => {
             const photo = document.getElementById('member-photo').value.trim();
             const linkedin = document.getElementById('member-linkedin').value.trim();
 
-            if (editId) {
-                // Update
-                const idx = store.team.findIndex(m => m.id === editId);
-                if (idx !== -1) {
-                    store.team[idx] = { id: editId, name, role, tier, photo, linkedin };
-                    showToast(`Updated member: ${name}`);
+            if (window.supabaseClient) {
+                try {
+                    if (editId && !editId.startsWith('tm_')) {
+                        // Supabase UUID update
+                        await window.supabaseClient.from('team_members').update({
+                            name, role, tier, photo, linkedin
+                        }).eq('id', editId);
+                    } else {
+                        // Supabase Insert
+                        await window.supabaseClient.from('team_members').insert([
+                            { name, role, tier, photo, linkedin }
+                        ]);
+                    }
+                } catch(err) {
+                    console.error("Supabase team member save error:", err);
                 }
-            } else {
-                // Create
-                const newMember = {
-                    id: "tm_" + Date.now(),
-                    name, role, tier, photo, linkedin
-                };
-                store.team.push(newMember);
-                showToast(`Added new member: ${name}`);
             }
 
+            // Also update local store
+            const store = getStore();
+            if (editId) {
+                const idx = store.team.findIndex(m => m.id === editId);
+                if (idx !== -1) store.team[idx] = { id: editId, name, role, tier, photo, linkedin };
+            } else {
+                store.team.push({ id: "tm_" + Date.now(), name, role, tier, photo, linkedin });
+            }
             saveStore(store);
+
+            showToast(`✅ Saved member: ${name}`);
             closeMemberModal();
             renderDashboard();
         });
     }
 
     window.editTeamMember = function(id) {
-        const store = getStore();
-        const member = store.team.find(m => m.id === id);
+        const member = cachedTeam.find(m => m.id === id);
         if (member) openMemberModal(member);
     };
 
-    window.deleteTeamMember = function(id) {
-        const store = getStore();
-        const member = store.team.find(m => m.id === id);
+    window.deleteTeamMember = async function(id) {
+        const member = cachedTeam.find(m => m.id === id);
         if (member && confirm(`Are you sure you want to remove ${member.name} from the team?`)) {
+            if (window.supabaseClient && !id.startsWith('tm_')) {
+                try {
+                    await window.supabaseClient.from('team_members').delete().eq('id', id);
+                } catch(err) {
+                    console.error("Supabase team member delete error:", err);
+                }
+            }
+            const store = getStore();
             store.team = store.team.filter(m => m.id !== id);
             saveStore(store);
             renderDashboard();
@@ -440,20 +515,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
     // 7. KNOWLEDGE HUB & ACHIEVEMENTS TABLE RENDERING
     // ----------------------------------------------------------------------
-    function renderKnowledgeTable() {
+    function renderKnowledgeTable(knowledgeList = []) {
         const tbody = document.getElementById('knowledge-table-body');
         if (!tbody) return;
-        const store = getStore();
-        if (store.knowledge.length === 0) {
+        if (knowledgeList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--admin-text-muted);">No primers added.</td></tr>`;
             return;
         }
-        tbody.innerHTML = store.knowledge.map(k => `
+        tbody.innerHTML = knowledgeList.map(k => `
             <tr>
                 <td><strong>${escapeHtml(k.title)}</strong></td>
                 <td><span class="tier-badge tier-senior">${escapeHtml(k.category)}</span></td>
-                <td>${escapeHtml(k.date)}</td>
-                <td>${escapeHtml(k.readTime)}</td>
+                <td>${escapeHtml(k.date_label || k.date || '')}</td>
+                <td>${escapeHtml(k.read_time || k.readTime || '')}</td>
                 <td>
                     <div class="action-btns-group">
                         <button class="btn-icon delete" onclick="deleteKnowledge('${k.id}')">🗑️</button>
@@ -463,7 +537,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    window.deleteKnowledge = function(id) {
+    window.deleteKnowledge = async function(id) {
+        if (window.supabaseClient && !id.startsWith('kn_')) {
+            await window.supabaseClient.from('knowledge_primers').delete().eq('id', id);
+        }
         const store = getStore();
         store.knowledge = store.knowledge.filter(k => k.id !== id);
         saveStore(store);
@@ -471,19 +548,18 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast("Removed primer item.");
     };
 
-    function renderAchievementsTable() {
+    function renderAchievementsTable(achievementsList = []) {
         const tbody = document.getElementById('achievements-table-body');
         if (!tbody) return;
-        const store = getStore();
-        if (store.achievements.length === 0) {
+        if (achievementsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--admin-text-muted);">No achievements listed.</td></tr>`;
             return;
         }
-        tbody.innerHTML = store.achievements.map(a => `
+        tbody.innerHTML = achievementsList.map(a => `
             <tr>
-                <td><strong>${escapeHtml(a.event)}</strong></td>
+                <td><strong>${escapeHtml(a.event_name || a.event || '')}</strong></td>
                 <td><span class="tier-badge tier-board">${escapeHtml(a.position)}</span></td>
-                <td>${escapeHtml(a.team)}</td>
+                <td>${escapeHtml(a.team_name || a.team || '')}</td>
                 <td>${escapeHtml(a.year)}</td>
                 <td>
                     <div class="action-btns-group">
@@ -494,7 +570,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    window.deleteAchievement = function(id) {
+    window.deleteAchievement = async function(id) {
+        if (window.supabaseClient && !id.startsWith('ac_')) {
+            await window.supabaseClient.from('achievements').delete().eq('id', id);
+        }
         const store = getStore();
         store.achievements = store.achievements.filter(a => a.id !== id);
         saveStore(store);
@@ -505,19 +584,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
     // 8. CONTACT INBOX RENDER
     // ----------------------------------------------------------------------
-    function renderInboxList() {
+    function renderInboxList(inboxList = []) {
         const container = document.getElementById('inbox-list-container');
         if (!container) return;
-        const store = getStore();
-        if (store.inbox.length === 0) {
+        if (inboxList.length === 0) {
             container.innerHTML = `<p style="text-align:center; color:var(--admin-text-muted); padding:2rem;">No messages in inbox.</p>`;
             return;
         }
-        container.innerHTML = store.inbox.map(item => `
+        container.innerHTML = inboxList.map(item => `
             <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:10px; padding:1.25rem; margin-bottom:1rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
                     <strong style="color:var(--admin-gold);">${escapeHtml(item.name)} &lt;${escapeHtml(item.email)}&gt;</strong>
-                    <small style="color:var(--admin-text-muted);">${escapeHtml(item.date)}</small>
+                    <small style="color:var(--admin-text-muted);">${escapeHtml(item.date || new Date(item.created_at || Date.now()).toLocaleDateString())}</small>
                 </div>
                 <h4 style="margin-bottom:0.5rem;">Subject: ${escapeHtml(item.subject)}</h4>
                 <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5;">${escapeHtml(item.message)}</p>
@@ -546,6 +624,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3500);
     }
 
-    // Initial check
     checkAuthSession();
 });
