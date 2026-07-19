@@ -114,10 +114,10 @@
                                             <div class="team-card">
                                                 ${item.photo ? `<img src="${item.photo}" alt="${item.name}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin: 1rem auto 0.5rem; border: 3px solid var(--primary-light); display: block;">` : `<div class="avatar-placeholder" style="width: 110px; height: 110px; border-radius: 50%; margin: 1rem auto 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🎓</div>`}
                                                 <div class="team-info">
-                                                    <h3 class="team-name">${item.name}</h3>
-                                                    <span class="team-role" style="font-weight:600;">${formerRole}</span>
-                                                    ${placement ? `<span class="team-role" style="color: var(--primary-light); margin-top: 0.25rem;">${placement}</span>` : ''}
-                                                    ${item.linkedin ? `<a href="${item.linkedin}" target="_blank" rel="noopener noreferrer" style="color:#0077b5; font-size:0.85rem; font-weight:600; margin-top:0.5rem; display:inline-flex; align-items:center; gap:0.2rem; text-decoration:none;">LinkedIn ↗</a>` : ''}
+                                                    <h3 class="team-name" style="margin-bottom: 0.35rem;">${item.name}</h3>
+                                                    <span class="team-role" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem;">${formerRole}</span>
+                                                    ${placement ? `<span class="team-role" style="display: block; color: var(--primary-light); font-weight: 500; font-size: 0.9rem; margin-bottom: 0.4rem;">${placement}</span>` : ''}
+                                                    ${item.linkedin ? `<div style="margin-top: 0.4rem;"><a href="${item.linkedin}" target="_blank" rel="noopener noreferrer" style="color: #0077b5; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem;">LinkedIn ↗</a></div>` : ''}
                                                 </div>
                                             </div>
                                         `;
