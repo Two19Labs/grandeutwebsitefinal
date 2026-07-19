@@ -573,6 +573,18 @@
                         <input type="text" id="alumni-placement" class="form-input" placeholder="e.g. Analyst at Bain & Company / IIM C" required>
                     </div>
                     <div class="form-group">
+                        <label for="alumni-photo-file">Alumni Photo (Upload Image)</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="file" id="alumni-photo-file" class="form-input" accept="image/*" style="padding: 0.4rem;">
+                            <input type="hidden" id="alumni-photo">
+                            <div id="alumni-photo-preview-box" style="width: 46px; height: 46px; border-radius: 50%; border: 2px dashed var(--admin-gold); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0f172a; flex-shrink: 0;">
+                                <img id="alumni-photo-preview-img" src="" alt="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                <span id="alumni-photo-preview-icon" style="font-size: 1.2rem;">🎓</span>
+                            </div>
+                        </div>
+                        <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Upload image file from computer (JPG, PNG, WEBP).</small>
+                    </div>
+                    <div class="form-group">
                         <label for="alumni-linkedin">LinkedIn Profile URL (Optional)</label>
                         <input type="url" id="alumni-linkedin" class="form-input" placeholder="https://linkedin.com/in/username">
                     </div>

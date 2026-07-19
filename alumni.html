@@ -115,6 +115,11 @@
                         const grid = document.getElementById('alumni-grid');
                         if (!grid) return;
 
+                        function getBatchYearNum(item) {
+                            const match = (item.role || '').match(/20\d\d/);
+                            return match ? parseInt(match[0], 10) : 0;
+                        }
+
                         try {
                             const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?tier=eq.board&order=created_at.asc', {
                                 headers: {
@@ -126,7 +131,10 @@
                             const alumni = await res.json();
 
                             if (Array.isArray(alumni) && alumni.length > 0) {
-                                grid.innerHTML = alumni.map(item => {
+                                // Sort descending by batch year (2025 -> 2024 -> 2023...)
+                                const sorted = [...alumni].sort((a, b) => getBatchYearNum(b) - getBatchYearNum(a));
+
+                                grid.innerHTML = sorted.map(item => {
                                     const parts = (item.role || '').split('|');
                                     let batch = 'Alumni';
                                     let roleAndPlacement = item.role || '';
@@ -140,7 +148,7 @@
 
                                     return `
                                         <div class="team-card">
-                                            <div class="avatar-placeholder"></div>
+                                            ${item.photo ? `<img src="${item.photo}" alt="${item.name}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; border: 3px solid var(--primary-light);">` : `<div class="avatar-placeholder">🎓</div>`}
                                             <div class="team-info">
                                                 <h3 class="team-name">${item.name}</h3>
                                                 <span class="team-role">${batch} &bull; ${formerRole}</span>

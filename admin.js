@@ -687,6 +687,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCloseAlumniModal = document.getElementById('btn-close-alumni-modal');
     const btnCancelAlumniModal = document.getElementById('btn-cancel-alumni-modal');
     const formAlumniModal = document.getElementById('form-alumni-modal');
+    const alumniPhotoFile = document.getElementById('alumni-photo-file');
+    const alumniPhotoInput = document.getElementById('alumni-photo');
+    const alumniPhotoPreviewImg = document.getElementById('alumni-photo-preview-img');
+    const alumniPhotoPreviewIcon = document.getElementById('alumni-photo-preview-icon');
+
+    if (alumniPhotoFile) {
+        alumniPhotoFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                showToast(`⏳ Optimizing image: ${file.name}...`);
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxDim = 300;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                        } else {
+                            if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+                        if (alumniPhotoInput) alumniPhotoInput.value = compressedBase64;
+                        if (alumniPhotoPreviewImg) {
+                            alumniPhotoPreviewImg.src = compressedBase64;
+                            alumniPhotoPreviewImg.style.display = 'block';
+                        }
+                        if (alumniPhotoPreviewIcon) alumniPhotoPreviewIcon.style.display = 'none';
+                        showToast(`✅ Photo optimized (${(compressedBase64.length / 1024).toFixed(0)}KB)`);
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    function getBatchYear(item) {
+        const match = (item.role || '').match(/20\d\d/);
+        return match ? parseInt(match[0], 10) : 0;
+    }
 
     function renderAlumniTable(alumniList = cachedAlumni) {
         if (!alumniTableBody) return;
@@ -695,7 +742,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        alumniTableBody.innerHTML = alumniList.map(item => {
+        // Sort descending by batch year (2025 -> 2024 -> 2023...)
+        const sorted = [...alumniList].sort((a, b) => getBatchYear(b) - getBatchYear(a));
+
+        alumniTableBody.innerHTML = sorted.map(item => {
             const parts = (item.role || '').split('|');
             let batch = 'Alumni';
             let roleAndPlacement = item.role || '';
@@ -709,7 +759,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `
                 <tr>
-                    <td><strong>${escapeHtml(item.name)}</strong></td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            ${item.photo ? `<img src="${item.photo}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--admin-gold);">` : `<div style="width:36px; height:36px; border-radius:50%; background:#0f172a; border:1px dashed var(--admin-gold); display:flex; align-items:center; justify-content:center; font-size:0.9rem;">🎓</div>`}
+                            <strong>${escapeHtml(item.name)}</strong>
+                        </div>
+                    </td>
                     <td><span class="tier-badge tier-core">${escapeHtml(batch)}</span></td>
                     <td>${escapeHtml(formerRole)}</td>
                     <td>${escapeHtml(placement)}</td>
@@ -735,6 +790,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputPlacement = document.getElementById('alumni-placement');
         const inputLinkedin = document.getElementById('alumni-linkedin');
 
+        if (alumniPhotoFile) alumniPhotoFile.value = '';
+        if (alumniPhotoInput) alumniPhotoInput.value = '';
+        if (alumniPhotoPreviewImg) { alumniPhotoPreviewImg.src = ''; alumniPhotoPreviewImg.style.display = 'none'; }
+        if (alumniPhotoPreviewIcon) alumniPhotoPreviewIcon.style.display = 'block';
+
         if (alumnus) {
             modalTitle.textContent = "Edit Alumni Member";
             inputId.value = alumnus.id;
@@ -752,6 +812,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 inputPlacement.value = "";
             }
             inputLinkedin.value = alumnus.linkedin || "";
+
+            if (alumnus.photo) {
+                if (alumniPhotoInput) alumniPhotoInput.value = alumnus.photo;
+                if (alumniPhotoPreviewImg) { alumniPhotoPreviewImg.src = alumnus.photo; alumniPhotoPreviewImg.style.display = 'block'; }
+                if (alumniPhotoPreviewIcon) alumniPhotoPreviewIcon.style.display = 'none';
+            }
         } else {
             modalTitle.textContent = "Add Alumni Member";
             inputId.value = "";
@@ -781,6 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formerRole = document.getElementById('alumni-former-role').value.trim();
             const placement = document.getElementById('alumni-placement').value.trim();
             const linkedin = document.getElementById('alumni-linkedin').value.trim();
+            const photo = alumniPhotoInput ? alumniPhotoInput.value : "";
 
             const formattedRole = `Batch of ${batch.replace(/^Batch of\s*/i, '')} | ${formerRole} • ${placement}`;
 
@@ -790,9 +857,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.GrandeurDB) {
                 try {
                     if (editId) {
-                        await window.GrandeurDB.updateAlumniMember(editId, { name, role: formattedRole, linkedin });
+                        await window.GrandeurDB.updateAlumniMember(editId, { name, role: formattedRole, linkedin, photo });
                     } else {
-                        await window.GrandeurDB.insertAlumniMember({ name, role: formattedRole, linkedin });
+                        await window.GrandeurDB.insertAlumniMember({ name, role: formattedRole, linkedin, photo });
                     }
                 } catch(err) {
                     console.error("Alumni save error:", err);
