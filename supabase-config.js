@@ -87,7 +87,7 @@ window.GrandeurDB = {
         return res.ok;
     },
 
-    // 4. KNOWLEDGE PRIMERS
+    // 4. KNOWLEDGE PRIMERS / PUBLICATIONS
     async getKnowledgePrimers() {
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=*&order=created_at.desc`, { headers: HEADERS });
@@ -99,6 +99,16 @@ window.GrandeurDB = {
     async insertKnowledgePrimer(data) {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers`, {
             method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return await res.json();
+    },
+
+    async updateKnowledgePrimer(id, data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?id=eq.${id}`, {
+            method: 'PATCH',
             headers: HEADERS,
             body: JSON.stringify(data)
         });

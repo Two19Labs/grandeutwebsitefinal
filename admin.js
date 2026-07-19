@@ -120,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    let cachedTeam = [];
+    let cachedPrimers = [];
+
     // DASHBOARD RENDER
     async function renderDashboard() {
         let recruitmentData = null;
@@ -133,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 bannerData = await window.GrandeurDB.getBanner();
                 teamData = await window.GrandeurDB.getTeamMembers();
                 inboxData = await window.GrandeurDB.getContactInquiries();
+                cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
             }
@@ -198,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputBannerBtnUrl) inputBannerBtnUrl.value = banner.btnUrl || "";
 
         renderTeamTable(cachedTeam);
+        renderKnowledgeTable(cachedPrimers);
         renderInboxList(inbox);
     }
 
@@ -465,6 +470,146 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(`Removed team member: ${member.name}`);
             await renderDashboard();
             window.dispatchEvent(new Event('grandeur_store_updated'));
+        }
+    };
+
+    // KNOWLEDGE PRIMERS CRUD
+    const knowledgeTableBody = document.getElementById('knowledge-table-body');
+    const modalPrimer = document.getElementById('modal-primer');
+    const btnOpenAddPrimer = document.getElementById('btn-open-add-primer-modal');
+    const btnClosePrimerModal = document.getElementById('btn-close-primer-modal');
+    const btnCancelPrimerModal = document.getElementById('btn-cancel-primer-modal');
+    const formPrimerModal = document.getElementById('form-primer-modal');
+    const primerPdfFile = document.getElementById('primer-pdf-file');
+    const primerPdfUrl = document.getElementById('primer-pdf-url');
+
+    if (primerPdfFile) {
+        primerPdfFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    if (primerPdfUrl) primerPdfUrl.value = evt.target.result;
+                    showToast(`📄 Document loaded: ${file.name}`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    function renderKnowledgeTable(primersList = cachedPrimers) {
+        if (!knowledgeTableBody) return;
+        if (!primersList || primersList.length === 0) {
+            knowledgeTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No research publications found. Click "Add New Primer" to publish one.</td></tr>`;
+            return;
+        }
+
+        knowledgeTableBody.innerHTML = primersList.map(item => `
+            <tr>
+                <td><strong>${escapeHtml(item.title)}</strong></td>
+                <td><span class="tier-badge tier-core">${escapeHtml(item.category)}</span></td>
+                <td>${escapeHtml(item.date_label || item.year || '2026')}</td>
+                <td>${item.read_time ? escapeHtml(item.read_time) : 'PDF Document'}</td>
+                <td style="text-align: right;">
+                    <div class="action-btns-group" style="justify-content: flex-end;">
+                        ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" class="btn-icon" title="View Document" style="text-decoration:none;">📄</a>` : ''}
+                        <button class="btn-icon" onclick="editKnowledgePrimer('${item.id}')" title="Edit Publication">✏️</button>
+                        <button class="btn-icon delete" onclick="deleteKnowledgePrimer('${item.id}')" title="Delete Publication">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openPrimerModal(primer = null) {
+        if (!modalPrimer) return;
+        const modalTitle = document.getElementById('modal-primer-title');
+        const inputId = document.getElementById('primer-edit-id');
+        const inputTitle = document.getElementById('primer-title');
+        const inputCategory = document.getElementById('primer-category');
+        const inputDate = document.getElementById('primer-date');
+        const inputReadTime = document.getElementById('primer-read-time');
+        const inputPdfUrl = document.getElementById('primer-pdf-url');
+
+        if (primerPdfFile) primerPdfFile.value = '';
+
+        if (primer) {
+            modalTitle.textContent = "Edit Publication";
+            inputId.value = primer.id;
+            inputTitle.value = primer.title || "";
+            inputCategory.value = primer.category || "Industry Report";
+            inputDate.value = primer.date_label || primer.year || "2026";
+            inputReadTime.value = primer.read_time || "5 min read";
+            inputPdfUrl.value = primer.pdf_url || "";
+        } else {
+            modalTitle.textContent = "Add Knowledge Primer / Publication";
+            inputId.value = "";
+            inputTitle.value = "";
+            inputCategory.value = "Industry Report";
+            inputDate.value = "2026";
+            inputReadTime.value = "5 min read";
+            inputPdfUrl.value = "";
+        }
+        modalPrimer.style.display = 'flex';
+    }
+
+    function closePrimerModal() {
+        if (modalPrimer) modalPrimer.style.display = 'none';
+    }
+
+    if (btnOpenAddPrimer) btnOpenAddPrimer.addEventListener('click', () => openPrimerModal());
+    if (btnClosePrimerModal) btnClosePrimerModal.addEventListener('click', closePrimerModal);
+    if (btnCancelPrimerModal) btnCancelPrimerModal.addEventListener('click', closePrimerModal);
+
+    if (formPrimerModal) {
+        formPrimerModal.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('primer-edit-id').value;
+            const title = document.getElementById('primer-title').value.trim();
+            const category = document.getElementById('primer-category').value;
+            const date_label = document.getElementById('primer-date').value.trim();
+            const read_time = document.getElementById('primer-read-time').value.trim();
+            const pdf_url = document.getElementById('primer-pdf-url').value.trim();
+
+            if (window.GrandeurDB) {
+                try {
+                    if (editId) {
+                        await window.GrandeurDB.updateKnowledgePrimer(editId, { title, category, date_label, read_time, pdf_url });
+                    } else {
+                        await window.GrandeurDB.insertKnowledgePrimer({ title, category, date_label, read_time, pdf_url });
+                    }
+                } catch(err) {
+                    console.error("Primer save error:", err);
+                    showToast(`⚠️ Error saving publication: ${err.message}`);
+                    return;
+                }
+            }
+
+            showToast(`✅ Saved publication: ${title}`);
+            closePrimerModal();
+            await renderDashboard();
+        });
+    }
+
+    window.editKnowledgePrimer = function(id) {
+        const primer = cachedPrimers.find(p => p.id === id);
+        if (primer) openPrimerModal(primer);
+    };
+
+    window.deleteKnowledgePrimer = async function(id) {
+        const primer = cachedPrimers.find(p => p.id === id);
+        if (primer && confirm(`Are you sure you want to delete "${primer.title}"?`)) {
+            if (window.GrandeurDB) {
+                try {
+                    await window.GrandeurDB.deleteKnowledgePrimer(id);
+                } catch(err) {
+                    console.error("Primer delete error:", err);
+                    showToast(`⚠️ Delete failed: ${err.message}`);
+                    return;
+                }
+            }
+            showToast(`Removed publication: ${primer.title}`);
+            await renderDashboard();
         }
     };
 

@@ -419,6 +419,58 @@
         </div>
     </div>
 
+    <!-- KNOWLEDGE PRIMER MODAL -->
+    <div class="admin-modal-overlay" id="modal-primer" style="display: none;">
+        <div class="admin-modal">
+            <div class="modal-header">
+                <h3 id="modal-primer-title">Add Knowledge Primer / Publication</h3>
+                <button class="modal-close" id="btn-close-primer-modal">&times;</button>
+            </div>
+            <form id="form-primer-modal" onsubmit="return false;">
+                <input type="hidden" id="primer-edit-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="primer-title">Publication / Primer Title *</label>
+                        <input type="text" id="primer-title" class="form-input" placeholder="e.g. Indian EdTech Industry Report" required>
+                    </div>
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label for="primer-category">Category / Tag *</label>
+                            <select id="primer-category" class="form-select" required>
+                                <option value="Industry Report">Industry Report</option>
+                                <option value="Company Report">Company Report</option>
+                                <option value="Casebook">Casebook / Guide</option>
+                                <option value="Framework">Business Framework</option>
+                                <option value="Sector Analysis">Sector Analysis</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="primer-date">Date / Year Label *</label>
+                            <input type="text" id="primer-date" class="form-input" placeholder="e.g. 2026 or Jan 2026" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="primer-read-time">Read Time / Page Count (Optional)</label>
+                        <input type="text" id="primer-read-time" class="form-input" placeholder="e.g. 5 min read or 15 pages">
+                    </div>
+                    <div class="form-group">
+                        <label for="primer-pdf-file">Upload Document / File (PDF, Doc, Image)</label>
+                        <input type="file" id="primer-pdf-file" class="form-input" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*" style="padding: 0.4rem;">
+                        <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Upload PDF or document file directly from your device.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="primer-pdf-url">Document Link / File URL (Optional)</label>
+                        <input type="text" id="primer-pdf-url" class="form-input" placeholder="https://drive.google.com/... or uploaded Data URL">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-primer-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-primer">Save Publication</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
