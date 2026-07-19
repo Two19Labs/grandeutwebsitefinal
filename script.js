@@ -32,11 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. Stats Counter Animation
-    const statsSection = document.querySelector('.stats-section');
     const statNumbers = document.querySelectorAll('.stat-number[data-target]');
 
-    if (statsSection && statNumbers.length > 0) {
+    if (statNumbers.length > 0) {
         const countUp = (element) => {
+            if (element.dataset.animated) return;
+            element.dataset.animated = "true";
+
             const targetAttr = element.getAttribute('data-target');
             if (!targetAttr) return;
             const target = parseInt(targetAttr, 10);
@@ -51,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const timer = setInterval(() => {
                 current += increment;
                 if (current >= target) {
-                    element.textContent = target + (element.getAttribute('data-suffix') || '');
+                    element.textContent = target.toLocaleString() + (element.getAttribute('data-suffix') || '');
                     clearInterval(timer);
                 } else {
-                    element.textContent = Math.floor(current) + (element.getAttribute('data-suffix') || '');
+                    element.textContent = Math.floor(current).toLocaleString() + (element.getAttribute('data-suffix') || '');
                 }
             }, stepTime);
         };
@@ -62,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    statNumbers.forEach(num => countUp(num));
+                    countUp(entry.target);
                     observer.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.1 });
 
-        observer.observe(statsSection);
+        statNumbers.forEach(num => observer.observe(num));
     }
 
     // 5. Contact Form Validation
