@@ -73,15 +73,7 @@
                         if (!container) return;
 
                         try {
-                            const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?select=*&order=created_at.asc', {
-                                headers: {
-                                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
-                                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs'
-                                }
-                            });
-                            if (!res.ok) return;
-                            const rawData = await res.json();
-                            const alumni = (rawData || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
+                            const alumni = window.GrandeurDB ? await window.GrandeurDB.getAlumniMembers() : [];
 
                             if (Array.isArray(alumni) && alumni.length > 0) {
                                 // Group by Batch Year
@@ -195,6 +187,7 @@
         </div>
     </footer>
 
+    <script src="supabase-config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

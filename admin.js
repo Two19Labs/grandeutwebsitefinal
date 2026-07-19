@@ -385,11 +385,30 @@ document.addEventListener('DOMContentLoaded', () => {
         photoFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
+                showToast(`⏳ Optimizing photo...`);
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    const dataUrl = evt.target.result;
-                    if (photoHiddenInput) photoHiddenInput.value = dataUrl;
-                    updatePhotoPreview(dataUrl);
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxDim = 300;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                        } else {
+                            if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
+                        if (photoHiddenInput) photoHiddenInput.value = compressedBase64;
+                        updatePhotoPreview(compressedBase64);
+                        showToast(`✅ Photo optimized (${(compressedBase64.length / 1024).toFixed(0)}KB)`);
+                    };
+                    img.src = evt.target.result;
                 };
                 reader.readAsDataURL(file);
             }

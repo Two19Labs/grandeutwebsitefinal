@@ -188,23 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    if (!success) {
-                        try {
-                            const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/contact_inquiries', {
-                                method: 'POST',
-                                headers: {
-                                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
-                                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
-                                    'Content-Type': 'application/json',
-                                    'Prefer': 'return=representation'
-                                },
-                                body: JSON.stringify(inquiryData)
-                            });
-                            if (res.ok) success = true;
-                        } catch (e) {
-                            console.error("Direct fetch contact error:", e);
-                        }
-                    }
 
                     btn.textContent = originalText;
                     btn.disabled = false;
