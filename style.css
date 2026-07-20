@@ -174,6 +174,26 @@ a {
     width: 100%;
 }
 
+.nav-link-btn {
+    background: linear-gradient(135deg, var(--primary) 0%, #b8860b 100%);
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    padding: 0.45rem 1.1rem !important;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+    transition: all 0.3s ease;
+}
+
+.nav-link-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+    color: #000 !important;
+}
+
+.nav-link-btn::after {
+    display: none !important;
+}
+
 .menu-toggle {
     display: none;
     flex-direction: column;

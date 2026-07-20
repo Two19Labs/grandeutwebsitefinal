@@ -558,8 +558,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const recData = await window.GrandeurDB.getRecruitment();
-                if (recData) applyRecruitmentState(recData.active, recData.form_url);
+                if (recData) applyRecruitmentState(recData);
             } catch (err) { console.warn("Recruitment fetch warning:", err); }
+        }
+
+        const dataStr = localStorage.getItem('grandeur_admin_store');
+        if (dataStr) {
+            try {
+                const store = JSON.parse(dataStr);
+                if (store.recruitment) applyRecruitmentState(store.recruitment);
+                if (store.team && teamHierarchy) renderDynamicTeamGrid(store.team, teamHierarchy);
+            } catch (e) {}
         }
 
         if (teamHierarchy && window.GrandeurDB) {
@@ -571,16 +580,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) {
                 console.error("GrandeurDB team fetch error on site:", err);
-            }
-        }
-
-        if (teamHierarchy) {
-            const dataStr = localStorage.getItem('grandeur_admin_store');
-            if (dataStr) {
-                try {
-                    const store = JSON.parse(dataStr);
-                    if (store.team) renderDynamicTeamGrid(store.team, teamHierarchy);
-                } catch (e) {}
             }
         }
     }
@@ -606,7 +605,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function applyRecruitmentState(active, formUrl) {
+    function applyRecruitmentState(recData) {
+        if (!recData) return;
+        const active = typeof recData === 'object' ? !!recData.active : !!recData;
+        const title = (typeof recData === 'object' && recData.title) || 'Grandeur Recruitment Drive 2026';
+        const description = (typeof recData === 'object' && recData.description) || 'Join the premier Consulting & Knowledge Cell of SSCBS.';
+        const formUrl = (typeof recData === 'object' && (recData.form_url || recData.formUrl)) || '#';
+        const deadline = (typeof recData === 'object' && recData.deadline) || 'August 20, 2026';
+
+        // Toggle nav links across all pages
+        const joinNavElements = document.querySelectorAll('.nav-item-join, .footer-join-link');
+        joinNavElements.forEach(el => {
+            el.style.display = active ? 'inline-block' : 'none';
+        });
+
+        // Also handle legacy cta elements if any
         const recElements = document.querySelectorAll('.recruitment-cta-btn, .recruitment-notice');
         recElements.forEach(el => {
             if (active) {
@@ -616,6 +629,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.style.display = 'none';
             }
         });
+
+        // Render Join Us page states
+        const activeContainer = document.getElementById('join-active-state');
+        const closedContainer = document.getElementById('join-closed-state');
+
+        if (activeContainer && closedContainer) {
+            if (active) {
+                activeContainer.style.display = 'block';
+                closedContainer.style.display = 'none';
+
+                const titleEl = document.getElementById('join-drive-title');
+                if (titleEl) titleEl.textContent = title;
+
+                const descEl = document.getElementById('join-drive-desc');
+                if (descEl) descEl.textContent = description;
+
+                const deadlineEl = document.getElementById('join-drive-deadline');
+                if (deadlineEl) deadlineEl.textContent = deadline;
+
+                const applyBtns = document.querySelectorAll('.join-apply-btn');
+                applyBtns.forEach(btn => {
+                    if (formUrl && formUrl !== '#') {
+                        btn.href = formUrl;
+                    }
+                });
+
+                const iframeContainer = document.getElementById('join-form-iframe-container');
+                if (iframeContainer && formUrl && formUrl.includes('google.com/forms')) {
+                    iframeContainer.innerHTML = `<iframe src="${escapeHtml(formUrl)}?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0" style="border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:#fff;">Loading…</iframe>`;
+                    iframeContainer.style.display = 'block';
+                }
+            } else {
+                activeContainer.style.display = 'none';
+                closedContainer.style.display = 'block';
+            }
+        }
     }
 
     function renderDynamicTeamGrid(teamMembers, container) {
