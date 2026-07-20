@@ -8,7 +8,264 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Styles for Join Grandeur Page */
+        .join-hero-section {
+            padding: 5.5rem 1.5rem 3.5rem;
+            background: radial-gradient(circle at top center, rgba(212, 175, 55, 0.15) 0%, rgba(15, 23, 42, 0.95) 75%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .join-hero-section::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .live-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: #4ade80;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse-ring 1.8s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+
+        .join-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(135deg, #ffffff 40%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .join-subtitle {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            max-width: 780px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        .drive-glass-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3.5rem;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(16px);
+            position: relative;
+            transition: border-color 0.3s ease;
+        }
+
+        .drive-glass-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .deadline-badge-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            padding: 1.25rem 1.75rem;
+            border-radius: 16px;
+            text-align: left;
+            min-width: 240px;
+        }
+
+        .why-join-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .why-card {
+            background: rgba(30, 41, 59, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2rem 1.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .why-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(212, 175, 55, 0.3);
+            background: rgba(30, 41, 59, 0.7);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .why-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .wings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.75rem;
+            margin-top: 2rem;
+        }
+
+        .wing-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 18px;
+            padding: 2.25rem 2rem;
+            position: relative;
+        }
+
+        .wing-card h3 {
+            font-family: 'Cinzel', serif;
+            color: #f8fafc;
+            font-size: 1.35rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.75rem;
+            margin-top: 2.5rem;
+        }
+
+        .process-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 18px;
+            padding: 2.25rem 1.75rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .process-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .process-number {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            line-height: 1;
+        }
+
+        .faq-accordion {
+            max-width: 850px;
+            margin: 2.5rem auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .faq-item {
+            background: rgba(30, 41, 59, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.5rem 1.75rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .faq-item summary {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #f8fafc;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-item summary::after {
+            content: '＋';
+            color: var(--primary);
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item[open] summary::after {
+            content: '－';
+        }
+
+        .faq-item p {
+            color: #94a3b8;
+            margin-top: 1rem;
+            font-size: 0.98rem;
+            line-height: 1.6;
+        }
+
+        .apply-now-btn-lg {
+            background: linear-gradient(135deg, var(--primary) 0%, #b8860b 100%);
+            color: #0f172a !important;
+            font-weight: 700 !important;
+            padding: 1rem 2.5rem !important;
+            border-radius: 30px !important;
+            font-size: 1.1rem !important;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .apply-now-btn-lg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(212, 175, 55, 0.45);
+            color: #000 !important;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
@@ -37,83 +294,190 @@
 
     <main class="main-content">
         <!-- Hero Section -->
-        <section class="section" style="padding-top: 5rem; padding-bottom: 3rem; background: radial-gradient(circle at top center, rgba(212, 175, 55, 0.12) 0%, rgba(15, 23, 42, 0.95) 70%); text-align: center;">
-            <div class="section-container" style="max-width: 900px;">
-                <span class="section-badge" style="background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--primary); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">Recruitment Portal</span>
-                <h1 style="font-family: 'Cinzel', serif; font-size: 3rem; margin-top: 1rem; margin-bottom: 1.25rem; background: linear-gradient(135deg, #ffffff 30%, var(--primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Join Grandeur</h1>
-                <p style="font-size: 1.15rem; color: #94a3b8; max-width: 750px; margin: 0 auto 2rem; line-height: 1.7;">Step into the world of management consulting, strategic analysis, and high-impact industry research at Shaheed Sukhdev College of Business Studies.</p>
+        <section class="join-hero-section">
+            <div class="section-container" style="max-width: 900px; position: relative; z-index: 1;">
+                <div class="live-status-pill">
+                    <span class="pulse-dot"></span> Recruitment Portal Active
+                </div>
+                <h1 class="join-title">Shape Strategy. Drive Impact.</h1>
+                <p class="join-subtitle">Join Shaheed Sukhdev College of Business Studies' premier Consulting & Knowledge Cell. Step into live client advisories, publication research, and national case championships.</p>
             </div>
         </section>
 
         <!-- Dynamic Recruitment Content Container -->
-        <div class="section-container" style="max-width: 1100px; padding: 0 1.5rem 4rem;">
+        <div class="section-container" style="max-width: 1180px; padding: 0 1.5rem 5rem;">
             
             <!-- ACTIVE RECRUITMENT STATE -->
             <div id="join-active-state">
                 
-                <!-- Drive Status Card -->
-                <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 12px 32px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(212, 175, 55, 0.08); border-radius: 50%; filter: blur(40px); pointer-events: none;"></div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem;">
-                        <div>
-                            <span style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">
-                                <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block;"></span> Applications Open
-                            </span>
-                            <h2 id="join-drive-title" style="font-size: 2rem; color: #f8fafc; font-family: 'Cinzel', serif; margin-bottom: 0.5rem;">Grandeur Recruitment Drive 2026</h2>
-                            <p id="join-drive-desc" style="color: #94a3b8; font-size: 1.05rem; line-height: 1.6; max-width: 700px;">Join the premier Consulting & Knowledge Cell of SSCBS.</p>
+                <!-- Drive Status Glass Card -->
+                <div class="drive-glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem; margin-bottom: 2rem;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <span style="display: inline-block; background: rgba(212, 175, 55, 0.15); color: var(--primary); border: 1px solid rgba(212, 175, 55, 0.3); padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Official Selection Drive</span>
+                            <h2 id="join-drive-title" style="font-size: clamp(1.75rem, 3.5vw, 2.5rem); color: #f8fafc; font-family: 'Cinzel', serif; margin-bottom: 0.75rem; line-height: 1.3;">Grandeur Recruitment Drive 2026</h2>
+                            <p id="join-drive-desc" style="color: #94a3b8; font-size: 1.1rem; line-height: 1.7; max-width: 750px;">Join the premier Consulting & Knowledge Cell of SSCBS.</p>
                         </div>
 
-                        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.25rem 1.5rem; border-radius: 14px; min-width: 220px;">
-                            <span style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Application Deadline</span>
-                            <div id="join-drive-deadline" style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">August 20, 2026</div>
+                        <div class="deadline-badge-box">
+                            <span style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">Application Deadline</span>
+                            <div id="join-drive-deadline" style="font-size: 1.35rem; font-weight: 700; color: var(--primary); margin-top: 0.35rem; font-family: 'Inter', sans-serif;">August 20, 2026</div>
+                            <span style="display: inline-block; margin-top: 0.5rem; font-size: 0.8rem; color: #4ade80;">● Submissions Accepted</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1.75rem;">
-                        <a href="#" class="btn btn-primary join-apply-btn" target="_blank" style="padding: 0.85rem 2rem; font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">🚀 Fill Application Form</a>
-                        <a href="#selection-process" class="btn btn-outline" style="padding: 0.85rem 1.75rem; font-size: 1rem;">View Selection Process ↓</a>
+                    <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 2rem; align-items: center;">
+                        <a href="#" class="apply-now-btn-lg join-apply-btn" target="_blank">
+                            <span>Fill Application Form</span>
+                            <span style="font-size: 1.2rem;">→</span>
+                        </a>
+                        <a href="#selection-process" class="btn btn-outline" style="padding: 0.95rem 1.8rem; font-size: 1rem; border-radius: 30px;">Selection Timeline ↓</a>
+                    </div>
+                </div>
+
+                <!-- Why Join Grandeur Grid -->
+                <div style="margin-bottom: 4.5rem;">
+                    <div style="text-align: center; margin-bottom: 2.5rem;">
+                        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;">Why Grandeur?</span>
+                        <h2 style="font-family: 'Cinzel', serif; font-size: 2.2rem; color: #f8fafc; margin-top: 0.5rem;">What You Gain As A Member</h2>
+                    </div>
+
+                    <div class="why-join-grid">
+                        <div class="why-card">
+                            <div class="why-icon">💼</div>
+                            <h3 style="color: #f8fafc; font-size: 1.25rem; margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Live Client Advisories</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Work on real strategy, market entry, and operational consulting projects for startups, brands, and corporate clients.</p>
+                        </div>
+
+                        <div class="why-card">
+                            <div class="why-icon">📊</div>
+                            <h3 style="color: #f8fafc; font-size: 1.25rem; margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Published Thought Leadership</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Author & publish high-impact research primers, industry whitepapers, and sector analyses circulated to business leaders.</p>
+                        </div>
+
+                        <div class="why-card">
+                            <div class="why-icon">🏆</div>
+                            <h3 style="color: #f8fafc; font-size: 1.25rem; margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Case Championship Pedigree</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Master elite case-solving frameworks through internal bootcamps and compete at IITs, IIMs, SRCC, and national competitions.</p>
+                        </div>
+
+                        <div class="why-card">
+                            <div class="why-icon">🎓</div>
+                            <h3 style="color: #f8fafc; font-size: 1.25rem; margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Distinguished Network</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Gain direct 1-on-1 mentorship from alumni placed across MBB (McKinsey, BCG, Bain), Big 4 firms, and top global B-schools.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wings & Core Departments -->
+                <div style="margin-bottom: 4.5rem;">
+                    <div style="text-align: center; margin-bottom: 2.5rem;">
+                        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;">Cell Structure</span>
+                        <h2 style="font-family: 'Cinzel', serif; font-size: 2.2rem; color: #f8fafc; margin-top: 0.5rem;">Our Core Departments</h2>
+                    </div>
+
+                    <div class="wings-grid">
+                        <div class="wing-card">
+                            <span style="font-size: 1.8rem; display: block; margin-bottom: 0.75rem;">🧩</span>
+                            <h3>Consulting & Strategy</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Executes client consulting engagements, financial modeling, market estimation, and strategic business problem solving.</p>
+                        </div>
+
+                        <div class="wing-card">
+                            <span style="font-size: 1.8rem; display: block; margin-bottom: 0.75rem;">📚</span>
+                            <h3>Knowledge & Research</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Engineers industry research primers, macroeconomic reports, casebooks, and analytical deep dives across key sectors.</p>
+                        </div>
+
+                        <div class="wing-card">
+                            <span style="font-size: 1.8rem; display: block; margin-bottom: 0.75rem;">🤝</span>
+                            <h3>Corporate Relations & Growth</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Manages corporate partnerships, client outreach, speaker summits, institutional collaborations, and brand strategy.</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Selection Process Timeline -->
-                <div id="selection-process" style="margin-bottom: 4rem;">
-                    <h2 style="font-family: 'Cinzel', serif; text-align: center; font-size: 2rem; color: #f8fafc; margin-bottom: 2.5rem;">Selection Process</h2>
+                <div id="selection-process" style="margin-bottom: 4.5rem;">
+                    <div style="text-align: center; margin-bottom: 2.5rem;">
+                        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;">Roadmap to Induction</span>
+                        <h2 style="font-family: 'Cinzel', serif; font-size: 2.2rem; color: #f8fafc; margin-top: 0.5rem;">Selection Process</h2>
+                    </div>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                        <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 1.75rem;">
-                            <div style="font-size: 2rem; color: var(--primary); font-weight: 800; font-family: 'Cinzel', serif; margin-bottom: 0.75rem;">01</div>
-                            <h3 style="color: #f8fafc; font-size: 1.2rem; margin-bottom: 0.5rem;">Application Screening</h3>
-                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Review of candidates based on CV quality, analytical aptitude, and responses to initial case scenarios in the application form.</p>
+                    <div class="process-grid">
+                        <div class="process-card">
+                            <div class="process-number">01</div>
+                            <h3 style="color: #f8fafc; font-size: 1.25rem; margin-bottom: 0.5rem;">Application Screening</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Evaluation of applicants based on resume quality, analytical clarity, and responses to initial case & motivation prompts.</p>
                         </div>
 
-                        <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 1.75rem;">
-                            <div style="font-size: 2rem; color: var(--primary); font-weight: 800; font-family: 'Cinzel', serif; margin-bottom: 0.75rem;">02</div>
-                            <h3 style="color: #f8fafc; font-size: 1.2rem; margin-bottom: 0.5rem;">Case & Problem Solving</h3>
-                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Shortlisted applicants undergo a practical case study round testing logical structuring, market estimation, and strategic decision-making.</p>
+                        <div class="process-card">
+                            <div class="process-number">02</div>
+                            <h3 style="color: #f8fafc; font-size: 1.25rem; margin-bottom: 0.5rem;">Case & Aptitude Round</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Shortlisted candidates undergo a practical case study session testing problem structuring, guesstimates, and logical reasoning.</p>
                         </div>
 
-                        <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 1.75rem;">
-                            <div style="font-size: 2rem; color: var(--primary); font-weight: 800; font-family: 'Cinzel', serif; margin-bottom: 0.75rem;">03</div>
-                            <h3 style="color: #f8fafc; font-size: 1.2rem; margin-bottom: 0.5rem;">Personal Interview</h3>
-                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Final one-on-one interactive interview focusing on leadership potential, domain curiosity, and alignment with Grandeur's core values.</p>
+                        <div class="process-card">
+                            <div class="process-number">03</div>
+                            <h3 style="color: #f8fafc; font-size: 1.25rem; margin-bottom: 0.5rem;">Personal Interview</h3>
+                            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">Final interactive interview with cell leadership focusing on domain curiosity, teamwork, initiative, and cultural alignment.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Form Iframe Container (If Google Form link is present) -->
+                <!-- FAQ Accordion Section -->
+                <div style="margin-bottom: 4rem;">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;">Got Questions?</span>
+                        <h2 style="font-family: 'Cinzel', serif; font-size: 2.2rem; color: #f8fafc; margin-top: 0.5rem;">Frequently Asked Questions</h2>
+                    </div>
+
+                    <div class="faq-accordion">
+                        <details class="faq-item">
+                            <summary>Who is eligible to apply for Grandeur?</summary>
+                            <p>Recruitment is open to undergraduate students across all courses (BMS, BBA FIA, B.Sc. Computer Science) and academic batches at Shaheed Sukhdev College of Business Studies (SSCBS).</p>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>Do I need prior consulting or financial modeling experience?</summary>
+                            <p>No prior consulting experience is required! We value structured thinking, curiosity, communication skills, and a strong problem-solving mindset. Comprehensive internal training and case bootcamps are provided to all inducted members.</p>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>What is the expected weekly time commitment?</summary>
+                            <p>Members typically dedicate 8 to 12 hours per week to live client engagements, knowledge primers, and internal skill sessions. Time commitment may vary depending on project milestones and competition schedules.</p>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>How can I prepare for the selection process?</summary>
+                            <p>We recommend familiarizing yourself with basic case structuring principles (such as profitability frameworks, guesstimates, and market entry) and highlighting your analytical experiences in the application form.</p>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Direct Form Action Callout -->
+                <div style="text-align: center; background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(30, 41, 59, 0.7) 100%); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; padding: 3rem 2rem; margin-top: 3rem;">
+                    <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: #f8fafc; margin-bottom: 1rem;">Ready to Join Grandeur?</h2>
+                    <p style="color: #94a3b8; font-size: 1.05rem; max-width: 600px; margin: 0 auto 2rem;">Take the first step towards an extraordinary collegiate consulting journey.</p>
+                    <a href="#" class="apply-now-btn-lg join-apply-btn" target="_blank">
+                        <span>Fill Out Application Form</span>
+                        <span style="font-size: 1.2rem;">🚀</span>
+                    </a>
+                </div>
+
+                <!-- Form Iframe Container (If Google Form link is embedded) -->
                 <div id="join-form-iframe-container" style="display: none; margin-top: 3rem;"></div>
             </div>
 
             <!-- CLOSED RECRUITMENT STATE -->
-            <div id="join-closed-state" style="display: none; text-align: center; padding: 4rem 2rem; background: rgba(30, 41, 59, 0.4); border: 1px dashed rgba(212, 175, 55, 0.3); border-radius: 20px; max-width: 750px; margin: 0 auto;">
+            <div id="join-closed-state" style="display: none; text-align: center; padding: 4.5rem 2rem; background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.9)); border: 1px dashed rgba(212, 175, 55, 0.3); border-radius: 20px; max-width: 800px; margin: 2rem auto 0; box-shadow: 0 12px 32px rgba(0,0,0,0.3);">
                 <div style="font-size: 3.5rem; margin-bottom: 1rem;">🔒</div>
-                <h2 style="font-family: 'Cinzel', serif; color: #f8fafc; font-size: 2rem; margin-bottom: 1rem;">Recruitments Are Currently Closed</h2>
-                <p style="color: #94a3b8; font-size: 1.05rem; line-height: 1.7; max-width: 600px; margin: 0 auto 2rem;">Thank you for your interest in Grandeur SSCBS. Our recruitment portal is currently offline as our team selection drive is concluded. Follow our updates and check back during our next recruitment drive!</p>
+                <h2 style="font-family: 'Cinzel', serif; color: #f8fafc; font-size: 2.2rem; margin-bottom: 1rem;">Recruitments Are Currently Closed</h2>
+                <p style="color: #94a3b8; font-size: 1.1rem; line-height: 1.7; max-width: 620px; margin: 0 auto 2.5rem;">Thank you for your interest in Grandeur SSCBS. Our recruitment portal is currently offline as our team selection drive has concluded. Follow our social channels and check back during our next recruitment drive!</p>
                 
-                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                    <a href="what-we-do.html" class="btn btn-primary">Explore What We Do</a>
-                    <a href="contact-us.html" class="btn btn-outline">Contact Us</a>
+                <div style="display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap;">
+                    <a href="what-we-do.html" class="btn btn-primary" style="padding: 0.85rem 1.75rem; border-radius: 25px;">Explore What We Do</a>
+                    <a href="contact-us.html" class="btn btn-outline" style="padding: 0.85rem 1.75rem; border-radius: 25px;">Contact Us</a>
                 </div>
             </div>
 
