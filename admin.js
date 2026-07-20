@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loginView) loginView.style.display = 'flex';
             if (dashboardView) dashboardView.style.display = 'none';
             if (adminUserActions) adminUserActions.style.display = 'none';
+            hideAdminLoader();
         }
     }
 
@@ -286,6 +287,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // DASHBOARD RENDER
+    let loaderSafetyTimeout = null;
+
+    function showAdminLoader(statusText, progressPercent) {
+        const loader = document.getElementById('admin-global-loader');
+        if (loader) {
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+            loader.style.pointerEvents = 'all';
+        }
+        updateAdminLoader(statusText, progressPercent);
+        if (loaderSafetyTimeout) clearTimeout(loaderSafetyTimeout);
+        loaderSafetyTimeout = setTimeout(() => {
+            hideAdminLoader();
+        }, 5000);
+    }
+
     function updateAdminLoader(statusText, progressPercent) {
         const loaderText = document.getElementById('loader-status-text');
         const loaderBar = document.getElementById('loader-bar-fill');
@@ -294,6 +311,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hideAdminLoader() {
+        if (loaderSafetyTimeout) {
+            clearTimeout(loaderSafetyTimeout);
+            loaderSafetyTimeout = null;
+        }
         const loader = document.getElementById('admin-global-loader');
         if (loader) {
             updateAdminLoader('Ready!', 100);
@@ -306,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderDashboard() {
-        updateAdminLoader('⚡ Connecting to Grandeur Supabase DB...', 25);
+        showAdminLoader('⚡ Connecting to Grandeur Supabase DB...', 25);
         let recruitmentData = null;
         let bannerData = null;
         let teamData = null;
