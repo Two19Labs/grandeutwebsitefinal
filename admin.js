@@ -345,6 +345,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 `<img src="${escapeHtml(m.photo)}" class="member-avatar-mini" alt="${escapeHtml(m.name)}">` : 
                 `<div class="member-avatar-mini">${initials}</div>`;
 
+            const tierLabels = {
+                faculty: 'Faculty In-Charge',
+                board: 'President & Vice President',
+                coordinators: 'Co-ordinators',
+                organizing: 'Board of Directors',
+                advisory: 'Advisory Committee',
+                core: 'Core Committee'
+            };
+            const tierLabel = tierLabels[m.tier] || m.tier;
+
             return `
                 <tr>
                     <td>
@@ -354,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </td>
                     <td>${escapeHtml(m.role)}</td>
-                    <td><span class="tier-badge tier-${m.tier}">${m.tier}</span></td>
+                    <td><span class="tier-badge tier-${m.tier}">${escapeHtml(tierLabel)}</span></td>
                     <td>${m.linkedin ? `<a href="${escapeHtml(m.linkedin)}" target="_blank" style="color:var(--admin-gold);">Profile ↗</a>` : '—'}</td>
                     <td>
                         <div class="action-btns-group">

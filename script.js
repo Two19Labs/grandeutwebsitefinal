@@ -707,9 +707,9 @@ document.addEventListener('DOMContentLoaded', () => {
             faculty: { title: "Faculty In-Charge", members: [] },
             board: { title: "President & Vice President", members: [] },
             coordinators: { title: "Co-ordinators", members: [] },
+            organizing: { title: "Board of Directors", members: [] },
             advisory: { title: "Advisory Committee", members: [] },
-            core: { title: "Core Committee", members: [] },
-            organizing: { title: "Organizing Committee", members: [] }
+            core: { title: "Core Committee", members: [] }
         };
 
         teamMembers.forEach(m => {
