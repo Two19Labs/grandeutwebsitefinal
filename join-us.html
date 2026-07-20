@@ -391,7 +391,14 @@
             if (dataStr) {
                 try { localRec = JSON.parse(dataStr).recruitment; } catch(e) {}
             }
-            const recData = { ...(localRec || {}), ...(dbData || {}) };
+            const recData = {
+                title: "Grandeur Recruitment Drive 2026",
+                description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
+                deadline: "August 20, 2026",
+                deadline_datetime: "",
+                ...(dbData || {}),
+                ...(localRec || {})
+            };
 
             const isActive = recData ? (recData.active !== false) : true;
             const dtStr = recData ? (recData.deadline_datetime || recData.deadlineDatetime) : null;
