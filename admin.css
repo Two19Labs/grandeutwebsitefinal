@@ -190,6 +190,30 @@ body.admin-body {
     color: var(--admin-text-muted);
 }
 
+.admin-info-banner {
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    color: var(--admin-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.admin-info-banner .banner-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.admin-info-banner strong {
+    color: var(--admin-accent-blue);
+}
+
+
 /* Dashboard Layout */
 .admin-dashboard-layout {
     display: flex;
