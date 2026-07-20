@@ -352,11 +352,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Update counts in UI if elements exist
-        const countBadge = document.getElementById('resource-count-badge');
-        if (countBadge) {
-            countBadge.textContent = `${visibleCount} ${visibleCount === 1 ? 'Resource' : 'Resources'} Available`;
-        }
+        // Count badge preserved statically with Linktree icon link
+        // const countBadge = document.getElementById('resource-count-badge');
+        // if (countBadge) {
+        //     countBadge.textContent = `${visibleCount} ${visibleCount === 1 ? 'Resource' : 'Resources'} Available`;
+        // }
     };
 
     if (resourceFilterButtons.length > 0) {
