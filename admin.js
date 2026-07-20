@@ -279,18 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputRecDeadlineDt = document.getElementById('recruitment-deadline-datetime');
         if (inputRecDeadlineDt) inputRecDeadlineDt.value = recruitment.deadline_datetime || recruitment.deadlineDatetime || "";
 
-        const switchBanner = document.getElementById('switch-banner-active');
-        if (switchBanner) switchBanner.checked = banner.active;
-
-        const inputBannerText = document.getElementById('banner-text');
-        if (inputBannerText) inputBannerText.value = banner.text || "";
-
-        const inputBannerBtnText = document.getElementById('banner-text');
-        if (inputBannerBtnText) inputBannerBtnText.value = banner.btnText || "";
-
-        const inputBannerBtnUrl = document.getElementById('banner-btn-url');
-        if (inputBannerBtnUrl) inputBannerBtnUrl.value = banner.btnUrl || "";
-
         renderTeamTable(cachedTeam);
         renderKnowledgeTable(cachedPrimers);
         renderInboxList(inbox);
@@ -342,42 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
             saveStore(store);
             renderDashboard();
             showToast("✅ Recruitment settings updated!");
-        });
-    }
-
-    const switchBanner = document.getElementById('switch-banner-active');
-    if (switchBanner) {
-        switchBanner.addEventListener('change', async () => {
-            const active = switchBanner.checked;
-            if (window.GrandeurDB) {
-                await window.GrandeurDB.updateBanner({ active });
-            }
-            const store = getStore();
-            store.banner.active = active;
-            saveStore(store);
-            renderDashboard();
-            showToast(`Header Banner is now ${active ? 'ENABLED' : 'DISABLED'}`);
-        });
-    }
-
-    const formBanner = document.getElementById('form-banner-settings');
-    if (formBanner) {
-        formBanner.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const active = document.getElementById('switch-banner-active').checked;
-            const text = document.getElementById('banner-text').value;
-            const btnText = document.getElementById('banner-btn-text').value;
-            const btnUrl = document.getElementById('banner-btn-url').value;
-
-            if (window.GrandeurDB) {
-                await window.GrandeurDB.updateBanner({ active, text, btn_text: btnText, btn_url: btnUrl });
-            }
-
-            const store = getStore();
-            store.banner = { active, text, btnText, btnUrl };
-            saveStore(store);
-            renderDashboard();
-            showToast("✅ Announcement banner saved!");
         });
     }
 

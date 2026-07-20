@@ -552,11 +552,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.GrandeurDB) {
             try {
-                const bannerData = await window.GrandeurDB.getBanner();
-                if (bannerData) renderBanner(bannerData.active, bannerData.text, bannerData.btn_text, bannerData.btn_url);
-            } catch (err) { console.warn("Banner fetch warning:", err); }
-
-            try {
                 const recData = await window.GrandeurDB.getRecruitment();
                 if (recData) applyRecruitmentState(recData);
             } catch (err) { console.warn("Recruitment fetch warning:", err); }
@@ -581,27 +576,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 console.error("GrandeurDB team fetch error on site:", err);
             }
-        }
-    }
-
-    function renderBanner(active, text, btnText, btnUrl) {
-        let bannerEl = document.getElementById('grandeur-global-banner');
-        if (active) {
-            if (!bannerEl) {
-                bannerEl = document.createElement('div');
-                bannerEl.id = 'grandeur-global-banner';
-                bannerEl.className = 'global-announcement-banner';
-                document.body.prepend(bannerEl);
-            }
-            const btnHtml = btnText ? `<a href="${btnUrl || '#'}" class="banner-btn">${escapeHtml(btnText)}</a>` : '';
-            bannerEl.innerHTML = `
-                <div class="banner-content">
-                    <span>${escapeHtml(text)}</span>
-                    ${btnHtml}
-                </div>
-            `;
-        } else if (bannerEl) {
-            bannerEl.remove();
         }
     }
 

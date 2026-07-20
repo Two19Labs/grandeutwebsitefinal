@@ -84,7 +84,7 @@
                 <aside class="admin-sidebar">
                     <nav class="admin-nav">
                         <button class="admin-nav-item active" data-tab="tab-recruitment">
-                            <span class="nav-icon">📢</span> Recruitment & Banners
+                            <span class="nav-icon">📢</span> Recruitments
                         </button>
                         <button class="admin-nav-item" data-tab="tab-team">
                             <span class="nav-icon">👥</span> Team Members
@@ -112,12 +112,12 @@
                 <!-- Content Panels -->
                 <div class="admin-content-area">
                     
-                    <!-- TAB 1: RECRUITMENT & BANNERS -->
+                    <!-- TAB 1: RECRUITMENTS -->
                     <div class="tab-panel active" id="tab-recruitment">
                         <div class="panel-header">
                             <div>
-                                <h1>Recruitment & Global Announcement Settings</h1>
-                                <p>Control recruitment forms, active status banners, and website header notices.</p>
+                                <h1>Recruitments Management</h1>
+                                <p>Configure active recruitment drive details, set automatic form cutoff timers, and review candidate applications.</p>
                             </div>
                         </div>
 
@@ -170,38 +170,6 @@
                                 <div id="recruitment-applications-list">
                                     <!-- Rendered dynamically -->
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="admin-card" style="margin-top: 2rem;">
-                            <div class="card-header-flex">
-                                <div>
-                                    <h3>Global Header Announcement Banner</h3>
-                                    <p>Display an alert bar at the very top of all website pages.</p>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="switch-banner-active">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <div class="card-body">
-                                <form id="form-banner-settings">
-                                    <div class="form-group">
-                                        <label for="banner-text">Banner Announcement Message</label>
-                                        <input type="text" id="banner-text" class="form-input" placeholder="e.g. 🚀 Grandeur Recruitments 2026 are officially open!">
-                                    </div>
-                                    <div class="grid grid-2" style="gap: 1.5rem;">
-                                        <div class="form-group">
-                                            <label for="banner-btn-text">Button Text</label>
-                                            <input type="text" id="banner-btn-text" class="form-input" placeholder="e.g. Apply Now">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="banner-btn-url">Button Link Target</label>
-                                            <input type="text" id="banner-btn-url" class="form-input" placeholder="e.g. contact-us.html or https://...">
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary" id="btn-save-banner">Save Announcement Banner</button>
-                                </form>
                             </div>
                         </div>
                     </div>

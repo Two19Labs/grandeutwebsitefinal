@@ -2325,42 +2325,8 @@ a.resources-badge:hover {
 }
 
 /* ==========================================================================
-   Global Announcement Banner & Admin Link
+   Admin Footer Link
    ========================================================================== */
-.global-announcement-banner {
-    background: linear-gradient(90deg, #0b1120 0%, #1e293b 50%, #0b1120 100%);
-    border-bottom: 1px solid rgba(212, 175, 55, 0.4);
-    color: #f8fafc;
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-    text-align: center;
-    position: relative;
-    z-index: 1001;
-}
-
-.global-announcement-banner .banner-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.global-announcement-banner .banner-btn {
-    background: var(--gold, #d4af37);
-    color: #000;
-    font-weight: 700;
-    padding: 0.25rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    text-decoration: none;
-    transition: transform 0.2s;
-}
-
-.global-announcement-banner .banner-btn:hover {
-    transform: scale(1.05);
-}
-
 .footer-admin-link {
     display: inline-block;
     color: rgba(255, 255, 255, 0.3) !important;
