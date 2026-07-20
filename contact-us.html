@@ -106,11 +106,14 @@
                     </div>
 
                     <script>
+                        let isSubmitting = false;
                         async function handleContactSubmit(e) {
                             if (e) {
                                 e.preventDefault();
                                 e.stopPropagation();
                             }
+                            if (isSubmitting) return false;
+
                             const nameInput = document.getElementById('name');
                             const emailInput = document.getElementById('email');
                             const messageInput = document.getElementById('message');
@@ -128,6 +131,7 @@
                                 return false;
                             }
 
+                            isSubmitting = true;
                             const btn = document.querySelector('#contact-form button[type="submit"]');
                             let originalText = "Send Message ↗";
                             if (btn) {
@@ -140,9 +144,21 @@
                             let success = false;
 
                             try {
-                                if (window.GrandeurDB) {
+                                if (window.GrandeurDB && typeof window.GrandeurDB.insertContactInquiry === 'function') {
                                     await window.GrandeurDB.insertContactInquiry(inquiryData);
                                     success = true;
+                                } else {
+                                    const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/contact_inquiries', {
+                                        method: 'POST',
+                                        headers: {
+                                            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                            'Content-Type': 'application/json',
+                                            'Prefer': 'return=minimal'
+                                        },
+                                        body: JSON.stringify(inquiryData)
+                                    });
+                                    if (res.ok) success = true;
                                 }
                             } catch (err) {
                                 console.error("Inquiry submit error:", err);
@@ -152,6 +168,7 @@
                                 btn.disabled = false;
                                 btn.textContent = originalText;
                             }
+                            isSubmitting = false;
 
                             if (success) {
                                 const form = document.getElementById('contact-form');
@@ -275,7 +292,7 @@
         </div>
     </footer>
 
-    <script src="supabase-config.js?v=5"></script>
-    <script src="script.js?v=5"></script>
+    <script src="supabase-config.js?v=15"></script>
+    <script src="script.js?v=15"></script>
 </body>
 </html>

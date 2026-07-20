@@ -131,90 +131,19 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(checkAndAnimate, 1000);
     }
 
-    // 5. Contact Form Validation
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const nameInput = document.getElementById('name');
-            const emailInput = document.getElementById('email');
-            const messageInput = document.getElementById('message');
-            
-            let isValid = true;
-            
-            if (!nameInput.value.trim()) {
-                showError(nameInput, 'Name is required');
-                isValid = false;
-            } else {
-                clearError(nameInput);
-            }
-            
-            if (!emailInput.value.trim() || !validateEmail(emailInput.value)) {
-                showError(emailInput, 'A valid email is required');
-                isValid = false;
-            } else {
-                clearError(emailInput);
-            }
-            
-            if (!messageInput.value.trim()) {
-                showError(messageInput, 'Message cannot be empty');
-                isValid = false;
-            } else {
-                clearError(messageInput);
-            }
-            
-            if (isValid) {
-                const btn = contactForm.querySelector('button[type="submit"]');
-                const originalText = btn.textContent;
-                btn.textContent = 'Submitting...';
-                btn.disabled = true;
-
-                const inquiryData = {
-                    name: nameInput.value.trim(),
-                    email: emailInput.value.trim(),
-                    subject: document.getElementById('subject')?.value || 'General Inquiry',
-                    message: messageInput.value.trim()
-                };
-
-                (async function submitContactForm() {
-                    let success = false;
-                    if (window.GrandeurDB && typeof window.GrandeurDB.insertContactInquiry === 'function') {
-                        try {
-                            await window.GrandeurDB.insertContactInquiry(inquiryData);
-                            success = true;
-                        } catch (err) {
-                            console.error("GrandeurDB submission error:", err);
-                        }
-                    }
-
-
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                    contactForm.reset();
-
-                    const wrapper = document.getElementById('contact-form-wrapper');
-                    const successState = document.getElementById('contact-success-state');
-                    if (wrapper && successState) {
-                        wrapper.style.display = 'none';
-                        successState.style.display = 'block';
-                    }
-                })();
+    // 5. Contact Form Button Handler
+    const btnSendAnother = document.getElementById('btn-send-another');
+    if (btnSendAnother) {
+        btnSendAnother.addEventListener('click', () => {
+            const wrapper = document.getElementById('contact-form-wrapper');
+            const successState = document.getElementById('contact-success-state');
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) contactForm.reset();
+            if (wrapper && successState) {
+                successState.style.display = 'none';
+                wrapper.style.display = 'block';
             }
         });
-
-        const btnSendAnother = document.getElementById('btn-send-another');
-        if (btnSendAnother) {
-            btnSendAnother.addEventListener('click', () => {
-                const wrapper = document.getElementById('contact-form-wrapper');
-                const successState = document.getElementById('contact-success-state');
-                if (contactForm) contactForm.reset();
-                if (wrapper && successState) {
-                    successState.style.display = 'none';
-                    wrapper.style.display = 'block';
-                }
-            });
-        }
     }
 
     function showError(input, message) {
@@ -797,46 +726,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    // Contact form saver to CMS inbox & Supabase
-    const cmsContactForm = document.getElementById('contact-form');
-    if (cmsContactForm) {
-        cmsContactForm.addEventListener('submit', async (e) => {
-            const nameVal = document.getElementById('name')?.value || '';
-            const emailVal = document.getElementById('email')?.value || '';
-            const subjectVal = document.getElementById('subject')?.value || 'General Inquiry';
-            const messageVal = document.getElementById('message')?.value || '';
-
-            if (nameVal && emailVal && messageVal) {
-                // If Supabase connected
-                if (window.supabaseClient) {
-                    try {
-                        await window.supabaseClient.from('contact_inquiries').insert([
-                            { name: nameVal, email: emailVal, subject: subjectVal, message: messageVal }
-                        ]);
-                    } catch(err) { console.error("Supabase insert error:", err); }
-                }
-
-                // Also save locally
-                const dataStr = localStorage.getItem('grandeur_admin_store');
-                if (dataStr) {
-                    try {
-                        const store = JSON.parse(dataStr);
-                        if (!store.inbox) store.inbox = [];
-                        store.inbox.unshift({
-                            id: "in_" + Date.now(),
-                            name: nameVal,
-                            email: emailVal,
-                            subject: subjectVal,
-                            message: messageVal,
-                            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                        });
-                        localStorage.setItem('grandeur_admin_store', JSON.stringify(store));
-                    } catch(err){}
-                }
-            }
-        });
     }
 
     // Execute sync
