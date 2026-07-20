@@ -173,9 +173,26 @@
                                 });
                                 if (res.ok) data = await res.json();
                             }
+                            function sortPrimersByYearDesc(list) {
+                                return (list || []).sort((a, b) => {
+                                    const extractYear = (p) => {
+                                        const str = String(p.date_label || p.year || '');
+                                        const match = str.match(/\b(20\d\d|19\d\d)\b/);
+                                        if (match) return parseInt(match[1], 10);
+                                        return p.created_at ? new Date(p.created_at).getFullYear() : 0;
+                                    };
+                                    const yearA = extractYear(a);
+                                    const yearB = extractYear(b);
+                                    if (yearB !== yearA) return yearB - yearA;
+                                    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+                                    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+                                    return timeB - timeA;
+                                });
+                            }
+
                             if (Array.isArray(data)) {
-                                allPrimers = data;
-                                renderPrimersGrid(data);
+                                allPrimers = sortPrimersByYearDesc(data);
+                                renderPrimersGrid(allPrimers);
                             }
                         } catch(e) {
                             console.error("Knowledge Hub load error:", e);
@@ -229,7 +246,7 @@
         </div>
     </footer>
 
-    <script src="supabase-config.js?v=10"></script>
-    <script src="script.js?v=10"></script>
+    <script src="supabase-config.js?v=11"></script>
+    <script src="script.js?v=11"></script>
 </body>
 </html>

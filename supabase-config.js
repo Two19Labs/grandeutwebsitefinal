@@ -35,6 +35,23 @@ const WRITE_HEADERS = {
     } catch(e) {}
 })();
 
+function sortPrimersByYearDesc(primers) {
+    return (primers || []).sort((a, b) => {
+        const extractYear = (p) => {
+            const str = String(p.date_label || p.year || '');
+            const match = str.match(/\b(20\d\d|19\d\d)\b/);
+            if (match) return parseInt(match[1], 10);
+            return p.created_at ? new Date(p.created_at).getFullYear() : 0;
+        };
+        const yearA = extractYear(a);
+        const yearB = extractYear(b);
+        if (yearB !== yearA) return yearB - yearA;
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return timeB - timeA;
+    });
+}
+
 window.GrandeurDB = {
     clearCache() {
         try {
@@ -124,12 +141,13 @@ window.GrandeurDB = {
         return res.ok;
     },
 
-    // 4. KNOWLEDGE PRIMERS / PUBLICATIONS (Real-Time Live Query)
+    // 4. KNOWLEDGE PRIMERS / PUBLICATIONS (Real-Time Live Query Sorted by Descending Year)
     async getKnowledgePrimers() {
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=*&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            return await res.json();
+            const rows = await res.json();
+            return sortPrimersByYearDesc(rows);
         } catch(e) { return []; }
     },
 
@@ -255,4 +273,4 @@ window.GrandeurDB = {
     }
 };
 
-console.log("⚡ GrandeurDB Engine loaded - Pure Real-Time Sync Enabled!");
+console.log("⚡ GrandeurDB Engine loaded - Descending Year Sorting Enabled!");

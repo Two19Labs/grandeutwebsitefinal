@@ -538,12 +538,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderKnowledgeTable(primersList = cachedPrimers) {
         if (!knowledgeTableBody) return;
-        if (!primersList || primersList.length === 0) {
+        
+        const sortedList = (primersList || []).sort((a, b) => {
+            const extractYear = (p) => {
+                const str = String(p.date_label || p.year || '');
+                const match = str.match(/\b(20\d\d|19\d\d)\b/);
+                if (match) return parseInt(match[1], 10);
+                return p.created_at ? new Date(p.created_at).getFullYear() : 0;
+            };
+            const yearA = extractYear(a);
+            const yearB = extractYear(b);
+            if (yearB !== yearA) return yearB - yearA;
+            const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return timeB - timeA;
+        });
+
+        if (sortedList.length === 0) {
             knowledgeTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No research publications found. Click "Add New Primer" to publish one.</td></tr>`;
             return;
         }
 
-        knowledgeTableBody.innerHTML = primersList.map(item => `
+        knowledgeTableBody.innerHTML = sortedList.map(item => `
             <tr>
                 <td><strong>${escapeHtml(item.title)}</strong></td>
                 <td><span class="tier-badge tier-core">${escapeHtml(item.category)}</span></td>
