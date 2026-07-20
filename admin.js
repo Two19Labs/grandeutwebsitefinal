@@ -156,8 +156,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabButtons = document.querySelectorAll('.admin-nav-item');
     const tabPanels = document.querySelectorAll('.tab-panel');
 
+    function triggerTopProgress(percent) {
+        const bar = document.getElementById('top-loading-bar');
+        if (bar) {
+            bar.classList.add('active');
+            bar.style.width = percent + '%';
+            if (percent >= 100) {
+                setTimeout(() => {
+                    bar.style.width = '100%';
+                    setTimeout(() => {
+                        bar.classList.remove('active');
+                        bar.style.width = '0%';
+                    }, 350);
+                }, 200);
+            }
+        }
+    }
+
     function activateTab(tabId) {
         if (!tabId) return;
+        triggerTopProgress(60);
         const targetBtn = document.querySelector(`.admin-nav-item[data-tab="${tabId}"]`);
         const targetPanel = document.getElementById(tabId);
         if (!targetPanel) return;
@@ -173,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             location.hash = tabId;
         }
+        setTimeout(() => triggerTopProgress(100), 150);
     }
 
     tabButtons.forEach(btn => {
@@ -260,11 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const list = [];
         cards.forEach(card => {
             const id = card.getAttribute('data-q-id') || ('q_' + Date.now());
-            const prompt = card.querySelector('.q-input-prompt') ? card.querySelector('.q-input-prompt').value.trim() : '';
-            const type = card.querySelector('.q-input-type') ? card.querySelector('.q-input-type').value : 'textarea';
-            const required = card.querySelector('.q-input-required') ? card.querySelector('.q-input-required').value === 'true' : true;
-            const options = card.querySelector('.q-input-options') ? card.querySelector('.q-input-options').value.trim() : '';
-
+            const prompt = card.querySelector('.q-input-prompt')?.value || '';
+            const type = card.querySelector('.q-input-type')?.value || 'textarea';
+            const required = card.querySelector('.q-input-required')?.value === 'true';
+            const options = card.querySelector('.q-input-options')?.value || '';
             list.push({ id, prompt, type, required, options });
         });
         currentCustomQuestions = list;
@@ -289,7 +307,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // DASHBOARD RENDER
     let loaderSafetyTimeout = null;
 
-    function showAdminLoader(statusText, progressPercent) {
+    function showAdminLoader(statusText, progressPercent = 30) {
+        triggerTopProgress(progressPercent);
         const loader = document.getElementById('admin-global-loader');
         if (loader) {
             loader.style.display = 'flex';
@@ -300,10 +319,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loaderSafetyTimeout) clearTimeout(loaderSafetyTimeout);
         loaderSafetyTimeout = setTimeout(() => {
             hideAdminLoader();
-        }, 5000);
+        }, 6000);
     }
 
     function updateAdminLoader(statusText, progressPercent) {
+        triggerTopProgress(progressPercent);
         const loaderText = document.getElementById('loader-status-text');
         const loaderBar = document.getElementById('loader-bar-fill');
         if (loaderText && statusText) loaderText.textContent = statusText;
@@ -311,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hideAdminLoader() {
+        triggerTopProgress(100);
         if (loaderSafetyTimeout) {
             clearTimeout(loaderSafetyTimeout);
             loaderSafetyTimeout = null;

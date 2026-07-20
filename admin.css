@@ -3,13 +3,14 @@
    ========================================================================== */
 
 :root {
-    --admin-bg: #0b1120;
+    --admin-bg: #090d16;
     --admin-sidebar-bg: #0f172a;
     --admin-card-bg: #1e293b;
-    --admin-card-hover: #334155;
+    --admin-card-hover: #26334d;
     --admin-border: #334155;
     --admin-gold: #d4af37;
     --admin-gold-light: #f3e5ab;
+    --admin-accent-yellow: #fbc523;
     --admin-text: #f8fafc;
     --admin-text-muted: #94a3b8;
     --admin-accent-blue: #38bdf8;
@@ -25,6 +26,25 @@ body.admin-body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+/* TOP PROGRESS LOADING BAR */
+#top-loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(90deg, #d4af37, #fbc523, #38bdf8);
+    z-index: 9999999;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.9);
+    transition: width 0.25s ease, opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#top-loading-bar.active {
+    opacity: 1;
 }
 
 /* Header */
