@@ -319,12 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         currentCustomQuestions = recruitment.custom_questions || recruitment.customQuestions || [];
-        if (!Array.isArray(currentCustomQuestions) || currentCustomQuestions.length === 0) {
-            currentCustomQuestions = [
-                { id: 'q_why', prompt: 'Why do you want to join Grandeur?', type: 'textarea', options: '', required: true },
-                { id: 'q_case', prompt: 'Case / Aptitude Prompt Response', type: 'textarea', options: '', required: false }
-            ];
-        }
         renderCustomQuestionsBuilder(currentCustomQuestions);
 
         cachedTeam = teamData !== null ? teamData : localStore.team;

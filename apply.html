@@ -212,16 +212,11 @@
                     </div>
 
                     <div class="form-group-app">
-                        <label for="app-why-join">Why do you want to join Grandeur? <span class="req">*</span></label>
-                        <textarea id="app-why-join" class="input-app textarea-app" placeholder="Briefly describe your interest in strategy, consulting, research, and how you aim to contribute..." required></textarea>
-                    </div>
-
-                    <div class="form-group-app">
                         <label for="app-resume-link">Resume / LinkedIn / Portfolio Link <span class="req">*</span></label>
                         <input type="url" id="app-resume-link" class="input-app" placeholder="https://drive.google.com/file/... or LinkedIn URL" required>
                     </div>
 
-                    <!-- DYNAMIC CUSTOM RECRUITMENT QUESTIONS -->
+                    <!-- DYNAMIC CUSTOM RECRUITMENT QUESTIONS (ONLY QUESTIONS ADDED IN ADMIN CONSOLE) -->
                     <div id="dynamic-custom-questions">
                         <!-- Custom questions rendered dynamically -->
                     </div>
@@ -311,50 +306,51 @@
                 if (subtitle) subtitle.textContent = recData.title;
             }
 
-            // Render Dynamic Custom Questions
+            // Render ONLY questions added in Admin Console
             const customQuestionsContainer = document.getElementById('dynamic-custom-questions');
-            const customQList = (recData && Array.isArray(recData.custom_questions) && recData.custom_questions.length > 0)
+            const customQList = (recData && Array.isArray(recData.custom_questions))
                 ? recData.custom_questions
-                : (recData && Array.isArray(recData.customQuestions) && recData.customQuestions.length > 0)
+                : (recData && Array.isArray(recData.customQuestions))
                 ? recData.customQuestions
-                : [
-                    { id: 'q_why', prompt: 'Why do you want to join Grandeur?', type: 'textarea', options: '', required: true },
-                    { id: 'q_case', prompt: 'Case / Aptitude Prompt Response', type: 'textarea', options: '', required: false }
-                ];
+                : [];
 
             if (customQuestionsContainer) {
                 function sanitizeHtml(str) {
                     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                 }
 
-                customQuestionsContainer.innerHTML = customQList.map((q) => {
-                    const isReq = q.required !== false;
-                    const reqStar = isReq ? '<span class="req">*</span>' : '';
-                    const reqAttr = isReq ? 'required' : '';
-                    let fieldHtml = '';
+                if (customQList.length > 0) {
+                    customQuestionsContainer.innerHTML = customQList.map((q) => {
+                        const isReq = q.required !== false;
+                        const reqStar = isReq ? '<span class="req">*</span>' : '';
+                        const reqAttr = isReq ? 'required' : '';
+                        let fieldHtml = '';
 
-                    if (q.type === 'select') {
-                        const opts = (q.options || '').split(',').map(o => o.trim()).filter(Boolean);
-                        const optTags = opts.map(o => `<option value="${sanitizeHtml(o)}">${sanitizeHtml(o)}</option>`).join('');
-                        fieldHtml = `
-                            <select data-q-prompt="${sanitizeHtml(q.prompt)}" class="input-app select-app q-custom-field" ${reqAttr}>
-                                <option value="" disabled selected>Select an option</option>
-                                ${optTags}
-                            </select>
+                        if (q.type === 'select') {
+                            const opts = (q.options || '').split(',').map(o => o.trim()).filter(Boolean);
+                            const optTags = opts.map(o => `<option value="${sanitizeHtml(o)}">${sanitizeHtml(o)}</option>`).join('');
+                            fieldHtml = `
+                                <select data-q-prompt="${sanitizeHtml(q.prompt)}" class="input-app select-app q-custom-field" ${reqAttr}>
+                                    <option value="" disabled selected>Select an option</option>
+                                    ${optTags}
+                                </select>
+                            `;
+                        } else if (q.type === 'text') {
+                            fieldHtml = `<input type="text" data-q-prompt="${sanitizeHtml(q.prompt)}" class="input-app q-custom-field" placeholder="Enter your response..." ${reqAttr}>`;
+                        } else {
+                            fieldHtml = `<textarea data-q-prompt="${sanitizeHtml(q.prompt)}" class="input-app textarea-app q-custom-field" placeholder="Enter your response..." ${reqAttr}></textarea>`;
+                        }
+
+                        return `
+                            <div class="form-group-app">
+                                <label>${sanitizeHtml(q.prompt)} ${reqStar}</label>
+                                ${fieldHtml}
+                            </div>
                         `;
-                    } else if (q.type === 'text') {
-                        fieldHtml = `<input type="text" data-q-prompt="${sanitizeHtml(q.prompt)}" class="input-app q-custom-field" placeholder="Enter your response..." ${reqAttr}>`;
-                    } else {
-                        fieldHtml = `<textarea data-q-prompt="${sanitizeHtml(q.prompt)}" class="input-app textarea-app q-custom-field" placeholder="Enter your response..." ${reqAttr}></textarea>`;
-                    }
-
-                    return `
-                        <div class="form-group-app">
-                            <label>${sanitizeHtml(q.prompt)} ${reqStar}</label>
-                            ${fieldHtml}
-                        </div>
-                    `;
-                }).join('');
+                    }).join('');
+                } else {
+                    customQuestionsContainer.innerHTML = '';
+                }
             }
 
             if (appForm) {
