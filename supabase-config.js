@@ -1,6 +1,6 @@
 /* ==========================================================================
    Grandeur SSCBS - Direct Native Supabase Engine (Zero-Dependency REST API)
-   Real-Time Fresh Sync (No Stale Caching)
+   Real-Time Live Sync (Bypasses Stale Browser LocalStorage/SessionStorage Caches)
    ========================================================================== */
 
 const SUPABASE_URL = 'https://mtycgxndnaxdusqsvqqs.supabase.co';
@@ -19,8 +19,35 @@ const WRITE_HEADERS = {
     'Prefer': 'return=minimal'
 };
 
+// Purge all legacy/stale local caches immediately
+(function purgeLegacyCaches() {
+    try {
+        if (typeof window !== 'undefined') {
+            ['sessionStorage', 'localStorage'].forEach(storageType => {
+                const store = window[storageType];
+                if (store) {
+                    Object.keys(store).forEach(k => {
+                        if (k.startsWith('gdb_cache_')) store.removeItem(k);
+                    });
+                }
+            });
+        }
+    } catch(e) {}
+})();
+
 window.GrandeurDB = {
-    clearCache() {},
+    clearCache() {
+        try {
+            ['sessionStorage', 'localStorage'].forEach(st => {
+                const store = window[st];
+                if (store) {
+                    Object.keys(store).forEach(k => {
+                        if (k.startsWith('gdb_cache_')) store.removeItem(k);
+                    });
+                }
+            });
+        } catch(e) {}
+    },
 
     // 1. TEAM MEMBERS CRUD (Current Team Only)
     async getTeamMembers() {
@@ -97,7 +124,7 @@ window.GrandeurDB = {
         return res.ok;
     },
 
-    // 4. KNOWLEDGE PRIMERS / PUBLICATIONS
+    // 4. KNOWLEDGE PRIMERS / PUBLICATIONS (Real-Time Live Query)
     async getKnowledgePrimers() {
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=*&order=created_at.desc`, { headers: READ_HEADERS });
@@ -228,4 +255,4 @@ window.GrandeurDB = {
     }
 };
 
-console.log("⚡ GrandeurDB Engine loaded - Real-time fresh data sync enabled!");
+console.log("⚡ GrandeurDB Engine loaded - Pure Real-Time Sync Enabled!");

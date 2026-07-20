@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        const maxDim = 300;
+                        const maxDim = 350;
                         let width = img.width;
                         let height = img.height;
                         if (width > height) {
@@ -736,7 +736,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
                         if (alumniPhotoInput) alumniPhotoInput.value = compressedBase64;
                         if (alumniPhotoPreviewImg) {
                             alumniPhotoPreviewImg.src = compressedBase64;
