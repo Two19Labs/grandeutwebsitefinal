@@ -568,9 +568,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const finalRec = (recData && (recData.title || recData.active !== undefined))
-            ? { ...(localStore ? localStore.recruitment : {}), ...recData }
-            : (localStore ? localStore.recruitment : null);
+        const localRec = (localStore && localStore.recruitment) ? localStore.recruitment : {};
+        const finalRec = {
+            active: true,
+            title: "Grandeur Recruitment Drive 2026",
+            description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
+            deadline: "August 20, 2026",
+            deadline_datetime: "",
+            ...(recData || {}),
+            ...localRec
+        };
 
         if (finalRec) {
             applyRecruitmentState(finalRec);

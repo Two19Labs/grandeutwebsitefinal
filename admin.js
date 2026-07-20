@@ -378,22 +378,16 @@ document.addEventListener('DOMContentLoaded', () => {
             cachedApplications = localStore.applications;
         }
 
+        const localRec = localStore.recruitment || {};
         const recruitment = {
             active: true,
             title: "Grandeur Recruitment Drive 2026",
             description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
             deadline: "August 20, 2026",
             deadline_datetime: "",
-            ...(localStore.recruitment || {}),
-            ...(recruitmentData && typeof recruitmentData === 'object' ? recruitmentData : {})
+            ...(recruitmentData && typeof recruitmentData === 'object' ? recruitmentData : {}),
+            ...localRec
         };
-
-        if (localStore.recruitment) {
-            if (localStore.recruitment.title && (!recruitmentData || !recruitmentData.title)) recruitment.title = localStore.recruitment.title;
-            if (localStore.recruitment.description && (!recruitmentData || !recruitmentData.description)) recruitment.description = localStore.recruitment.description;
-            if (localStore.recruitment.deadline && (!recruitmentData || !recruitmentData.deadline)) recruitment.deadline = localStore.recruitment.deadline;
-            if (localStore.recruitment.deadline_datetime && (!recruitmentData || !recruitmentData.deadline_datetime)) recruitment.deadline_datetime = localStore.recruitment.deadline_datetime;
-        }
 
         currentCustomQuestions = recruitment.custom_questions || recruitment.customQuestions || [];
         renderCustomQuestionsBuilder(currentCustomQuestions);
@@ -503,6 +497,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 customQuestions: customQuestions
             };
 
+            // 1. Save to localStore IMMEDIATELY
+            const store = getStore();
+            store.recruitment = payload;
+            saveStore(store);
+
+            // 2. Sync to Supabase DB asynchronously
             if (window.GrandeurDB) {
                 try {
                     await window.GrandeurDB.updateRecruitment(payload);
@@ -510,10 +510,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.warn("DB recruitment update error:", err);
                 }
             }
-
-            const store = getStore();
-            store.recruitment = { ...(store.recruitment || {}), ...payload };
-            saveStore(store);
 
             updateAdminLoader('✅ Drive details saved! Syncing live website...', 90);
             await renderDashboard();
@@ -547,6 +543,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 customQuestions: customQuestions
             };
 
+            // 1. Save to localStore IMMEDIATELY
+            const store = getStore();
+            store.recruitment = payload;
+            saveStore(store);
+
+            // 2. Sync to Supabase DB asynchronously
             if (window.GrandeurDB) {
                 try {
                     await window.GrandeurDB.updateRecruitment(payload);
@@ -554,10 +556,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.warn("DB custom questions update error:", err);
                 }
             }
-
-            const store = getStore();
-            store.recruitment = { ...(store.recruitment || {}), ...payload };
-            saveStore(store);
 
             updateAdminLoader('✅ Questions saved! Syncing live website...', 90);
             await renderDashboard();
