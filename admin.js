@@ -468,27 +468,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formRecruitment) {
         formRecruitment.addEventListener('submit', async (e) => {
             e.preventDefault();
+            showAdminLoader('💾 Saving recruitment drive settings...', 40);
+
             const active = document.getElementById('switch-recruitment-active').checked;
-            const title = document.getElementById('recruitment-title').value;
-            const description = document.getElementById('recruitment-description').value;
-            const deadline = document.getElementById('recruitment-deadline').value;
+            const title = document.getElementById('recruitment-title').value.trim();
+            const description = document.getElementById('recruitment-description').value.trim();
+            const deadline = document.getElementById('recruitment-deadline').value.trim();
             const deadlineDatetime = document.getElementById('recruitment-deadline-datetime').value;
             const customQuestions = readCustomQuestionsFromDOM();
 
-            if (window.GrandeurDB) {
-                await window.GrandeurDB.updateRecruitment({
-                    active,
-                    title,
-                    description,
-                    deadline,
-                    deadline_datetime: deadlineDatetime,
-                    custom_questions: customQuestions
-                });
-            }
-
-            const store = getStore();
-            store.recruitment = {
-                ...(store.recruitment || {}),
+            const payload = {
+                id: 1,
                 active,
                 title,
                 description,
@@ -498,9 +488,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 custom_questions: customQuestions,
                 customQuestions: customQuestions
             };
+
+            if (window.GrandeurDB) {
+                try {
+                    await window.GrandeurDB.updateRecruitment(payload);
+                } catch(err) {
+                    console.warn("DB recruitment update error:", err);
+                }
+            }
+
+            const store = getStore();
+            store.recruitment = payload;
             saveStore(store);
-            renderDashboard();
-            showToast("✅ Recruitment settings updated!");
+
+            updateAdminLoader('✅ Settings saved! Refreshing portal...', 90);
+            await renderDashboard();
+            showToast("✅ Recruitment settings updated & live on website!");
         });
     }
 

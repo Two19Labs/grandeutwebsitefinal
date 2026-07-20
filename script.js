@@ -550,31 +550,44 @@ document.addEventListener('DOMContentLoaded', () => {
     async function syncGrandeurCMS() {
         const teamHierarchy = document.querySelector('.team-hierarchy');
 
-        if (window.GrandeurDB) {
-            try {
-                const recData = await window.GrandeurDB.getRecruitment();
-                if (recData) applyRecruitmentState(recData);
-            } catch (err) { console.warn("Recruitment fetch warning:", err); }
-        }
+        let recData = null;
+        let localStore = null;
 
         const dataStr = localStorage.getItem('grandeur_admin_store');
         if (dataStr) {
             try {
-                const store = JSON.parse(dataStr);
-                if (store.recruitment) applyRecruitmentState(store.recruitment);
-                if (store.team && teamHierarchy) renderDynamicTeamGrid(store.team, teamHierarchy);
+                localStore = JSON.parse(dataStr);
             } catch (e) {}
         }
 
-        if (teamHierarchy && window.GrandeurDB) {
+        if (window.GrandeurDB) {
             try {
-                const teamData = await window.GrandeurDB.getTeamMembers();
-                if (teamData) {
-                    renderDynamicTeamGrid(teamData, teamHierarchy);
-                    return;
-                }
+                recData = await window.GrandeurDB.getRecruitment();
             } catch (err) {
-                console.error("GrandeurDB team fetch error on site:", err);
+                console.warn("Recruitment fetch warning:", err);
+            }
+        }
+
+        const finalRec = (recData && (recData.title || recData.active !== undefined))
+            ? { ...(localStore ? localStore.recruitment : {}), ...recData }
+            : (localStore ? localStore.recruitment : null);
+
+        if (finalRec) {
+            applyRecruitmentState(finalRec);
+        }
+
+        if (teamHierarchy) {
+            if (window.GrandeurDB) {
+                try {
+                    const teamData = await window.GrandeurDB.getTeamMembers();
+                    if (teamData && teamData.length > 0) {
+                        renderDynamicTeamGrid(teamData, teamHierarchy);
+                        return;
+                    }
+                } catch(e) {}
+            }
+            if (localStore && localStore.team) {
+                renderDynamicTeamGrid(localStore.team, teamHierarchy);
             }
         }
     }
@@ -601,12 +614,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const isActive = isRecruitmentActive(recData);
         const isExpired = isRecruitmentExpired(recData);
 
-        const title = (typeof recData === 'object' && recData.title) || 'Grandeur Recruitment Drive 2026';
-        const description = (typeof recData === 'object' && recData.description) || 'Join the premier Consulting & Knowledge Cell of SSCBS.';
-        const deadline = (typeof recData === 'object' && recData.deadline) || 'August 20, 2026';
+        const title = (recData && typeof recData.title === 'string' && recData.title.trim() !== '') ? recData.title.trim() : 'Grandeur Recruitment Drive 2026';
+        const description = (recData && typeof recData.description === 'string' && recData.description.trim() !== '') ? recData.description.trim() : 'Join the premier Consulting & Knowledge Cell of SSCBS.';
+        const deadline = (recData && typeof recData.deadline === 'string' && recData.deadline.trim() !== '') ? recData.deadline.trim() : 'August 20, 2026';
 
         // 1. Header & footer "Join Grandeur" nav links:
-        // GONE when switch is toggled OFF (isActive === false). VISIBLE when switch is ON.
         const joinNavElements = document.querySelectorAll('.nav-item-join, .footer-join-link');
         joinNavElements.forEach(el => {
             el.style.display = isActive ? 'inline-block' : 'none';
@@ -617,10 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const closedContainer = document.getElementById('join-closed-state');
 
         if (activeContainer && closedContainer) {
-            if (!isActive) {
-                activeContainer.style.display = 'none';
-                closedContainer.style.display = 'block';
-            } else if (isExpired) {
+            if (!isActive || isExpired) {
                 activeContainer.style.display = 'none';
                 closedContainer.style.display = 'block';
             } else {
@@ -629,6 +638,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const titleEl = document.getElementById('join-drive-title');
                 if (titleEl) titleEl.textContent = title;
+
+                const subtitleEl = document.getElementById('app-drive-subtitle');
+                if (subtitleEl) subtitleEl.textContent = title;
 
                 const descEl = document.getElementById('join-drive-desc');
                 if (descEl) descEl.textContent = description;

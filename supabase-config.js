@@ -106,20 +106,34 @@ window.GrandeurDB = {
     // 2. RECRUITMENT SETTINGS
     async getRecruitment() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*&id=eq.1`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            return rows.length > 0 ? rows[0] : null;
+            return (rows && rows.length > 0) ? rows[0] : null;
         } catch(e) { return null; }
     },
 
     async updateRecruitment(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings`, {
-            method: 'POST',
-            headers: { ...WRITE_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify({ id: 1, ...data })
-        });
-        return res.ok;
+        try {
+            const payload = { id: 1, ...data };
+            let res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
+                method: 'PATCH',
+                headers: WRITE_HEADERS,
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) {
+                res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?on_conflict=id`, {
+                    method: 'POST',
+                    headers: { ...WRITE_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                    body: JSON.stringify(payload)
+                });
+            }
+            window.GrandeurDB.clearCache();
+            return res.ok;
+        } catch(e) {
+            console.warn("updateRecruitment error:", e);
+            return false;
+        }
     },
 
     // 3. ANNOUNCEMENTS / BANNER
