@@ -190,7 +190,100 @@ document.addEventListener('DOMContentLoaded', () => {
         activateTab(savedTab);
     }
 
-    cachedApplications = [];
+    let currentCustomQuestions = [];
+
+    function renderCustomQuestionsBuilder(qList = []) {
+        const container = document.getElementById('custom-questions-builder-list');
+        if (!container) return;
+
+        if (!Array.isArray(qList) || qList.length === 0) {
+            container.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.88rem; font-style:italic; padding:1rem 0;">No custom questions added yet. Click "Add Custom Question" above to create one.</p>`;
+            return;
+        }
+
+        container.innerHTML = qList.map((q, idx) => `
+            <div class="custom-q-card" data-q-id="${escapeHtml(q.id)}" style="background:rgba(15, 23, 42, 0.6); border:1px solid var(--admin-border); border-radius:10px; padding:1.1rem; margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                    <span style="font-weight:700; color:var(--admin-gold); font-size:0.9rem;">Question #${idx + 1}</span>
+                    <button type="button" class="btn-icon delete" onclick="deleteCustomQuestion('${q.id}')" title="Delete Question" style="padding:2px 8px; font-size:0.82rem;">🗑️ Remove</button>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0.75rem;">
+                    <label style="font-size:0.83rem; color:var(--admin-text-muted);">Question Label / Prompt</label>
+                    <input type="text" class="form-input q-input-prompt" value="${escapeHtml(q.prompt || '')}" placeholder="e.g. Why do you want to join Grandeur?" required>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.85rem;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.83rem; color:var(--admin-text-muted);">Answer Format</label>
+                        <select class="form-select q-input-type" onchange="toggleQOptionsVisibility(this)">
+                            <option value="textarea" ${q.type === 'textarea' ? 'selected' : ''}>Long Textarea (Paragraph)</option>
+                            <option value="text" ${q.type === 'text' ? 'selected' : ''}>Short Text Line</option>
+                            <option value="select" ${q.type === 'select' ? 'selected' : ''}>Dropdown Select Options</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.83rem; color:var(--admin-text-muted);">Requirement</label>
+                        <select class="form-select q-input-required">
+                            <option value="true" ${q.required !== false ? 'selected' : ''}>Required (*)</option>
+                            <option value="false" ${q.required === false ? 'selected' : ''}>Optional</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group q-options-wrap" style="margin-top:0.75rem; margin-bottom:0; display: ${q.type === 'select' ? 'block' : 'none'};">
+                    <label style="font-size:0.83rem; color:var(--admin-text-muted);">Dropdown Options (Comma Separated)</label>
+                    <input type="text" class="form-input q-input-options" value="${escapeHtml(q.options || '')}" placeholder="Option 1, Option 2, Option 3">
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.toggleQOptionsVisibility = function(selectEl) {
+        const card = selectEl.closest('.custom-q-card');
+        if (card) {
+            const optionsWrap = card.querySelector('.q-options-wrap');
+            if (optionsWrap) {
+                optionsWrap.style.display = selectEl.value === 'select' ? 'block' : 'none';
+            }
+        }
+    };
+
+    window.deleteCustomQuestion = function(id) {
+        currentCustomQuestions = currentCustomQuestions.filter(q => q.id !== id);
+        renderCustomQuestionsBuilder(currentCustomQuestions);
+    };
+
+    function readCustomQuestionsFromDOM() {
+        const cards = document.querySelectorAll('.custom-q-card');
+        const list = [];
+        cards.forEach(card => {
+            const id = card.getAttribute('data-q-id') || ('q_' + Date.now());
+            const prompt = card.querySelector('.q-input-prompt') ? card.querySelector('.q-input-prompt').value.trim() : '';
+            const type = card.querySelector('.q-input-type') ? card.querySelector('.q-input-type').value : 'textarea';
+            const required = card.querySelector('.q-input-required') ? card.querySelector('.q-input-required').value === 'true' : true;
+            const options = card.querySelector('.q-input-options') ? card.querySelector('.q-input-options').value.trim() : '';
+
+            list.push({ id, prompt, type, required, options });
+        });
+        currentCustomQuestions = list;
+        return list;
+    }
+
+    const btnAddCustomQ = document.getElementById('btn-add-custom-question');
+    if (btnAddCustomQ) {
+        btnAddCustomQ.addEventListener('click', () => {
+            readCustomQuestionsFromDOM();
+            currentCustomQuestions.push({
+                id: 'q_' + Date.now(),
+                prompt: '',
+                type: 'textarea',
+                options: '',
+                required: true
+            });
+            renderCustomQuestionsBuilder(currentCustomQuestions);
+        });
+    }
 
     // DASHBOARD RENDER
     async function renderDashboard() {
@@ -202,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.GrandeurDB) {
             try {
                 recruitmentData = await window.GrandeurDB.getRecruitment();
-                bannerData = await window.GrandeurDB.getBanner();
                 teamData = await window.GrandeurDB.getTeamMembers();
                 inboxData = await window.GrandeurDB.getContactInquiries();
                 cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
@@ -225,7 +317,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ...(localStore.recruitment || {}),
             ...(recruitmentData || {})
         };
-        const banner = bannerData || localStore.banner;
+
+        currentCustomQuestions = recruitment.custom_questions || recruitment.customQuestions || [];
+        if (!Array.isArray(currentCustomQuestions) || currentCustomQuestions.length === 0) {
+            currentCustomQuestions = [
+                { id: 'q_why', prompt: 'Why do you want to join Grandeur?', type: 'textarea', options: '', required: true },
+                { id: 'q_case', prompt: 'Case / Aptitude Prompt Response', type: 'textarea', options: '', required: false }
+            ];
+        }
+        renderCustomQuestionsBuilder(currentCustomQuestions);
+
         cachedTeam = teamData !== null ? teamData : localStore.team;
         const inbox = Array.isArray(inboxData) ? inboxData : [];
 
@@ -312,9 +413,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const description = document.getElementById('recruitment-description').value;
             const deadline = document.getElementById('recruitment-deadline').value;
             const deadlineDatetime = document.getElementById('recruitment-deadline-datetime').value;
+            const customQuestions = readCustomQuestionsFromDOM();
 
             if (window.GrandeurDB) {
-                await window.GrandeurDB.updateRecruitment({ active, title, description, deadline, deadline_datetime: deadlineDatetime });
+                await window.GrandeurDB.updateRecruitment({
+                    active,
+                    title,
+                    description,
+                    deadline,
+                    deadline_datetime: deadlineDatetime,
+                    custom_questions: customQuestions
+                });
             }
 
             const store = getStore();
@@ -325,7 +434,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 description,
                 deadline,
                 deadline_datetime: deadlineDatetime,
-                deadlineDatetime: deadlineDatetime
+                deadlineDatetime: deadlineDatetime,
+                custom_questions: customQuestions,
+                customQuestions: customQuestions
             };
             saveStore(store);
             renderDashboard();
@@ -774,7 +885,35 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        container.innerHTML = appList.map(item => `
+        container.innerHTML = appList.map(item => {
+            let qaContent = '';
+            const customQA = item.custom_answers || item.customAnswers;
+
+            if (Array.isArray(customQA) && customQA.length > 0) {
+                qaContent = customQA.map(qa => `
+                    <div style="margin-bottom:0.75rem;">
+                        <strong style="color:var(--admin-gold); font-size:0.95rem;">💡 ${escapeHtml(qa.question)}</strong>
+                        <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:6px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.05); margin-bottom:0; white-space:pre-wrap;">${escapeHtml(qa.answer || 'N/A')}</p>
+                    </div>
+                `).join('');
+            } else {
+                if (item.why_join) {
+                    qaContent += `
+                    <div style="margin-bottom:0.75rem;">
+                        <strong style="color:var(--admin-gold); font-size:0.95rem;">💡 Why Join Grandeur:</strong>
+                        <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:6px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.05); margin-bottom:0;">${escapeHtml(item.why_join)}</p>
+                    </div>`;
+                }
+                if (item.case_response) {
+                    qaContent += `
+                    <div style="margin-bottom:0.75rem;">
+                        <strong style="color:var(--admin-gold); font-size:0.95rem;">🧩 Case Scenario Response:</strong>
+                        <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:6px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.05); margin-bottom:0;">${escapeHtml(item.case_response)}</p>
+                    </div>`;
+                }
+            }
+
+            return `
             <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:12px; padding:1.5rem; margin-bottom:1.25rem; position:relative;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem;">
                     <div>
@@ -796,17 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div>🆔 <strong>Roll No:</strong> ${escapeHtml(item.roll_no || 'N/A')}</div>
                 </div>
 
-                <div style="margin-bottom:0.75rem;">
-                    <strong style="color:#f8fafc; font-size:0.95rem;">💡 Why Join Grandeur:</strong>
-                    <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:6px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.05); margin-bottom:0;">${escapeHtml(item.why_join || 'N/A')}</p>
-                </div>
-
-                ${item.case_response ? `
-                <div style="margin-bottom:0.75rem;">
-                    <strong style="color:#f8fafc; font-size:0.95rem;">🧩 Case Scenario Response:</strong>
-                    <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:6px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.05); margin-bottom:0;">${escapeHtml(item.case_response)}</p>
-                </div>
-                ` : ''}
+                ${qaContent}
 
                 ${item.resume_url ? `
                 <div style="margin-top:0.75rem;">
@@ -814,7 +943,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 ` : ''}
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     window.deleteRecruitmentApp = async function(id) {
