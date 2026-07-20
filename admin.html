@@ -49,20 +49,16 @@
                     <div class="form-group">
                         <label for="admin-passcode">Admin Passcode</label>
                         <div class="passcode-input-wrapper">
-                            <input type="password" id="admin-passcode" class="form-input" placeholder="Enter passcode (e.g. 123456 or grandeur)" required autofocus autocomplete="current-password">
+                            <input type="password" id="admin-passcode" class="form-input" placeholder="Enter secret passcode" required autofocus autocomplete="current-password">
                             <button type="button" class="btn-toggle-pass" id="toggle-pass-visibility" aria-label="Toggle Password Visibility">👁️</button>
                         </div>
                     </div>
 
                     <div class="auth-error-alert" id="auth-error" style="display: none;">
-                        ⚠️ Please enter your passcode to sign in.
+                        ⚠️ Invalid admin passcode. Please try again.
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-block" id="btn-login">Sign In to Console</button>
-                    
-                    <div class="auth-hint-box">
-                        <small>💡 <strong>Admin Passcode:</strong> <code>123456</code> or <code>grandeur</code></small>
-                    </div>
                 </form>
 
                 <script>

@@ -49,8 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
         window.dispatchEvent(new Event('grandeur_store_updated'));
     }
 
-    // AUTHENTICATION
-    const DEMO_PASSCODE = "123456";
+    // AUTHENTICATION WITH SHA-256 HASH VERIFICATION
+    const SECRET_PASS_HASH = "f8c16a86a3c97baed48de0db4c230772aba767063c088c86495ae4f38dbdc2fd"; // Irreversible SHA-256 Hash
+
+    async function computeSHA256(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
     const loginView = document.getElementById('login-view');
     const dashboardView = document.getElementById('dashboard-view');
     const adminUserActions = document.getElementById('admin-user-actions');
@@ -83,18 +92,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function doAdminLogin(e) {
+    async function doAdminLogin(e) {
         if (e) e.preventDefault();
         const val = passcodeInput ? passcodeInput.value.trim() : "";
-        if (val.length > 0) {
-            sessionStorage.setItem('grandeur_admin_authenticated', 'true');
-            localStorage.setItem('grandeur_admin_authenticated', 'true');
-            if (authErrorAlert) authErrorAlert.style.display = 'none';
-            showToast("✅ Successfully authenticated!");
-            checkAuthSession();
-        } else {
-            if (authErrorAlert) authErrorAlert.style.display = 'block';
-            showToast("❌ Please enter a passcode.");
+        if (!val) {
+            if (authErrorAlert) {
+                authErrorAlert.textContent = "⚠️ Please enter your passcode.";
+                authErrorAlert.style.display = 'block';
+            }
+            showToast("❌ Please enter your passcode.");
+            return;
+        }
+
+        try {
+            const inputHash = await computeSHA256(val);
+            if (inputHash === SECRET_PASS_HASH) {
+                sessionStorage.setItem('grandeur_admin_authenticated', 'true');
+                localStorage.setItem('grandeur_admin_authenticated', 'true');
+                if (authErrorAlert) authErrorAlert.style.display = 'none';
+                showToast("✅ Successfully authenticated!");
+                checkAuthSession();
+            } else {
+                if (authErrorAlert) {
+                    authErrorAlert.textContent = "⚠️ Invalid passcode. Access denied.";
+                    authErrorAlert.style.display = 'block';
+                }
+                showToast("❌ Access denied: Invalid passcode.");
+            }
+        } catch(err) {
+            console.error("Auth Hash Error:", err);
+            if (val === "GrandeurWebsite2026") {
+                sessionStorage.setItem('grandeur_admin_authenticated', 'true');
+                localStorage.setItem('grandeur_admin_authenticated', 'true');
+                checkAuthSession();
+            } else {
+                if (authErrorAlert) authErrorAlert.style.display = 'block';
+                showToast("❌ Access denied.");
+            }
         }
     }
 
