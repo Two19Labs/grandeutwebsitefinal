@@ -975,7 +975,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const formAchievementModal = document.getElementById('form-achievement-modal');
 
     function parseAchievementMeta(item) {
-        let team = '';
+        let teamName = '';
+        let members = '';
         let description = item.description || '';
         let photos = [];
 
@@ -983,14 +984,23 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const parsed = JSON.parse(item.team_name);
                 if (parsed && typeof parsed === 'object') {
-                    team = parsed.team || '';
+                    teamName = parsed.teamName || parsed.team || '';
+                    members = parsed.members || '';
                     if (parsed.description) description = parsed.description;
                     if (Array.isArray(parsed.photos)) photos = parsed.photos;
                 } else {
-                    team = item.team_name;
+                    teamName = item.team_name;
                 }
             } catch (e) {
-                team = item.team_name;
+                teamName = item.team_name;
+            }
+        }
+
+        if (!members && teamName.includes('(') && teamName.includes(')')) {
+            const match = teamName.match(/^(.*?)\((.*?)\)$/);
+            if (match) {
+                teamName = match[1].trim();
+                members = match[2].trim();
             }
         }
 
@@ -1003,7 +1013,8 @@ document.addEventListener('DOMContentLoaded', () => {
             title: item.event_name || item.title || 'Untitled Competition',
             position: item.position || item.category || 'Winner',
             year: item.year || item.date_label || '2026',
-            team: team || 'Team Grandeur',
+            teamName: teamName || 'Team Grandeur',
+            members: members || '',
             description: description,
             photos: photos
         };
@@ -1079,7 +1090,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${thumbHtml}
                             <div>
                                 <strong style="display:block;">${escapeHtml(meta.title)}</strong>
-                                <small style="color:var(--admin-text-muted);">${escapeHtml(meta.team)}</small>
+                                <small style="color:var(--admin-gold); font-weight:600;">${escapeHtml(meta.teamName)}</small>
+                                ${meta.members ? `<small style="color:var(--admin-text-muted); display:block;">👥 ${escapeHtml(meta.members)}</small>` : ''}
                             </div>
                         </div>
                     </td>
@@ -1121,7 +1133,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputTitle = document.getElementById('achievement-title');
         const inputCat = document.getElementById('achievement-category');
         const inputDate = document.getElementById('achievement-date');
-        const inputTeam = document.getElementById('achievement-team');
+        const inputTeamName = document.getElementById('achievement-team-name');
+        const inputTeamMembers = document.getElementById('achievement-team-members');
         const inputDesc = document.getElementById('achievement-description');
 
         if (item) {
@@ -1131,7 +1144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             inputTitle.value = meta.title;
             inputCat.value = meta.position;
             inputDate.value = meta.year;
-            inputTeam.value = meta.team;
+            if (inputTeamName) inputTeamName.value = meta.teamName;
+            if (inputTeamMembers) inputTeamMembers.value = meta.members;
             inputDesc.value = meta.description;
 
             setPhotoSlot(1, meta.photos[0] || '');
@@ -1143,7 +1157,8 @@ document.addEventListener('DOMContentLoaded', () => {
             inputTitle.value = "";
             inputCat.value = "";
             inputDate.value = "2026";
-            inputTeam.value = "";
+            if (inputTeamName) inputTeamName.value = "";
+            if (inputTeamMembers) inputTeamMembers.value = "";
             inputDesc.value = "";
 
             setPhotoSlot(1, '');
@@ -1168,7 +1183,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const title = document.getElementById('achievement-title').value.trim();
             const position = document.getElementById('achievement-category').value.trim();
             const year = document.getElementById('achievement-date').value.trim();
-            const team = document.getElementById('achievement-team').value.trim();
+            const teamName = document.getElementById('achievement-team-name')?.value.trim() || '';
+            const members = document.getElementById('achievement-team-members')?.value.trim() || '';
             const description = document.getElementById('achievement-description').value.trim();
 
             const p1 = document.getElementById('achievement-photo-1').value.trim();
@@ -1178,7 +1194,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const photos = [p1, p2, p3].filter(Boolean);
 
             const metaObj = {
-                team: team,
+                teamName: teamName,
+                members: members,
                 description: description,
                 photos: photos
             };

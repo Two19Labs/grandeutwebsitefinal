@@ -724,7 +724,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.renderDynamicTeamGrid = renderDynamicTeamGrid;
 
     function parseAchievementMeta(item) {
-        let team = '';
+        let teamName = '';
+        let members = '';
         let description = item.description || '';
         let photos = [];
 
@@ -732,14 +733,23 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const parsed = JSON.parse(item.team_name);
                 if (parsed && typeof parsed === 'object') {
-                    team = parsed.team || '';
+                    teamName = parsed.teamName || parsed.team || '';
+                    members = parsed.members || '';
                     if (parsed.description) description = parsed.description;
                     if (Array.isArray(parsed.photos)) photos = parsed.photos;
                 } else {
-                    team = item.team_name;
+                    teamName = item.team_name;
                 }
             } catch (e) {
-                team = item.team_name;
+                teamName = item.team_name;
+            }
+        }
+
+        if (!members && teamName.includes('(') && teamName.includes(')')) {
+            const match = teamName.match(/^(.*?)\((.*?)\)$/);
+            if (match) {
+                teamName = match[1].trim();
+                members = match[2].trim();
             }
         }
 
@@ -752,7 +762,8 @@ document.addEventListener('DOMContentLoaded', () => {
             title: item.event_name || item.title || 'Untitled Competition',
             position: item.position || item.category || 'Winner',
             year: item.year || item.date_label || '2026',
-            team: team || 'Team Grandeur',
+            teamName: teamName || 'Team Grandeur',
+            members: members || '',
             description: description,
             photos: photos
         };
@@ -826,9 +837,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${mediaHtml}
                     <div class="achievement-card-content">
                         <h3 class="achievement-card-title">${escapeHtml(meta.title)}</h3>
-                        <div class="achievement-card-team">
-                            <span>👥</span> ${escapeHtml(meta.team)}
+                        <div class="achievement-card-team-name">
+                            <span>🏆</span> <strong>Team:</strong> ${escapeHtml(meta.teamName)}
                         </div>
+                        ${meta.members ? `
+                        <div class="achievement-card-team-members">
+                            <span>👥</span> <strong>Members:</strong> ${escapeHtml(meta.members)}
+                        </div>` : ''}
                         <p class="achievement-card-desc">${escapeHtml(meta.description || 'Secured top podium finish demonstrating structured problem solving.')}</p>
                     </div>
                 </div>

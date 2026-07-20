@@ -2659,10 +2659,20 @@ a.resources-badge:hover {
     margin-bottom: 0.5rem;
 }
 
-.achievement-card-team {
+.achievement-card-team-name {
+    font-size: 0.9rem;
+    color: #1e3a8a;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.achievement-card-team-members {
     font-size: 0.85rem;
-    color: #2563eb;
-    font-weight: 600;
+    color: #475569;
+    font-weight: 500;
     margin-bottom: 0.85rem;
     display: flex;
     align-items: center;
