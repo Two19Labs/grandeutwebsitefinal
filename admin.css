@@ -653,23 +653,57 @@ input:checked + .slider:before {
 
 .admin-body .form-input,
 .admin-body .form-textarea,
-.admin-body .form-select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: #0f172a;
-    border: 1px solid var(--admin-border);
-    border-radius: 8px;
-    color: var(--admin-text);
-    font-size: 0.95rem;
+.admin-body .form-select,
+.admin-body input[type="text"],
+.admin-body input[type="email"],
+.admin-body input[type="url"],
+.admin-body input[type="number"],
+.admin-body input[type="tel"],
+.admin-body input[type="password"],
+.admin-body input[type="datetime-local"],
+.admin-body input[type="date"],
+.admin-body input[type="time"],
+.admin-body textarea,
+.admin-body select {
+    width: 100% !important;
+    padding: 0.75rem 1rem !important;
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    border: 1px solid var(--admin-border) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-size: 0.95rem !important;
+    font-family: inherit;
     transition: border-color 0.2s;
+    box-shadow: none !important;
+}
+
+.admin-body .form-input::placeholder,
+.admin-body .form-textarea::placeholder,
+.admin-body textarea::placeholder,
+.admin-body input::placeholder {
+    color: #64748b !important;
 }
 
 .admin-body .form-input:focus,
 .admin-body .form-textarea:focus,
-.admin-body .form-select:focus {
-    border-color: var(--admin-gold);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+.admin-body .form-select:focus,
+.admin-body input:focus,
+.admin-body textarea:focus,
+.admin-body select:focus {
+    border-color: var(--admin-gold) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+}
+
+/* datetime-local icon color fix for dark theme */
+.admin-body input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.admin-body input[type="date"]::-webkit-calendar-picker-indicator,
+.admin-body input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }
 
 /* Filter Bar */
