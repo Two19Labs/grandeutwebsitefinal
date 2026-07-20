@@ -151,6 +151,7 @@
                             </ul>
                         </div>
 
+                        <!-- DRIVE DETAILS CARD -->
                         <div class="admin-card">
                             <div class="card-header-flex">
                                 <div>
@@ -163,7 +164,7 @@
                                 </label>
                             </div>
                             <div class="card-body">
-                                <form id="form-recruitment-settings">
+                                <form id="form-recruitment-details">
                                     <div class="form-group">
                                         <label for="recruitment-title">Drive / Campaign Title</label>
                                         <input type="text" id="recruitment-title" class="form-input" placeholder="e.g. Grandeur Recruitment Drive 2026">
@@ -182,19 +183,30 @@
                                             <input type="datetime-local" id="recruitment-deadline-datetime" class="form-input">
                                         </div>
                                     </div>
-                                    <div style="border-top: 1px solid var(--admin-border); margin: 1.75rem 0 1.5rem; padding-top: 1.5rem;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                                            <div>
-                                                <h4 style="color: #f8fafc; font-size: 1.1rem; margin: 0;">📋 Application Form Questions</h4>
-                                                <p style="color: var(--admin-text-muted); font-size: 0.88rem; margin-top: 0.2rem;">Add and customize questions to ask candidates on the website recruitment form.</p>
-                                            </div>
-                                            <button type="button" class="btn btn-outline" id="btn-add-custom-question" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">➕ Add Custom Question</button>
-                                        </div>
-                                        <div id="custom-questions-builder-list">
-                                            <!-- Dynamically rendered custom question builder items -->
-                                        </div>
+                                    <div style="margin-top: 1.25rem;">
+                                        <button type="submit" class="btn btn-primary" id="btn-save-drive-details">💾 Save Drive Details</button>
                                     </div>
-                                    <button type="submit" class="btn btn-primary" id="btn-save-recruitment">Save Recruitment Settings</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- APPLICATION FORM QUESTIONS CARD -->
+                        <div class="admin-card" style="margin-top: 2rem;">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3>📋 Application Form Questions</h3>
+                                    <p>Add and customize questions asked to candidates on the recruitment form.</p>
+                                </div>
+                                <button type="button" class="btn btn-outline" id="btn-add-custom-question" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">➕ Add Custom Question</button>
+                            </div>
+                            <div class="card-body">
+                                <form id="form-custom-questions">
+                                    <div id="custom-questions-builder-list">
+                                        <!-- Dynamically rendered custom question builder items -->
+                                    </div>
+                                    <div style="margin-top: 1.25rem;">
+                                        <button type="submit" class="btn btn-primary" id="btn-save-custom-questions">💾 Save Application Questions</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>

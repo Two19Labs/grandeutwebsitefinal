@@ -464,11 +464,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const formRecruitment = document.getElementById('form-recruitment-settings');
-    if (formRecruitment) {
-        formRecruitment.addEventListener('submit', async (e) => {
+    // Save Drive Details (Campaign Title, Announcement Summary, Deadline, Cutoff Datetime)
+    const formDriveDetails = document.getElementById('form-recruitment-details');
+    if (formDriveDetails) {
+        formDriveDetails.addEventListener('submit', async (e) => {
             e.preventDefault();
-            showAdminLoader('💾 Saving recruitment drive settings...', 40);
+            showAdminLoader('💾 Saving recruitment drive details...', 40);
 
             const active = document.getElementById('switch-recruitment-active').checked;
             const title = document.getElementById('recruitment-title').value.trim();
@@ -498,12 +499,56 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const store = getStore();
-            store.recruitment = payload;
+            store.recruitment = { ...(store.recruitment || {}), ...payload };
             saveStore(store);
 
-            updateAdminLoader('✅ Settings saved! Refreshing portal...', 90);
+            updateAdminLoader('✅ Drive details saved! Syncing live website...', 90);
             await renderDashboard();
-            showToast("✅ Recruitment settings updated & live on website!");
+            showToast("✅ Drive details saved & live on website!");
+        });
+    }
+
+    // Save Application Form Custom Questions
+    const formCustomQ = document.getElementById('form-custom-questions');
+    if (formCustomQ) {
+        formCustomQ.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showAdminLoader('💾 Saving application form questions...', 40);
+
+            const active = document.getElementById('switch-recruitment-active').checked;
+            const title = document.getElementById('recruitment-title').value.trim();
+            const description = document.getElementById('recruitment-description').value.trim();
+            const deadline = document.getElementById('recruitment-deadline').value.trim();
+            const deadlineDatetime = document.getElementById('recruitment-deadline-datetime').value;
+            const customQuestions = readCustomQuestionsFromDOM();
+
+            const payload = {
+                id: 1,
+                active,
+                title,
+                description,
+                deadline,
+                deadline_datetime: deadlineDatetime,
+                deadlineDatetime: deadlineDatetime,
+                custom_questions: customQuestions,
+                customQuestions: customQuestions
+            };
+
+            if (window.GrandeurDB) {
+                try {
+                    await window.GrandeurDB.updateRecruitment(payload);
+                } catch(err) {
+                    console.warn("DB custom questions update error:", err);
+                }
+            }
+
+            const store = getStore();
+            store.recruitment = { ...(store.recruitment || {}), ...payload };
+            saveStore(store);
+
+            updateAdminLoader('✅ Questions saved! Syncing live website...', 90);
+            await renderDashboard();
+            showToast("✅ Application questions saved & live on website!");
         });
     }
 
