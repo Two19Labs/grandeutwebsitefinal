@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="40" fill="#0f172a"/>
+  <path d="M100 45 L112 70 L140 70 L118 88 L126 115 L100 98 L74 115 L82 88 L60 70 L88 70 Z" fill="#00d8ff"/>
+  <circle cx="100" cy="100" r="65" fill="none" stroke="#00d8ff" stroke-width="5"/>
+  <text x="100" y="168" font-family="'Outfit', sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="2">IIT BOMBAY</text>
+</svg>

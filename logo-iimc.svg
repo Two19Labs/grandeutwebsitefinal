@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="40" fill="#1e3a8a"/>
+  <polygon points="100,45 145,135 55,135" fill="none" stroke="#38bdf8" stroke-width="8"/>
+  <circle cx="100" cy="105" r="22" fill="#38bdf8"/>
+  <text x="100" y="168" font-family="'Outfit', sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="2">IIM CALCUTTA</text>
+</svg>

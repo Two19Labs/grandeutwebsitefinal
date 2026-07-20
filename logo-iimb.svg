@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="40" fill="#0b192c"/>
+  <path d="M55 50 H145 V72 H112 V145 H88 V72 H55 Z" fill="#2563eb"/>
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="6 6"/>
+  <text x="100" y="170" font-family="'Outfit', sans-serif" font-size="15" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="2">IIM BANGALORE</text>
+</svg>

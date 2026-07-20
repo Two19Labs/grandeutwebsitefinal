@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="40" fill="#091e42"/>
+  <path d="M100 45 L145 70 V125 C145 145 100 160 100 160 C100 160 55 145 55 125 V70 Z" fill="none" stroke="#eab308" stroke-width="6"/>
+  <path d="M80 95 L100 75 L120 95 M100 75 V130" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  <text x="100" y="178" font-family="'Outfit', sans-serif" font-size="12" font-weight="800" fill="#eab308" text-anchor="middle" letter-spacing="1.5">UNI OF MELBOURNE</text>
+</svg>

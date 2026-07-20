@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="40" fill="#0f1d3a"/>
+  <circle cx="100" cy="100" r="70" fill="none" stroke="#d4af37" stroke-width="6"/>
+  <path d="M65 140 L100 60 L135 140 M78 115 L122 115" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="100" y="165" font-family="'Outfit', sans-serif" font-size="16" font-weight="800" fill="#d4af37" text-anchor="middle" letter-spacing="2">IIM AHMEDABAD</text>
+</svg>
