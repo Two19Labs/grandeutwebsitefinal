@@ -563,6 +563,77 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // EXPORT RECRUITMENT APPLICATIONS TO EXCEL / CSV
+    const btnExportApps = document.getElementById('btn-export-applications-excel');
+    if (btnExportApps) {
+        btnExportApps.addEventListener('click', () => {
+            if (!cachedApplications || cachedApplications.length === 0) {
+                showToast("⚠️ No recruitment applications available to export.");
+                return;
+            }
+
+            // Collect all unique custom question prompts across all applications for dynamic columns
+            const questionSet = new Set();
+            cachedApplications.forEach(app => {
+                const answers = Array.isArray(app.custom_answers) ? app.custom_answers : (Array.isArray(app.customAnswers) ? app.customAnswers : []);
+                answers.forEach(ca => {
+                    if (ca.question) questionSet.add(ca.question);
+                });
+            });
+            const customQuestionsList = Array.from(questionSet);
+
+            // Define CSV Headers
+            const headers = ['S.No', 'Full Name', 'Email Address', 'Phone / WhatsApp', 'Submitted Date & Time'];
+            customQuestionsList.forEach(q => headers.push(q));
+            headers.push('Why Join (Legacy)', 'Case Response (Legacy)');
+
+            function escapeCSV(str) {
+                if (str === null || str === undefined) return '""';
+                let s = String(str).replace(/"/g, '""');
+                return `"${s}"`;
+            }
+
+            const rows = [];
+            rows.push(headers.map(escapeCSV).join(','));
+
+            cachedApplications.forEach((app, index) => {
+                const row = [
+                    index + 1,
+                    app.full_name || app.fullName || '',
+                    app.email || '',
+                    app.phone || '',
+                    app.created_at ? new Date(app.created_at).toLocaleString('en-IN') : ''
+                ];
+
+                const answersArr = Array.isArray(app.custom_answers) ? app.custom_answers : (Array.isArray(app.customAnswers) ? app.customAnswers : []);
+                customQuestionsList.forEach(qPrompt => {
+                    const found = answersArr.find(a => a.question === qPrompt);
+                    row.push(found ? found.answer : '');
+                });
+
+                row.push(app.why_join || app.whyJoin || '');
+                row.push(app.case_response || app.caseResponse || '');
+
+                rows.push(row.map(escapeCSV).join(','));
+            });
+
+            // Add UTF-8 BOM (\uFEFF) for direct Microsoft Excel compatibility
+            const csvContent = '\uFEFF' + rows.join('\r\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            const dateStr = new Date().toISOString().slice(0, 10);
+            link.setAttribute('download', `Grandeur_Recruitment_Applications_${dateStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast(`📊 Exported ${cachedApplications.length} application(s) to Excel CSV!`);
+        });
+    }
+
     // TEAM CRUD
     const teamTableBody = document.getElementById('team-table-body');
     const filterTierSelect = document.getElementById('filter-team-tier');
