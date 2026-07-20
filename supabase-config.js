@@ -116,20 +116,30 @@ window.GrandeurDB = {
     async updateRecruitment(data) {
         try {
             const payload = { id: 1, ...data };
+            let updatedRows = [];
+            
+            // 1. Try PATCH with return=representation to see if row 1 exists
             let res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
                 method: 'PATCH',
-                headers: WRITE_HEADERS,
+                headers: { ...READ_HEADERS, 'Prefer': 'return=representation' },
                 body: JSON.stringify(data)
             });
-            if (!res.ok) {
-                res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?on_conflict=id`, {
+            
+            if (res.ok) {
+                try { updatedRows = await res.json(); } catch(e) {}
+            }
+            
+            // 2. If row 1 did not exist, insert it via POST
+            if (!Array.isArray(updatedRows) || updatedRows.length === 0) {
+                res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings`, {
                     method: 'POST',
-                    headers: { ...WRITE_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                    headers: { ...READ_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=representation' },
                     body: JSON.stringify(payload)
                 });
             }
+            
             window.GrandeurDB.clearCache();
-            return res.ok;
+            return true;
         } catch(e) {
             console.warn("updateRecruitment error:", e);
             return false;

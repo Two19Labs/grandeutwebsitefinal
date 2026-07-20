@@ -379,9 +379,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const recruitment = {
+            active: true,
+            title: "Grandeur Recruitment Drive 2026",
+            description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
+            deadline: "August 20, 2026",
+            deadline_datetime: "",
             ...(localStore.recruitment || {}),
-            ...(recruitmentData || {})
+            ...(recruitmentData && typeof recruitmentData === 'object' ? recruitmentData : {})
         };
+
+        if (localStore.recruitment) {
+            if (localStore.recruitment.title && (!recruitmentData || !recruitmentData.title)) recruitment.title = localStore.recruitment.title;
+            if (localStore.recruitment.description && (!recruitmentData || !recruitmentData.description)) recruitment.description = localStore.recruitment.description;
+            if (localStore.recruitment.deadline && (!recruitmentData || !recruitmentData.deadline)) recruitment.deadline = localStore.recruitment.deadline;
+            if (localStore.recruitment.deadline_datetime && (!recruitmentData || !recruitmentData.deadline_datetime)) recruitment.deadline_datetime = localStore.recruitment.deadline_datetime;
+        }
 
         currentCustomQuestions = recruitment.custom_questions || recruitment.customQuestions || [];
         renderCustomQuestionsBuilder(currentCustomQuestions);
@@ -428,16 +440,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (switchRecruitment) switchRecruitment.checked = recruitment.active;
 
         const inputRecTitle = document.getElementById('recruitment-title');
-        if (inputRecTitle) inputRecTitle.value = recruitment.title || "";
+        if (inputRecTitle && recruitment.title !== undefined) inputRecTitle.value = recruitment.title;
 
         const inputRecDesc = document.getElementById('recruitment-description');
-        if (inputRecDesc) inputRecDesc.value = recruitment.description || "";
+        if (inputRecDesc && recruitment.description !== undefined) inputRecDesc.value = recruitment.description;
 
         const inputRecDeadline = document.getElementById('recruitment-deadline');
-        if (inputRecDeadline) inputRecDeadline.value = recruitment.deadline || "";
+        if (inputRecDeadline && recruitment.deadline !== undefined) inputRecDeadline.value = recruitment.deadline;
 
         const inputRecDeadlineDt = document.getElementById('recruitment-deadline-datetime');
-        if (inputRecDeadlineDt) inputRecDeadlineDt.value = recruitment.deadline_datetime || recruitment.deadlineDatetime || "";
+        const dtVal = recruitment.deadline_datetime || recruitment.deadlineDatetime || "";
+        if (inputRecDeadlineDt && dtVal) inputRecDeadlineDt.value = dtVal;
 
         renderTeamTable(cachedTeam);
         renderKnowledgeTable(cachedPrimers);
