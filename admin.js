@@ -190,8 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activateTab(savedTab);
     }
 
-    cachedTeam = [];
-    cachedPrimers = [];
+    cachedApplications = [];
 
     // DASHBOARD RENDER
     async function renderDashboard() {
@@ -209,12 +208,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
                 cachedAlumni = await window.GrandeurDB.getAlumniMembers();
                 cachedAchievements = await window.GrandeurDB.getAchievements();
+                if (window.GrandeurDB.getRecruitmentApplications) {
+                    cachedApplications = await window.GrandeurDB.getRecruitmentApplications();
+                }
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
             }
         }
 
         const localStore = getStore();
+        if ((!cachedApplications || cachedApplications.length === 0) && Array.isArray(localStore.applications)) {
+            cachedApplications = localStore.applications;
+        }
 
         const recruitment = recruitmentData || localStore.recruitment;
         const banner = bannerData || localStore.banner;
@@ -258,11 +263,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputRecDesc = document.getElementById('recruitment-description');
         if (inputRecDesc) inputRecDesc.value = recruitment.description || "";
 
-        const inputRecUrl = document.getElementById('recruitment-form-url');
-        if (inputRecUrl) inputRecUrl.value = recruitment.formUrl || "";
-
         const inputRecDeadline = document.getElementById('recruitment-deadline');
         if (inputRecDeadline) inputRecDeadline.value = recruitment.deadline || "";
+
+        const inputRecDeadlineDt = document.getElementById('recruitment-deadline-datetime');
+        if (inputRecDeadlineDt) inputRecDeadlineDt.value = recruitment.deadline_datetime || recruitment.deadlineDatetime || "";
 
         const switchBanner = document.getElementById('switch-banner-active');
         if (switchBanner) switchBanner.checked = banner.active;
@@ -270,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputBannerText = document.getElementById('banner-text');
         if (inputBannerText) inputBannerText.value = banner.text || "";
 
-        const inputBannerBtnText = document.getElementById('banner-btn-text');
+        const inputBannerBtnText = document.getElementById('banner-text');
         if (inputBannerBtnText) inputBannerBtnText.value = banner.btnText || "";
 
         const inputBannerBtnUrl = document.getElementById('banner-btn-url');
@@ -281,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderInboxList(inbox);
         renderAlumniTable(cachedAlumni);
         renderAchievementsTable(cachedAchievements);
+        renderApplicationsList(cachedApplications);
     }
 
     // FORMS SUBMISSION
@@ -306,15 +312,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const active = document.getElementById('switch-recruitment-active').checked;
             const title = document.getElementById('recruitment-title').value;
             const description = document.getElementById('recruitment-description').value;
-            const formUrl = document.getElementById('recruitment-form-url').value;
             const deadline = document.getElementById('recruitment-deadline').value;
+            const deadlineDatetime = document.getElementById('recruitment-deadline-datetime').value;
 
             if (window.GrandeurDB) {
-                await window.GrandeurDB.updateRecruitment({ active, title, description, form_url: formUrl, deadline });
+                await window.GrandeurDB.updateRecruitment({ active, title, description, deadline, deadline_datetime: deadlineDatetime });
             }
 
             const store = getStore();
-            store.recruitment = { active, title, description, formUrl, deadline };
+            store.recruitment = { active, title, description, deadline, deadline_datetime: deadlineDatetime };
             saveStore(store);
             renderDashboard();
             showToast("✅ Recruitment settings updated!");
@@ -785,6 +791,88 @@ document.addEventListener('DOMContentLoaded', () => {
             await renderDashboard();
         }
     };
+
+    // RECRUITMENT APPLICATIONS RENDER & CRUD (RECRUITMENT & BANNERS TAB ONLY)
+    function renderApplicationsList(appList = []) {
+        const container = document.getElementById('recruitment-applications-list');
+        const badge = document.getElementById('recruitment-apps-badge');
+        if (badge) badge.textContent = appList.length;
+        if (!container) return;
+
+        if (!Array.isArray(appList) || appList.length === 0) {
+            container.innerHTML = `<p style="text-align:center; color:var(--admin-text-muted); padding:3rem;">📥 No member applications submitted yet. Candidate form responses submitted via the website will be listed here.</p>`;
+            return;
+        }
+
+        container.innerHTML = appList.map(item => `
+            <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:12px; padding:1.5rem; margin-bottom:1.25rem; position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem;">
+                    <div>
+                        <strong style="color:var(--admin-gold); font-size:1.1rem;">${escapeHtml(item.full_name || item.name || 'Candidate')}</strong>
+                        <span style="background:rgba(56, 189, 248, 0.15); color:var(--admin-accent-blue); padding:3px 10px; border-radius:10px; font-size:0.8rem; margin-left:0.5rem; border:1px solid rgba(56, 189, 248, 0.3); font-weight:600;">
+                            ${escapeHtml(item.wing_preference || item.wing || 'Consulting')}
+                        </span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <small style="color:var(--admin-text-muted);">${escapeHtml(item.created_at ? new Date(item.created_at).toLocaleString() : 'Recent')}</small>
+                        <button class="btn-icon delete" onclick="deleteRecruitmentApp('${item.id}')" title="Delete Application" style="padding:4px 8px;">🗑️</button>
+                    </div>
+                </div>
+
+                <div style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); display:grid; gap:0.75rem; margin-bottom:1rem; background:rgba(0,0,0,0.2); padding:0.85rem; border-radius:8px; font-size:0.9rem; color:var(--admin-text-muted);">
+                    <div>📧 <strong>Email:</strong> <a href="mailto:${escapeHtml(item.email || '')}" style="color:var(--admin-accent-blue); text-decoration:underline;">${escapeHtml(item.email || 'N/A')}</a></div>
+                    <div>📞 <strong>Phone:</strong> ${escapeHtml(item.phone || 'N/A')}</div>
+                    <div>🎓 <strong>Course & Year:</strong> ${escapeHtml(item.course || 'N/A')} (${escapeHtml(item.batch_year || item.batch || 'N/A')})</div>
+                    <div>🆔 <strong>Roll No:</strong> ${escapeHtml(item.roll_no || 'N/A')}</div>
+                </div>
+
+                <div style="margin-bottom:0.75rem;">
+                    <strong style="color:#f8fafc; font-size:0.95rem;">💡 Why Join Grandeur:</strong>
+                    <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:6px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.05); margin-bottom:0;">${escapeHtml(item.why_join || 'N/A')}</p>
+                </div>
+
+                ${item.case_response ? `
+                <div style="margin-bottom:0.75rem;">
+                    <strong style="color:#f8fafc; font-size:0.95rem;">🧩 Case Scenario Response:</strong>
+                    <p style="color:var(--admin-text-muted); font-size:0.9rem; line-height:1.5; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:6px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.05); margin-bottom:0;">${escapeHtml(item.case_response)}</p>
+                </div>
+                ` : ''}
+
+                ${item.resume_url ? `
+                <div style="margin-top:0.75rem;">
+                    🔗 <strong>Resume/Portfolio Link:</strong> <a href="${escapeHtml(item.resume_url)}" target="_blank" style="color:var(--admin-gold); text-decoration:underline; font-weight:600;">View Resume / Portfolio ↗</a>
+                </div>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    window.deleteRecruitmentApp = async function(id) {
+        if (confirm("Are you sure you want to delete this member application?")) {
+            if (window.GrandeurDB && window.GrandeurDB.deleteRecruitmentApplication) {
+                try {
+                    await window.GrandeurDB.deleteRecruitmentApplication(id);
+                } catch(err) {
+                    console.error("App delete error:", err);
+                }
+            }
+            const store = getStore();
+            if (Array.isArray(store.applications)) {
+                store.applications = store.applications.filter(a => a.id !== id);
+                saveStore(store);
+            }
+            showToast("🗑️ Removed candidate application");
+            await renderDashboard();
+        }
+    };
+
+    const btnRefreshApps = document.getElementById('btn-refresh-applications');
+    if (btnRefreshApps) {
+        btnRefreshApps.addEventListener('click', async () => {
+            await renderDashboard();
+            showToast("🔄 Applications list refreshed!");
+        });
+    }
 
     // ALUMNI NETWORK CRUD
     const alumniTableBody = document.getElementById('alumni-table-body');

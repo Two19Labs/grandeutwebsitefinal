@@ -144,16 +144,32 @@
                                     </div>
                                     <div class="grid grid-2" style="gap: 1.5rem;">
                                         <div class="form-group">
-                                            <label for="recruitment-form-url">Application Link (Google Form / Unstop URL)</label>
-                                            <input type="url" id="recruitment-form-url" class="form-input" placeholder="https://forms.google.com/...">
+                                            <label for="recruitment-deadline">Deadline Text (Displayed on website)</label>
+                                            <input type="text" id="recruitment-deadline" class="form-input" placeholder="e.g. August 20, 2026 - 11:59 PM IST">
                                         </div>
                                         <div class="form-group">
-                                            <label for="recruitment-deadline">Deadline Text / Date</label>
-                                            <input type="text" id="recruitment-deadline" class="form-input" placeholder="e.g. August 15, 2026 - 11:59 PM IST">
+                                            <label for="recruitment-deadline-datetime">Automatic Cutoff Date & Time (Form Expiry)</label>
+                                            <input type="datetime-local" id="recruitment-deadline-datetime" class="form-input">
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary" id="btn-save-recruitment">Save Recruitment Settings</button>
                                 </form>
+                            </div>
+                        </div>
+
+                        <!-- SUBMITTED RECRUITMENT APPLICATIONS -->
+                        <div class="admin-card" style="margin-top: 2rem;">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3>📥 Submitted Member Applications <span class="badge-count" id="recruitment-apps-badge">0</span></h3>
+                                    <p>View and manage all candidate applications submitted via the website form.</p>
+                                </div>
+                                <button class="btn btn-outline" id="btn-refresh-applications" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">🔄 Refresh Applications</button>
+                            </div>
+                            <div class="card-body">
+                                <div id="recruitment-applications-list">
+                                    <!-- Rendered dynamically -->
+                                </div>
                             </div>
                         </div>
 

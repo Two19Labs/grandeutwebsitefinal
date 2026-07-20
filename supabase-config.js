@@ -280,6 +280,33 @@ window.GrandeurDB = {
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         return true;
+    },
+
+    // 8. RECRUITMENT APPLICATIONS
+    async getRecruitmentApplications() {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications?select=*&order=created_at.desc`, { headers: READ_HEADERS });
+            if (!res.ok) return [];
+            return await res.json();
+        } catch(e) { return []; }
+    },
+
+    async insertRecruitmentApplication(data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications`, {
+            method: 'POST',
+            headers: WRITE_HEADERS,
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return true;
+    },
+
+    async deleteRecruitmentApplication(id) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: WRITE_HEADERS
+        });
+        return res.ok;
     }
 };
 
