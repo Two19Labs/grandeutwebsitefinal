@@ -602,10 +602,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const formUrl = (typeof recData === 'object' && (recData.form_url || recData.formUrl)) || 'apply.html';
         const deadline = (typeof recData === 'object' && recData.deadline) || 'August 20, 2026';
 
-        // Toggle nav links across all pages
+        // Keep nav links across all pages visible so page is always accessible
         const joinNavElements = document.querySelectorAll('.nav-item-join, .footer-join-link');
         joinNavElements.forEach(el => {
-            el.style.display = isOpen ? 'inline-block' : 'none';
+            el.style.display = 'inline-block';
         });
 
         // Also handle legacy cta elements if any
