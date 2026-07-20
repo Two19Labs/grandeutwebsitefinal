@@ -334,12 +334,29 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchTier && matchSearch;
         });
 
-        if (filtered.length === 0) {
+        const sortedFiltered = [...filtered].sort((a, b) => {
+            const roleA = (a.role || '').toLowerCase();
+            const roleB = (b.role || '').toLowerCase();
+
+            const isPresA = roleA.includes('president') && !roleA.includes('vice');
+            const isPresB = roleB.includes('president') && !roleB.includes('vice');
+            if (isPresA && !isPresB) return -1;
+            if (!isPresA && isPresB) return 1;
+
+            const isVpA = roleA.includes('vice president') || roleA.includes('vp');
+            const isVpB = roleB.includes('vice president') || roleB.includes('vp');
+            if (isVpA && !isVpB) return -1;
+            if (!isVpA && isVpB) return 1;
+
+            return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+        });
+
+        if (sortedFiltered.length === 0) {
             teamTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No team members found. Click "Add New Member" to add one.</td></tr>`;
             return;
         }
 
-        teamTableBody.innerHTML = filtered.map(m => {
+        teamTableBody.innerHTML = sortedFiltered.map(m => {
             const initials = m.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
             const avatarHtml = m.photo ? 
                 `<img src="${escapeHtml(m.photo)}" class="member-avatar-mini" alt="${escapeHtml(m.name)}">` : 

@@ -721,16 +721,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        function sortCategoryMembers(tierKey, membersList) {
+            if (tierKey === 'board') {
+                return [...membersList].sort((a, b) => {
+                    const roleA = (a.role || '').toLowerCase();
+                    const roleB = (b.role || '').toLowerCase();
+
+                    const isPresA = roleA.includes('president') && !roleA.includes('vice');
+                    const isPresB = roleB.includes('president') && !roleB.includes('vice');
+
+                    if (isPresA && !isPresB) return -1;
+                    if (!isPresA && isPresB) return 1;
+
+                    const isVpA = roleA.includes('vice president') || roleA.includes('vp');
+                    const isVpB = roleB.includes('vice president') || roleB.includes('vp');
+
+                    if (isVpA && !isVpB) return -1;
+                    if (!isVpA && isVpB) return 1;
+
+                    return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+                });
+            }
+
+            return [...membersList].sort((a, b) => {
+                return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+            });
+        }
+
         // Build HTML
         let html = '';
         Object.keys(tiers).forEach(tierKey => {
             const tierData = tiers[tierKey];
-            if (tierData.members.length > 0) {
+            const sortedMembers = sortCategoryMembers(tierKey, tierData.members);
+            if (sortedMembers.length > 0) {
                 html += `
                     <div class="hierarchy-section" data-tier="${tierKey}">
                         <h4 class="tier-title">${tierData.title}</h4>
                         <div class="team-grid tier-grid-1">
-                            ${tierData.members.map(m => {
+                            ${sortedMembers.map(m => {
                                 const initials = (m.name || 'M').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                                 const avatarHtml = m.photo ? 
                                     `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 1.5rem auto 0.5rem; border: 3px solid var(--primary-light); display: block; box-shadow: var(--shadow-md);">` :
