@@ -170,6 +170,29 @@ body.admin-body {
     gap: 1rem;
 }
 
+.admin-header .btn-outline {
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-header .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+}
+
+.admin-header #btn-logout {
+    background: var(--admin-gold);
+    color: #0f1d3a;
+    font-weight: 700;
+}
+
+.admin-header #btn-logout:hover {
+    background: var(--admin-accent-yellow);
+    transform: translateY(-1px);
+}
+
 .admin-session-status {
     font-size: 0.85rem;
     color: #cbd5e1;
