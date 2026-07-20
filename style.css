@@ -2676,6 +2676,18 @@ a.resources-badge:hover {
     margin-top: auto;
 }
 
+@media (max-width: 992px) {
+    .logo-grid-responsive {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 580px) {
+    .logo-grid-responsive {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
 
 
 
