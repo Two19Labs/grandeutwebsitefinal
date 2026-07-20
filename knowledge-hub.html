@@ -122,8 +122,7 @@
                                             </div>
                                             <h3>${p.title}</h3>
                                             ${readTime ? `<p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">${readTime}</p>` : ''}
-                                            <div class="resource-footer">
-                                                <span style="font-size: 0.8rem; color: var(--text-muted);">Grandeur Cell</span>
+                                            <div class="resource-footer" style="justify-content: flex-end;">
                                                 <a href="${hasUrl ? p.pdf_url : '#'}" 
                                                    target="${hasUrl ? '_blank' : '_self'}" 
                                                    rel="noopener noreferrer"
@@ -230,7 +229,7 @@
         </div>
     </footer>
 
-    <script src="supabase-config.js?v=9"></script>
-    <script src="script.js?v=9"></script>
+    <script src="supabase-config.js?v=10"></script>
+    <script src="script.js?v=10"></script>
 </body>
 </html>
