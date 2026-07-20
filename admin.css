@@ -47,6 +47,91 @@ body.admin-body {
     opacity: 1;
 }
 
+/* GLOBAL LOADING OVERLAY */
+#admin-global-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(9, 13, 22, 0.92);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.loader-card {
+    background: #1e293b;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 16px;
+    padding: 2.25rem 2rem;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.15);
+}
+
+.loader-pulse-ring {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.25rem;
+    background: rgba(212, 175, 55, 0.1);
+    border: 2px solid var(--admin-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: loaderPulse 1.8s infinite ease-in-out;
+}
+
+.loader-logo {
+    max-width: 44px !important;
+    max-height: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+    object-fit: contain !important;
+    display: block;
+    margin: 0 auto;
+}
+
+@keyframes loaderPulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(212, 175, 55, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+.loader-title {
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+#loader-status-text {
+    color: #94a3b8;
+    font-size: 0.88rem;
+    margin-bottom: 1.5rem;
+    min-height: 1.4em;
+}
+
+.loader-track {
+    background: rgba(255, 255, 255, 0.1);
+    height: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.loader-bar {
+    height: 100%;
+    width: 20%;
+    background: linear-gradient(90deg, var(--admin-gold), var(--admin-accent-yellow));
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
 /* Header */
 .admin-header {
     background: rgba(15, 23, 42, 0.95);
