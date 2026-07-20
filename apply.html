@@ -174,46 +174,9 @@
                             <input type="tel" id="app-phone" class="input-app" placeholder="e.g. +91 9876543210" required>
                         </div>
                         <div class="form-group-app">
-                            <label for="app-roll-no">College Roll No.</label>
-                            <input type="text" id="app-roll-no" class="input-app" placeholder="e.g. 23042">
+                            <label for="app-resume-link">Resume / LinkedIn / Portfolio Link <span class="req">*</span></label>
+                            <input type="url" id="app-resume-link" class="input-app" placeholder="https://drive.google.com/file/... or LinkedIn URL" required>
                         </div>
-                    </div>
-
-                    <div class="grid grid-2" style="gap: 1.5rem;">
-                        <div class="form-group-app">
-                            <label for="app-course">Course <span class="req">*</span></label>
-                            <select id="app-course" class="input-app select-app" required>
-                                <option value="" disabled selected>Select Your Course</option>
-                                <option value="BMS">BMS (Bachelor of Management Studies)</option>
-                                <option value="BBA FIA">BBA (Financial Investment Analysis)</option>
-                                <option value="B.Sc. Computer Science">B.Sc. (Hons) Computer Science</option>
-                                <option value="Other">Other Undergraduate Course</option>
-                            </select>
-                        </div>
-                        <div class="form-group-app">
-                            <label for="app-batch">Batch / Current Academic Year <span class="req">*</span></label>
-                            <select id="app-batch" class="input-app select-app" required>
-                                <option value="" disabled selected>Select Academic Year</option>
-                                <option value="1st Year">1st Year (Freshers)</option>
-                                <option value="2nd Year">2nd Year</option>
-                                <option value="3rd Year">3rd Year</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group-app">
-                        <label for="app-wing">Preferred Department / Wing <span class="req">*</span></label>
-                        <select id="app-wing" class="input-app select-app" required>
-                            <option value="" disabled selected>Select Primary Department Preference</option>
-                            <option value="Consulting & Strategy">Consulting & Strategy Wing</option>
-                            <option value="Knowledge & Research">Knowledge & Research Hub</option>
-                            <option value="Corporate Relations">Corporate & Public Relations</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group-app">
-                        <label for="app-resume-link">Resume / LinkedIn / Portfolio Link <span class="req">*</span></label>
-                        <input type="url" id="app-resume-link" class="input-app" placeholder="https://drive.google.com/file/... or LinkedIn URL" required>
                     </div>
 
                     <!-- DYNAMIC CUSTOM RECRUITMENT QUESTIONS (ONLY QUESTIONS ADDED IN ADMIN CONSOLE) -->
@@ -377,17 +340,22 @@
                     const whyJoinAnswer = customAnswers.find(ca => ca.question.toLowerCase().includes('why'))?.answer || (customAnswers[0] ? customAnswers[0].answer : '');
                     const caseAnswer = customAnswers.find(ca => ca.question.toLowerCase().includes('case'))?.answer || (customAnswers[1] ? customAnswers[1].answer : '');
 
+                    const rollEl = document.getElementById('app-roll-no');
+                    const courseEl = document.getElementById('app-course');
+                    const batchEl = document.getElementById('app-batch');
+                    const wingEl = document.getElementById('app-wing');
+
                     const appData = {
                         id: 'app_' + Date.now(),
                         full_name: document.getElementById('app-full-name').value.trim(),
                         email: document.getElementById('app-email').value.trim(),
                         phone: document.getElementById('app-phone').value.trim(),
-                        roll_no: document.getElementById('app-roll-no').value.trim(),
-                        course: document.getElementById('app-course').value,
-                        batch_year: document.getElementById('app-batch').value,
-                        wing_preference: document.getElementById('app-wing').value,
+                        roll_no: rollEl ? rollEl.value.trim() : '',
+                        course: courseEl ? courseEl.value : '',
+                        batch_year: batchEl ? batchEl.value : '',
+                        wing_preference: wingEl ? wingEl.value : '',
                         why_join: whyJoinAnswer,
-                        resume_url: document.getElementById('app-resume-link').value.trim(),
+                        resume_url: document.getElementById('app-resume-link') ? document.getElementById('app-resume-link').value.trim() : '',
                         case_response: caseAnswer,
                         custom_answers: customAnswers,
                         created_at: new Date().toISOString()

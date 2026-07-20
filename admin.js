@@ -907,14 +907,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            const wingBadge = item.wing_preference ? `
+                <span style="background:rgba(56, 189, 248, 0.15); color:var(--admin-accent-blue); padding:3px 10px; border-radius:10px; font-size:0.8rem; margin-left:0.5rem; border:1px solid rgba(56, 189, 248, 0.3); font-weight:600;">
+                    ${escapeHtml(item.wing_preference)}
+                </span>` : '';
+
+            const courseInfo = item.course ? `<div>🎓 <strong>Course & Year:</strong> ${escapeHtml(item.course)} ${item.batch_year ? '(' + escapeHtml(item.batch_year) + ')' : ''}</div>` : '';
+            const rollInfo = item.roll_no ? `<div>🆔 <strong>Roll No:</strong> ${escapeHtml(item.roll_no)}</div>` : '';
+
             return `
             <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:12px; padding:1.5rem; margin-bottom:1.25rem; position:relative;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem;">
                     <div>
                         <strong style="color:var(--admin-gold); font-size:1.1rem;">${escapeHtml(item.full_name || item.name || 'Candidate')}</strong>
-                        <span style="background:rgba(56, 189, 248, 0.15); color:var(--admin-accent-blue); padding:3px 10px; border-radius:10px; font-size:0.8rem; margin-left:0.5rem; border:1px solid rgba(56, 189, 248, 0.3); font-weight:600;">
-                            ${escapeHtml(item.wing_preference || item.wing || 'Consulting')}
-                        </span>
+                        ${wingBadge}
                     </div>
                     <div style="display:flex; align-items:center; gap:0.75rem;">
                         <small style="color:var(--admin-text-muted);">${escapeHtml(item.created_at ? new Date(item.created_at).toLocaleString() : 'Recent')}</small>
@@ -925,8 +931,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); display:grid; gap:0.75rem; margin-bottom:1rem; background:rgba(0,0,0,0.2); padding:0.85rem; border-radius:8px; font-size:0.9rem; color:var(--admin-text-muted);">
                     <div>📧 <strong>Email:</strong> <a href="mailto:${escapeHtml(item.email || '')}" style="color:var(--admin-accent-blue); text-decoration:underline;">${escapeHtml(item.email || 'N/A')}</a></div>
                     <div>📞 <strong>Phone:</strong> ${escapeHtml(item.phone || 'N/A')}</div>
-                    <div>🎓 <strong>Course & Year:</strong> ${escapeHtml(item.course || 'N/A')} (${escapeHtml(item.batch_year || item.batch || 'N/A')})</div>
-                    <div>🆔 <strong>Roll No:</strong> ${escapeHtml(item.roll_no || 'N/A')}</div>
+                    ${courseInfo}
+                    ${rollInfo}
                 </div>
 
                 ${qaContent}
