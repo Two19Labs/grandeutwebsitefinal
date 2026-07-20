@@ -106,71 +106,18 @@
             </div>
         </section>
 
-        <!-- Flagship Victories Slider Section -->
-        <section class="section">
+        <!-- Major Case Competition Wins & Achievements Section -->
+        <section class="section" id="achievements-section">
             <div class="section-container">
                 <div class="section-header">
-                    <h2>Flagship Victories</h2>
-                    <p>Slide through some of our benchmark competition wins and global heats qualifications.</p>
+                    <h2>Case Competition Wins & Victories</h2>
+                    <p>Major case competition wins, podium finishes, and global heats qualifications published directly from our CMS.</p>
                 </div>
 
-                <!-- Slider -->
-                <div class="slider-container">
-                    <div class="slides-wrapper">
-                        <!-- Slide 1 -->
-                        <div class="achieve-slide">
-                            <div class="slide-img-container">
-                                <img src="achieve-iitb.png" alt="Winner - Jack of All Trades">
-                            </div>
-                            <div class="slide-text-container">
-                                <span class="slide-tag">Flagship Win</span>
-                                <h3>Winner - Jack of All Trades</h3>
-                                <span class="slide-inst">IIT Bombay</span>
-                                <p>Secured first place at IIT Bombay's flagship management fest competition, solving an intensive business scenario strategy case against top-tier teams.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 2 -->
-                        <div class="achieve-slide">
-                            <div class="slide-img-container">
-                                <img src="achieve-srcc.png" alt="Winner - Office Voyage">
-                            </div>
-                            <div class="slide-text-container">
-                                <span class="slide-tag">Flagship Win</span>
-                                <h3>Winner - Office Voyage</h3>
-                                <span class="slide-inst">SRCC</span>
-                                <p>Secured first place in SRCC's premier case study event, demonstrating rigorous structured problem-solving and presentation skills under pressure.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 3 -->
-                        <div class="achieve-slide">
-                            <div class="slide-img-container">
-                                <img src="achieve-melbourne.png" alt="Global Heats Qualifier - GMCC">
-                            </div>
-                            <div class="slide-text-container">
-                                <span class="slide-tag">Global Achievement</span>
-                                <h3>Global Heats Qualifier - GMCC</h3>
-                                <span class="slide-inst">University of Melbourne</span>
-                                <p>Stood as the sole Indian team to qualify for the global top 12 heats in the Global Microfinance Case Competition, representing Grandeur and SSCBS on the global stage.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 4 -->
-                        <div class="achieve-slide">
-                            <div class="slide-img-container">
-                                <img src="achieve-nsut.png" alt="Winner - National Case Competition">
-                            </div>
-                            <div class="slide-text-container">
-                                <span class="slide-tag">National Win</span>
-                                <h3>Winner - National Case Competition</h3>
-                                <span class="slide-inst">E-Cell NSUT</span>
-                                <p>Triumphed over 2000+ teams nationwide in NSUT's flagship startup growth strategy competition, developing a robust scalable roadmap.</p>
-                            </div>
-                        </div>
+                <div id="achievements-live-container" class="achievements-live-grid">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
+                        Loading achievements...
                     </div>
-                    <!-- Controls -->
-                    <button class="slider-btn prev">&#8592;</button>
-                    <button class="slider-btn next">&#8594;</button>
-                    <!-- Dots -->
-                    <div class="slider-dots"></div>
                 </div>
             </div>
         </section>
@@ -316,6 +263,37 @@
         </div>
     </footer>
 
-    <script src="script.js?v=6"></script>
+    <!-- Supabase JS Client & Configuration -->
+    <script src="supabase-config.js?v=15"></script>
+    <script src="script.js?v=15"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('achievements-live-container');
+            if (!container) return;
+
+            let achievements = [];
+            if (window.GrandeurDB && typeof window.GrandeurDB.getAchievements === 'function') {
+                try {
+                    achievements = await window.GrandeurDB.getAchievements();
+                } catch(e) { console.error("Error loading achievements from GrandeurDB:", e); }
+            }
+
+            if ((!achievements || achievements.length === 0) && window.SUPABASE_ANON_KEY) {
+                try {
+                    const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?select=*&order=created_at.desc', {
+                        headers: {
+                            'apikey': window.SUPABASE_ANON_KEY,
+                            'Authorization': 'Bearer ' + window.SUPABASE_ANON_KEY
+                        }
+                    });
+                    if (res.ok) achievements = await res.json();
+                } catch(e) { console.error("Direct fetch error:", e); }
+            }
+
+            if (window.renderDynamicAchievements) {
+                window.renderDynamicAchievements(achievements, container);
+            }
+        });
+    </script>
 </body>
 </html>

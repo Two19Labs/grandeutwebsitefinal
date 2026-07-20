@@ -723,6 +723,151 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.renderDynamicTeamGrid = renderDynamicTeamGrid;
 
+    function parseAchievementMeta(item) {
+        let team = '';
+        let description = item.description || '';
+        let photos = [];
+
+        if (item.team_name) {
+            try {
+                const parsed = JSON.parse(item.team_name);
+                if (parsed && typeof parsed === 'object') {
+                    team = parsed.team || '';
+                    if (parsed.description) description = parsed.description;
+                    if (Array.isArray(parsed.photos)) photos = parsed.photos;
+                } else {
+                    team = item.team_name;
+                }
+            } catch (e) {
+                team = item.team_name;
+            }
+        }
+
+        if (photos.length === 0 && item.image_url) {
+            photos.push(item.image_url);
+        }
+
+        return {
+            id: item.id,
+            title: item.event_name || item.title || 'Untitled Competition',
+            position: item.position || item.category || 'Winner',
+            year: item.year || item.date_label || '2026',
+            team: team || 'Team Grandeur',
+            description: description,
+            photos: photos
+        };
+    }
+
+    function renderDynamicAchievements(achievementsList, container) {
+        if (!container) return;
+        if (!achievementsList || achievementsList.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">No achievements published yet. Check back soon!</div>`;
+            return;
+        }
+
+        const sorted = [...achievementsList].sort((a, b) => {
+            const metaA = parseAchievementMeta(a);
+            const metaB = parseAchievementMeta(b);
+            return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
+        });
+
+        container.innerHTML = sorted.map((item, cardIdx) => {
+            const meta = parseAchievementMeta(item);
+            
+            const posLower = meta.position.toLowerCase();
+            let rankClass = 'rank-general';
+            let rankIcon = '🏆';
+            if (posLower.includes('1st') || posLower.includes('winner')) {
+                rankClass = 'rank-gold';
+                rankIcon = '🥇';
+            } else if (posLower.includes('2nd') || posLower.includes('runner')) {
+                rankClass = 'rank-silver';
+                rankIcon = '🥈';
+            } else if (posLower.includes('3rd') || posLower.includes('podium')) {
+                rankClass = 'rank-bronze';
+                rankIcon = '🥉';
+            } else if (posLower.includes('finalist') || posLower.includes('qualifier')) {
+                rankClass = 'rank-general';
+                rankIcon = '🌟';
+            }
+
+            let mediaHtml = '';
+            if (meta.photos.length > 0) {
+                const slides = meta.photos.map((src, i) => `
+                    <img src="${escapeHtml(src)}" class="achievement-media-slide ${i === 0 ? 'active' : ''}" alt="${escapeHtml(meta.title)}" data-slide-idx="${i}">
+                `).join('');
+
+                const dots = meta.photos.length > 1 ? `
+                    <div class="achievement-slider-dots">
+                        ${meta.photos.map((_, i) => `<span class="achievement-slider-dot ${i === 0 ? 'active' : ''}" data-dot-idx="${i}"></span>`).join('')}
+                    </div>
+                ` : '';
+
+                mediaHtml = `
+                    <div class="achievement-card-media" id="achieve-card-media-${cardIdx}">
+                        ${slides}
+                        ${dots}
+                        <span class="achievement-year-badge">${escapeHtml(meta.year)}</span>
+                        <span class="achievement-rank-pill ${rankClass}">${rankIcon} ${escapeHtml(meta.position)}</span>
+                    </div>
+                `;
+            } else {
+                mediaHtml = `
+                    <div class="achievement-card-media" style="display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);">
+                        <span style="font-size: 4rem; opacity: 0.85;">🏆</span>
+                        <span class="achievement-year-badge">${escapeHtml(meta.year)}</span>
+                        <span class="achievement-rank-pill ${rankClass}">${rankIcon} ${escapeHtml(meta.position)}</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="achievement-live-card" data-card-index="${cardIdx}">
+                    ${mediaHtml}
+                    <div class="achievement-card-content">
+                        <h3 class="achievement-card-title">${escapeHtml(meta.title)}</h3>
+                        <div class="achievement-card-team">
+                            <span>👥</span> ${escapeHtml(meta.team)}
+                        </div>
+                        <p class="achievement-card-desc">${escapeHtml(meta.description || 'Secured top podium finish demonstrating structured problem solving.')}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        sorted.forEach((item, cardIdx) => {
+            const meta = parseAchievementMeta(item);
+            if (meta.photos.length > 1) {
+                const mediaBox = document.getElementById(`achieve-card-media-${cardIdx}`);
+                if (!mediaBox) return;
+
+                const slides = mediaBox.querySelectorAll('.achievement-media-slide');
+                const dots = mediaBox.querySelectorAll('.achievement-slider-dot');
+                let currentIdx = 0;
+
+                function goToSlide(idx) {
+                    currentIdx = idx;
+                    slides.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
+                    dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
+                }
+
+                const autoTimer = setInterval(() => {
+                    goToSlide((currentIdx + 1) % slides.length);
+                }, 3000);
+
+                dots.forEach((dot, i) => {
+                    dot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        clearInterval(autoTimer);
+                        goToSlide(i);
+                    });
+                });
+            }
+        });
+    }
+
+    window.renderDynamicAchievements = renderDynamicAchievements;
+
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");

@@ -198,6 +198,16 @@ window.GrandeurDB = {
         return true;
     },
 
+    async updateAchievement(id, data) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: WRITE_HEADERS,
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        return true;
+    },
+
     async deleteAchievement(id) {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?id=eq.${id}`, {
             method: 'DELETE',

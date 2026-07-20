@@ -974,26 +974,144 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancelAchievementModal = document.getElementById('btn-cancel-achievement-modal');
     const formAchievementModal = document.getElementById('form-achievement-modal');
 
+    function parseAchievementMeta(item) {
+        let team = '';
+        let description = item.description || '';
+        let photos = [];
+
+        if (item.team_name) {
+            try {
+                const parsed = JSON.parse(item.team_name);
+                if (parsed && typeof parsed === 'object') {
+                    team = parsed.team || '';
+                    if (parsed.description) description = parsed.description;
+                    if (Array.isArray(parsed.photos)) photos = parsed.photos;
+                } else {
+                    team = item.team_name;
+                }
+            } catch (e) {
+                team = item.team_name;
+            }
+        }
+
+        if (photos.length === 0 && item.image_url) {
+            photos.push(item.image_url);
+        }
+
+        return {
+            id: item.id,
+            title: item.event_name || item.title || 'Untitled Competition',
+            position: item.position || item.category || 'Winner',
+            year: item.year || item.date_label || '2026',
+            team: team || 'Team Grandeur',
+            description: description,
+            photos: photos
+        };
+    }
+
+    [1, 2, 3].forEach(num => {
+        const fileInput = document.getElementById(`achievement-photo-${num}-file`);
+        const hiddenInput = document.getElementById(`achievement-photo-${num}`);
+        const previewImg = document.getElementById(`achievement-photo-${num}-preview-img`);
+        const previewIcon = document.getElementById(`achievement-photo-${num}-preview-icon`);
+
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const maxDim = 800;
+                            let width = img.width;
+                            let height = img.height;
+                            if (width > height) {
+                                if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                            } else {
+                                if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(img, 0, 0, width, height);
+                            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.80);
+                            if (hiddenInput) hiddenInput.value = compressedBase64;
+                            if (previewImg) { previewImg.src = compressedBase64; previewImg.style.display = 'block'; }
+                            if (previewIcon) previewIcon.style.display = 'none';
+                            showToast(`✅ Photo ${num} optimized (${(compressedBase64.length / 1024).toFixed(0)}KB)`);
+                        };
+                        img.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+
     function renderAchievementsTable(list = cachedAchievements) {
         if (!achievementsTableBody) return;
         if (!list || list.length === 0) {
             achievementsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No achievements recorded yet. Click "Add Achievement" to publish one.</td></tr>`;
             return;
         }
-        achievementsTableBody.innerHTML = list.map(item => `
-            <tr>
-                <td><strong>${escapeHtml(item.title)}</strong></td>
-                <td><span class="tier-badge tier-board">${escapeHtml(item.category)}</span></td>
-                <td>${escapeHtml(item.description || '—')}</td>
-                <td>${escapeHtml(item.date_label || item.year || '2026')}</td>
-                <td style="text-align: right;">
-                    <div class="action-btns-group" style="justify-content: flex-end;">
-                        <button class="btn-icon" onclick="editAchievement('${item.id}')" title="Edit">✏️</button>
-                        <button class="btn-icon delete" onclick="deleteAchievement('${item.id}')" title="Delete">🗑️</button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+
+        // Sort descending by year
+        const sorted = [...list].sort((a, b) => {
+            const metaA = parseAchievementMeta(a);
+            const metaB = parseAchievementMeta(b);
+            return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
+        });
+
+        achievementsTableBody.innerHTML = sorted.map(item => {
+            const meta = parseAchievementMeta(item);
+            const thumbHtml = meta.photos.length > 0 ?
+                `<img src="${meta.photos[0]}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--admin-gold);">` :
+                `<div style="width:40px; height:40px; border-radius:6px; background:#0f172a; border:1px dashed var(--admin-gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🏆</div>`;
+            
+            const badgeClass = meta.position.toLowerCase().includes('1st') || meta.position.toLowerCase().includes('winner') ? 'tier-board' : 'tier-coordinators';
+
+            return `
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            ${thumbHtml}
+                            <div>
+                                <strong style="display:block;">${escapeHtml(meta.title)}</strong>
+                                <small style="color:var(--admin-text-muted);">${escapeHtml(meta.team)}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="tier-badge ${badgeClass}">${escapeHtml(meta.position)}</span></td>
+                    <td><div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(meta.description || '—')}</div></td>
+                    <td><strong>${escapeHtml(meta.year)}</strong></td>
+                    <td style="text-align: right;">
+                        <div class="action-btns-group" style="justify-content: flex-end;">
+                            <button class="btn-icon" onclick="editAchievement('${meta.id}')" title="Edit">✏️</button>
+                            <button class="btn-icon delete" onclick="deleteAchievement('${meta.id}')" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function setPhotoSlot(num, url) {
+        const fileInput = document.getElementById(`achievement-photo-${num}-file`);
+        const hiddenInput = document.getElementById(`achievement-photo-${num}`);
+        const previewImg = document.getElementById(`achievement-photo-${num}-preview-img`);
+        const previewIcon = document.getElementById(`achievement-photo-${num}-preview-icon`);
+
+        if (fileInput) fileInput.value = '';
+        if (hiddenInput) hiddenInput.value = url || '';
+        if (url) {
+            if (previewImg) { previewImg.src = url; previewImg.style.display = 'block'; }
+            if (previewIcon) previewIcon.style.display = 'none';
+        } else {
+            if (previewImg) { previewImg.src = ''; previewImg.style.display = 'none'; }
+            if (previewIcon) previewIcon.style.display = 'block';
+        }
     }
 
     function openAchievementModal(item = null) {
@@ -1003,22 +1121,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputTitle = document.getElementById('achievement-title');
         const inputCat = document.getElementById('achievement-category');
         const inputDate = document.getElementById('achievement-date');
+        const inputTeam = document.getElementById('achievement-team');
         const inputDesc = document.getElementById('achievement-description');
 
         if (item) {
+            const meta = parseAchievementMeta(item);
             modalTitle.textContent = "Edit Achievement";
-            inputId.value = item.id;
-            inputTitle.value = item.title || "";
-            inputCat.value = item.category || "";
-            inputDate.value = item.date_label || item.year || "2026";
-            inputDesc.value = item.description || "";
+            inputId.value = meta.id;
+            inputTitle.value = meta.title;
+            inputCat.value = meta.position;
+            inputDate.value = meta.year;
+            inputTeam.value = meta.team;
+            inputDesc.value = meta.description;
+
+            setPhotoSlot(1, meta.photos[0] || '');
+            setPhotoSlot(2, meta.photos[1] || '');
+            setPhotoSlot(3, meta.photos[2] || '');
         } else {
             modalTitle.textContent = "Add Achievement";
             inputId.value = "";
             inputTitle.value = "";
             inputCat.value = "";
             inputDate.value = "2026";
+            inputTeam.value = "";
             inputDesc.value = "";
+
+            setPhotoSlot(1, '');
+            setPhotoSlot(2, '');
+            setPhotoSlot(3, '');
         }
         modalAchievement.style.display = 'flex';
     }
@@ -1036,33 +1166,49 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const editId = document.getElementById('achievement-edit-id').value;
             const title = document.getElementById('achievement-title').value.trim();
-            const category = document.getElementById('achievement-category').value.trim();
-            const date_label = document.getElementById('achievement-date').value.trim();
+            const position = document.getElementById('achievement-category').value.trim();
+            const year = document.getElementById('achievement-date').value.trim();
+            const team = document.getElementById('achievement-team').value.trim();
             const description = document.getElementById('achievement-description').value.trim();
+
+            const p1 = document.getElementById('achievement-photo-1').value.trim();
+            const p2 = document.getElementById('achievement-photo-2').value.trim();
+            const p3 = document.getElementById('achievement-photo-3').value.trim();
+
+            const photos = [p1, p2, p3].filter(Boolean);
+
+            const metaObj = {
+                team: team,
+                description: description,
+                photos: photos
+            };
+
+            const payload = {
+                event_name: title,
+                position: position,
+                year: year,
+                team_name: JSON.stringify(metaObj)
+            };
+
+            const saveBtn = document.getElementById('btn-save-achievement');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Saving...'; }
 
             if (window.GrandeurDB) {
                 try {
                     if (editId) {
-                        const res = await fetch(`https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?id=eq.${editId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'apikey': SUPABASE_ANON_KEY,
-                                'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ title, category, date_label, description })
-                        });
-                        if (!res.ok) throw new Error(await res.text());
+                        await window.GrandeurDB.updateAchievement(editId, payload);
                     } else {
-                        await window.GrandeurDB.insertAchievement({ title, category, date_label, description });
+                        await window.GrandeurDB.insertAchievement(payload);
                     }
                 } catch(err) {
                     console.error("Achievement save error:", err);
                     showToast(`⚠️ Error: ${err.message}`);
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Achievement'; }
                     return;
                 }
             }
 
+            if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Achievement'; }
             showToast(`🏆 Saved achievement: ${title}`);
             closeAchievementModal();
             await renderDashboard();
