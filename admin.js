@@ -183,7 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function restoreActiveTab() {
         const hashTab = location.hash.replace('#', '');
-        const savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-overview';
+        let savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-recruitment';
+        if (!document.getElementById(savedTab)) {
+            savedTab = 'tab-recruitment';
+        }
         activateTab(savedTab);
     }
 

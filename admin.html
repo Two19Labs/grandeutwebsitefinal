@@ -83,10 +83,7 @@
                 <!-- Sidebar -->
                 <aside class="admin-sidebar">
                     <nav class="admin-nav">
-                        <button class="admin-nav-item active" data-tab="tab-overview">
-                            <span class="nav-icon">📊</span> Overview
-                        </button>
-                        <button class="admin-nav-item" data-tab="tab-recruitment">
+                        <button class="admin-nav-item active" data-tab="tab-recruitment">
                             <span class="nav-icon">📢</span> Recruitment & Banners
                         </button>
                         <button class="admin-nav-item" data-tab="tab-team">
@@ -115,70 +112,8 @@
                 <!-- Content Panels -->
                 <div class="admin-content-area">
                     
-                    <!-- TAB 1: OVERVIEW -->
-                    <div class="tab-panel active" id="tab-overview">
-                        <div class="panel-header">
-                            <div>
-                                <h1>Dashboard Overview</h1>
-                                <p>Quick summary of Grandeur website status and active controls.</p>
-                            </div>
-                        </div>
-
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon icon-gold">📢</div>
-                                <div class="stat-info">
-                                    <span class="stat-label">Recruitment Status</span>
-                                    <h3 class="stat-value" id="stat-recruitment-status">Closed</h3>
-                                    <span class="stat-sub" id="stat-recruitment-sub">No active drive</span>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-blue">👥</div>
-                                <div class="stat-info">
-                                    <span class="stat-label">Active Team Members</span>
-                                    <h3 class="stat-value" id="stat-team-count">0</h3>
-                                    <span class="stat-sub">Across all tiers</span>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-green">📚</div>
-                                <div class="stat-info">
-                                    <span class="stat-label">Knowledge Primers</span>
-                                    <h3 class="stat-value" id="stat-primers-count">0</h3>
-                                    <span class="stat-sub">Published research</span>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-purple">📬</div>
-                                <div class="stat-info">
-                                    <span class="stat-label">Contact Inquiries</span>
-                                    <h3 class="stat-value" id="stat-inbox-count">0</h3>
-                                    <span class="stat-sub">Messages received</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="overview-quick-actions">
-                            <h2>Quick Actions</h2>
-                            <div class="quick-buttons-row">
-                                <button class="btn btn-outline" id="quick-toggle-recruitment">🔄 Toggle Recruitment ON/OFF</button>
-                                <button class="btn btn-primary" id="quick-add-member">➕ Add New Team Member</button>
-                                <a href="index.html" target="_blank" class="btn btn-outline">🌐 Preview Website</a>
-                            </div>
-                        </div>
-
-                        <div class="supabase-status-banner">
-                            <div class="banner-icon">⚡</div>
-                            <div>
-                                <h4>Backend Integration Notice</h4>
-                                <p>This console is operating on real-time client state with persistence enabled. It is fully pre-configured to sync seamlessly with Supabase once your API credentials are linked.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TAB 2: RECRUITMENT & BANNERS -->
-                    <div class="tab-panel" id="tab-recruitment">
+                    <!-- TAB 1: RECRUITMENT & BANNERS -->
+                    <div class="tab-panel active" id="tab-recruitment">
                         <div class="panel-header">
                             <div>
                                 <h1>Recruitment & Global Announcement Settings</h1>
