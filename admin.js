@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogout = document.getElementById('btn-logout');
 
     function checkAuthSession() {
-        const isAuth = sessionStorage.getItem('grandeur_admin_authenticated') === 'true' || localStorage.getItem('grandeur_admin_authenticated') === 'true';
+        const isAuth = sessionStorage.getItem('grandeur_admin_authenticated') === 'true';
         if (isAuth) {
             if (loginView) loginView.style.display = 'none';
             if (dashboardView) dashboardView.style.display = 'block';
@@ -83,6 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (adminUserActions) adminUserActions.style.display = 'none';
         }
     }
+
+    // ALWAYS REQUIRE PASSCODE ON REFRESH / PAGE LOAD
+    sessionStorage.removeItem('grandeur_admin_authenticated');
+    localStorage.removeItem('grandeur_admin_authenticated');
 
     if (passcodeBtnToggle && passcodeInput) {
         passcodeBtnToggle.addEventListener('click', () => {
@@ -108,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const inputHash = await computeSHA256(val);
             if (inputHash === SECRET_PASS_HASH) {
                 sessionStorage.setItem('grandeur_admin_authenticated', 'true');
-                localStorage.setItem('grandeur_admin_authenticated', 'true');
                 if (authErrorAlert) authErrorAlert.style.display = 'none';
                 showToast("✅ Successfully authenticated!");
                 checkAuthSession();
@@ -123,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Auth Hash Error:", err);
             if (val === "GrandeurWebsite2026") {
                 sessionStorage.setItem('grandeur_admin_authenticated', 'true');
-                localStorage.setItem('grandeur_admin_authenticated', 'true');
                 checkAuthSession();
             } else {
                 if (authErrorAlert) authErrorAlert.style.display = 'block';
