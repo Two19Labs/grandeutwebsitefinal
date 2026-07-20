@@ -147,10 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function restoreActiveTab() {
         const hashTab = location.hash.replace('#', '');
-        let savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-team';
-        if (['tab-overview', 'tab-recruitment', 'tab-achievements'].includes(savedTab)) {
-            savedTab = 'tab-team';
-        }
+        const savedTab = hashTab || localStorage.getItem('grandeur_admin_active_tab') || 'tab-overview';
         activateTab(savedTab);
     }
 
@@ -172,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 inboxData = await window.GrandeurDB.getContactInquiries();
                 cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
                 cachedAlumni = await window.GrandeurDB.getAlumniMembers();
+                cachedAchievements = await window.GrandeurDB.getAchievements();
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
             }
@@ -201,6 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const statTeamCount = document.getElementById('stat-team-count');
         if (statTeamCount) statTeamCount.textContent = cachedTeam.length;
+
+        const statPrimersCount = document.getElementById('stat-primers-count');
+        if (statPrimersCount) statPrimersCount.textContent = cachedPrimers.length;
 
         const statInboxCount = document.getElementById('stat-inbox-count');
         if (statInboxCount) statInboxCount.textContent = inbox.length;
@@ -240,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderKnowledgeTable(cachedPrimers);
         renderInboxList(inbox);
         renderAlumniTable(cachedAlumni);
+        renderAchievementsTable(cachedAchievements);
     }
 
     // FORMS SUBMISSION
@@ -935,6 +937,140 @@ document.addEventListener('DOMContentLoaded', () => {
             await renderDashboard();
         }
     };
+
+    // ACHIEVEMENTS CRUD
+    let cachedAchievements = [];
+    const achievementsTableBody = document.getElementById('achievements-table-body');
+    const modalAchievement = document.getElementById('modal-achievement');
+    const btnOpenAddAchievement = document.getElementById('btn-open-add-achievement-modal');
+    const btnCloseAchievementModal = document.getElementById('btn-close-achievement-modal');
+    const btnCancelAchievementModal = document.getElementById('btn-cancel-achievement-modal');
+    const formAchievementModal = document.getElementById('form-achievement-modal');
+
+    function renderAchievementsTable(list = cachedAchievements) {
+        if (!achievementsTableBody) return;
+        if (!list || list.length === 0) {
+            achievementsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No achievements recorded yet. Click "Add Achievement" to publish one.</td></tr>`;
+            return;
+        }
+        achievementsTableBody.innerHTML = list.map(item => `
+            <tr>
+                <td><strong>${escapeHtml(item.title)}</strong></td>
+                <td><span class="tier-badge tier-board">${escapeHtml(item.category)}</span></td>
+                <td>${escapeHtml(item.description || '—')}</td>
+                <td>${escapeHtml(item.date_label || item.year || '2026')}</td>
+                <td style="text-align: right;">
+                    <div class="action-btns-group" style="justify-content: flex-end;">
+                        <button class="btn-icon" onclick="editAchievement('${item.id}')" title="Edit">✏️</button>
+                        <button class="btn-icon delete" onclick="deleteAchievement('${item.id}')" title="Delete">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openAchievementModal(item = null) {
+        if (!modalAchievement) return;
+        const modalTitle = document.getElementById('modal-achievement-title');
+        const inputId = document.getElementById('achievement-edit-id');
+        const inputTitle = document.getElementById('achievement-title');
+        const inputCat = document.getElementById('achievement-category');
+        const inputDate = document.getElementById('achievement-date');
+        const inputDesc = document.getElementById('achievement-description');
+
+        if (item) {
+            modalTitle.textContent = "Edit Achievement";
+            inputId.value = item.id;
+            inputTitle.value = item.title || "";
+            inputCat.value = item.category || "";
+            inputDate.value = item.date_label || item.year || "2026";
+            inputDesc.value = item.description || "";
+        } else {
+            modalTitle.textContent = "Add Achievement";
+            inputId.value = "";
+            inputTitle.value = "";
+            inputCat.value = "";
+            inputDate.value = "2026";
+            inputDesc.value = "";
+        }
+        modalAchievement.style.display = 'flex';
+    }
+
+    function closeAchievementModal() {
+        if (modalAchievement) modalAchievement.style.display = 'none';
+    }
+
+    if (btnOpenAddAchievement) btnOpenAddAchievement.addEventListener('click', () => openAchievementModal());
+    if (btnCloseAchievementModal) btnCloseAchievementModal.addEventListener('click', closeAchievementModal);
+    if (btnCancelAchievementModal) btnCancelAchievementModal.addEventListener('click', closeAchievementModal);
+
+    if (formAchievementModal) {
+        formAchievementModal.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('achievement-edit-id').value;
+            const title = document.getElementById('achievement-title').value.trim();
+            const category = document.getElementById('achievement-category').value.trim();
+            const date_label = document.getElementById('achievement-date').value.trim();
+            const description = document.getElementById('achievement-description').value.trim();
+
+            if (window.GrandeurDB) {
+                try {
+                    if (editId) {
+                        const res = await fetch(`https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?id=eq.${editId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ title, category, date_label, description })
+                        });
+                        if (!res.ok) throw new Error(await res.text());
+                    } else {
+                        await window.GrandeurDB.insertAchievement({ title, category, date_label, description });
+                    }
+                } catch(err) {
+                    console.error("Achievement save error:", err);
+                    showToast(`⚠️ Error: ${err.message}`);
+                    return;
+                }
+            }
+
+            showToast(`🏆 Saved achievement: ${title}`);
+            closeAchievementModal();
+            await renderDashboard();
+        });
+    }
+
+    window.editAchievement = function(id) {
+        const item = cachedAchievements.find(a => a.id === id);
+        if (item) openAchievementModal(item);
+    };
+
+    window.deleteAchievement = async function(id) {
+        const item = cachedAchievements.find(a => a.id === id);
+        if (item && confirm(`Are you sure you want to delete "${item.title}"?`)) {
+            if (window.GrandeurDB) {
+                try {
+                    await window.GrandeurDB.deleteAchievement(id);
+                } catch(err) {
+                    console.error("Achievement delete error:", err);
+                    showToast(`⚠️ Delete failed: ${err.message}`);
+                    return;
+                }
+            }
+            showToast(`Removed achievement: ${item.title}`);
+            await renderDashboard();
+        }
+    };
+
+    const quickToggleRec = document.getElementById('quick-toggle-recruitment');
+    if (quickToggleRec) {
+        quickToggleRec.addEventListener('click', () => {
+            const recruitmentTabBtn = document.querySelector('[data-tab="tab-recruitment"]');
+            if (recruitmentTabBtn) recruitmentTabBtn.click();
+        });
+    }
 
     function escapeHtml(str) {
         if (!str) return '';
