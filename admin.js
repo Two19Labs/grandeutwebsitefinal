@@ -900,19 +900,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         container.innerHTML = inboxList.map(item => `
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; padding:1.35rem; margin-bottom:1.15rem; box-shadow:0 2px 8px rgba(15,29,58,0.04);">
+            <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:12px; padding:1.35rem; margin-bottom:1.15rem; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
                     <div>
-                        <strong style="color:#0f1d3a; font-size:1.05rem; font-family:'Outfit',sans-serif;">${escapeHtml(item.name)}</strong>
-                        <a href="mailto:${escapeHtml(item.email)}" style="color:#0284c7; font-size:0.9rem; margin-left:0.5rem; text-decoration:underline; font-weight:600;">&lt;${escapeHtml(item.email)}&gt;</a>
+                        <strong style="color:#f8fafc; font-size:1.05rem; font-family:'Outfit',sans-serif;">${escapeHtml(item.name)}</strong>
+                        <a href="mailto:${escapeHtml(item.email)}" style="color:var(--admin-accent-blue); font-size:0.9rem; margin-left:0.5rem; text-decoration:underline; font-weight:600;">&lt;${escapeHtml(item.email)}&gt;</a>
                     </div>
                     <div style="display:flex; align-items:center; gap:0.75rem;">
-                        <small style="color:#64748b;">${escapeHtml(item.date || new Date(item.created_at || Date.now()).toLocaleString())}</small>
-                        <button class="btn-icon delete" onclick="deleteContactInquiry('${item.id}')" title="Delete Inquiry" style="padding:4px 8px; color:#dc2626;">🗑️</button>
+                        <small style="color:var(--admin-text-muted);">${escapeHtml(item.date || new Date(item.created_at || Date.now()).toLocaleString())}</small>
+                        <button class="btn-icon delete" onclick="deleteContactInquiry('${item.id}')" title="Delete Inquiry" style="padding:4px 8px;">🗑️</button>
                     </div>
                 </div>
-                <h4 style="margin-bottom:0.5rem; color:#0f1d3a; font-size:0.98rem; font-family:'Outfit',sans-serif;">📌 Subject: ${escapeHtml(item.subject)}</h4>
-                <p style="color:#334155; font-size:0.93rem; line-height:1.6; white-space:pre-wrap; background:#f8fafc; padding:0.85rem; border-radius:8px; border:1px solid #cbd5e1; margin:0;">${escapeHtml(item.message)}</p>
+                <h4 style="margin-bottom:0.5rem; color:var(--admin-gold); font-size:0.98rem; font-family:'Outfit',sans-serif;">📌 Subject: ${escapeHtml(item.subject)}</h4>
+                <p style="color:#cbd5e1; font-size:0.93rem; line-height:1.6; white-space:pre-wrap; background:rgba(0,0,0,0.35); padding:0.85rem 1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08); margin:0;">${escapeHtml(item.message)}</p>
             </div>
         `).join('');
     }
@@ -952,29 +952,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (Array.isArray(customQA) && customQA.length > 0) {
                 qaContent = customQA.map(qa => `
                     <div style="margin-bottom:0.85rem;">
-                        <strong style="color:#0f1d3a; font-size:0.95rem; font-family:'Outfit',sans-serif;">💡 ${escapeHtml(qa.question)}</strong>
-                        <p style="color:#334155; font-size:0.92rem; line-height:1.6; background:#f8fafc; padding:0.85rem 1rem; border-radius:8px; margin-top:0.35rem; border:1px solid #cbd5e1; margin-bottom:0; white-space:pre-wrap;">${escapeHtml(qa.answer || 'N/A')}</p>
+                        <strong style="color:var(--admin-gold); font-size:0.95rem; font-family:'Outfit',sans-serif;">💡 ${escapeHtml(qa.question)}</strong>
+                        <p style="color:#cbd5e1; font-size:0.92rem; line-height:1.6; background:rgba(0,0,0,0.35); padding:0.85rem 1rem; border-radius:8px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.08); margin-bottom:0; white-space:pre-wrap;">${escapeHtml(qa.answer || 'N/A')}</p>
                     </div>
                 `).join('');
             } else {
                 if (item.why_join) {
                     qaContent += `
                     <div style="margin-bottom:0.85rem;">
-                        <strong style="color:#0f1d3a; font-size:0.95rem; font-family:'Outfit',sans-serif;">💡 Why Join Grandeur:</strong>
-                        <p style="color:#334155; font-size:0.92rem; line-height:1.6; background:#f8fafc; padding:0.85rem 1rem; border-radius:8px; margin-top:0.35rem; border:1px solid #cbd5e1; margin-bottom:0;">${escapeHtml(item.why_join)}</p>
+                        <strong style="color:var(--admin-gold); font-size:0.95rem; font-family:'Outfit',sans-serif;">💡 Why Join Grandeur:</strong>
+                        <p style="color:#cbd5e1; font-size:0.92rem; line-height:1.6; background:rgba(0,0,0,0.35); padding:0.85rem 1rem; border-radius:8px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.08); margin-bottom:0;">${escapeHtml(item.why_join)}</p>
                     </div>`;
                 }
                 if (item.case_response) {
                     qaContent += `
                     <div style="margin-bottom:0.85rem;">
-                        <strong style="color:#0f1d3a; font-size:0.95rem; font-family:'Outfit',sans-serif;">🧩 Case Scenario Response:</strong>
-                        <p style="color:#334155; font-size:0.92rem; line-height:1.6; background:#f8fafc; padding:0.85rem 1rem; border-radius:8px; margin-top:0.35rem; border:1px solid #cbd5e1; margin-bottom:0;">${escapeHtml(item.case_response)}</p>
+                        <strong style="color:var(--admin-gold); font-size:0.95rem; font-family:'Outfit',sans-serif;">🧩 Case Scenario Response:</strong>
+                        <p style="color:#cbd5e1; font-size:0.92rem; line-height:1.6; background:rgba(0,0,0,0.35); padding:0.85rem 1rem; border-radius:8px; margin-top:0.35rem; border:1px solid rgba(255,255,255,0.08); margin-bottom:0;">${escapeHtml(item.case_response)}</p>
                     </div>`;
                 }
             }
 
             const wingBadge = item.wing_preference ? `
-                <span style="background:rgba(2, 132, 199, 0.1); color:#0284c7; padding:3px 10px; border-radius:10px; font-size:0.8rem; margin-left:0.5rem; border:1px solid rgba(2, 132, 199, 0.25); font-weight:600;">
+                <span style="background:rgba(56, 189, 248, 0.15); color:var(--admin-accent-blue); padding:3px 10px; border-radius:10px; font-size:0.8rem; margin-left:0.5rem; border:1px solid rgba(56, 189, 248, 0.3); font-weight:600;">
                     ${escapeHtml(item.wing_preference)}
                 </span>` : '';
 
@@ -982,20 +982,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const rollInfo = item.roll_no ? `<div>🆔 <strong>Roll No:</strong> ${escapeHtml(item.roll_no)}</div>` : '';
 
             return `
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; padding:1.5rem; margin-bottom:1.25rem; box-shadow:0 2px 8px rgba(15,29,58,0.04);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem; border-bottom:1px solid #f1f5f9; padding-bottom:0.75rem;">
+            <div style="background:#0f172a; border:1px solid var(--admin-border); border-radius:12px; padding:1.5rem; margin-bottom:1.25rem; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.75rem;">
                     <div>
-                        <strong style="color:#0f1d3a; font-size:1.15rem; font-family:'Outfit',sans-serif;">${escapeHtml(item.full_name || item.name || 'Candidate')}</strong>
+                        <strong style="color:#f8fafc; font-size:1.15rem; font-family:'Outfit',sans-serif;">${escapeHtml(item.full_name || item.name || 'Candidate')}</strong>
                         ${wingBadge}
                     </div>
                     <div style="display:flex; align-items:center; gap:0.75rem;">
-                        <small style="color:#64748b; font-weight:500;">📅 ${escapeHtml(item.created_at ? new Date(item.created_at).toLocaleString() : 'Recent')}</small>
-                        <button class="btn-icon delete" onclick="deleteRecruitmentApp('${item.id}')" title="Delete Application" style="padding:4px 8px; color:#dc2626;">🗑️</button>
+                        <small style="color:var(--admin-text-muted); font-weight:500;">📅 ${escapeHtml(item.created_at ? new Date(item.created_at).toLocaleString() : 'Recent')}</small>
+                        <button class="btn-icon delete" onclick="deleteRecruitmentApp('${item.id}')" title="Delete Application" style="padding:4px 8px;">🗑️</button>
                     </div>
                 </div>
 
-                <div style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); display:grid; gap:0.75rem; margin-bottom:1.25rem; background:#f8fafc; padding:0.85rem 1rem; border-radius:8px; font-size:0.92rem; color:#475569; border:1px solid #e2e8f0;">
-                    <div>📧 <strong>Email:</strong> <a href="mailto:${escapeHtml(item.email || '')}" style="color:#0284c7; text-decoration:underline; font-weight:600;">${escapeHtml(item.email || 'N/A')}</a></div>
+                <div style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); display:grid; gap:0.75rem; margin-bottom:1.25rem; background:rgba(0,0,0,0.35); padding:0.85rem 1rem; border-radius:8px; font-size:0.92rem; color:#cbd5e1; border:1px solid rgba(255,255,255,0.08);">
+                    <div>📧 <strong>Email:</strong> <a href="mailto:${escapeHtml(item.email || '')}" style="color:var(--admin-accent-blue); text-decoration:underline; font-weight:600;">${escapeHtml(item.email || 'N/A')}</a></div>
                     <div>📞 <strong>Phone:</strong> ${escapeHtml(item.phone || 'N/A')}</div>
                     ${courseInfo}
                     ${rollInfo}
