@@ -16,6 +16,7 @@
         window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
+    <script src="supabase-config.js?v=9"></script>
 </head>
 <body>
     <header class="header">
@@ -145,7 +146,19 @@
                         }
 
                         try {
-                            const data = window.GrandeurDB ? await window.GrandeurDB.getTeamMembers() : [];
+                            let data = window.GrandeurDB ? await window.GrandeurDB.getTeamMembers() : [];
+                            if (!Array.isArray(data) || data.length === 0) {
+                                const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?select=*&order=created_at.asc', {
+                                    headers: {
+                                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
+                                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs'
+                                    }
+                                });
+                                if (res.ok) {
+                                    const raw = await res.json();
+                                    data = (raw || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
+                                }
+                            }
                             if (Array.isArray(data) && data.length > 0) {
                                 renderInlineGrid(data);
                             }
@@ -193,7 +206,7 @@
     </footer>
 
     <!-- Supabase JS Client & Configuration -->
-    <script src="supabase-config.js?v=8"></script>
-    <script src="script.js?v=8"></script>
+    <script src="supabase-config.js?v=9"></script>
+    <script src="script.js?v=9"></script>
 </body>
 </html>
