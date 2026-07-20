@@ -579,52 +579,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function isRecruitmentOpen(recData) {
-        if (!recData) return false;
-        const active = typeof recData === 'object' ? recData.active !== false : !!recData;
-        if (!active) return false;
+    function isRecruitmentActive(recData) {
+        if (!recData) return true;
+        return typeof recData === 'object' ? recData.active !== false : !!recData;
+    }
 
-        const dtStr = typeof recData === 'object' ? (recData.deadline_datetime || recData.deadlineDatetime) : null;
+    function isRecruitmentExpired(recData) {
+        if (!recData || typeof recData !== 'object') return false;
+        const dtStr = recData.deadline_datetime || recData.deadlineDatetime;
         if (dtStr) {
             const cutoff = new Date(dtStr).getTime();
             if (!isNaN(cutoff) && Date.now() > cutoff) {
-                return false; // Date & Time Cutoff Expired!
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     function applyRecruitmentState(recData) {
         if (!recData) return;
-        const isOpen = isRecruitmentOpen(recData);
+        const isActive = isRecruitmentActive(recData);
+        const isExpired = isRecruitmentExpired(recData);
+
         const title = (typeof recData === 'object' && recData.title) || 'Grandeur Recruitment Drive 2026';
         const description = (typeof recData === 'object' && recData.description) || 'Join the premier Consulting & Knowledge Cell of SSCBS.';
-        const formUrl = (typeof recData === 'object' && (recData.form_url || recData.formUrl)) || 'apply.html';
         const deadline = (typeof recData === 'object' && recData.deadline) || 'August 20, 2026';
 
-        // Keep nav links across all pages visible so page is always accessible
+        // 1. Header & footer "Join Grandeur" nav links:
+        // GONE when switch is toggled OFF (isActive === false). VISIBLE when switch is ON.
         const joinNavElements = document.querySelectorAll('.nav-item-join, .footer-join-link');
         joinNavElements.forEach(el => {
-            el.style.display = 'inline-block';
+            el.style.display = isActive ? 'inline-block' : 'none';
         });
 
-        // Also handle legacy cta elements if any
-        const recElements = document.querySelectorAll('.recruitment-cta-btn, .recruitment-notice');
-        recElements.forEach(el => {
-            if (isOpen) {
-                el.style.display = 'inline-block';
-                if (el.tagName === 'A' && formUrl) el.href = formUrl;
-            } else {
-                el.style.display = 'none';
-            }
-        });
-
-        // Render Join Us page states
+        // 2. Render Join Us page states
         const activeContainer = document.getElementById('join-active-state');
         const closedContainer = document.getElementById('join-closed-state');
 
         if (activeContainer && closedContainer) {
-            if (isOpen) {
+            if (!isActive) {
+                activeContainer.style.display = 'none';
+                closedContainer.style.display = 'block';
+            } else if (isExpired) {
+                activeContainer.style.display = 'none';
+                closedContainer.style.display = 'block';
+            } else {
                 activeContainer.style.display = 'block';
                 closedContainer.style.display = 'none';
 
@@ -641,9 +640,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 applyBtns.forEach(btn => {
                     btn.href = 'apply.html';
                 });
-            } else {
-                activeContainer.style.display = 'none';
-                closedContainer.style.display = 'block';
             }
         }
     }

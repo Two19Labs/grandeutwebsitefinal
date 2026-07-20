@@ -284,18 +284,22 @@
             }
             const recData = { ...(localRec || {}), ...(dbData || {}) };
 
-            function checkExpired(data) {
-                if (!data) return false;
-                if (data.active === false) return true;
-                const dtStr = data.deadline_datetime || data.deadlineDatetime;
-                if (dtStr) {
-                    const cutoff = new Date(dtStr).getTime();
-                    if (!isNaN(cutoff) && Date.now() > cutoff) return true;
+            const isActive = recData ? (recData.active !== false) : true;
+            const dtStr = recData ? (recData.deadline_datetime || recData.deadlineDatetime) : null;
+            let isExpired = false;
+            if (dtStr) {
+                const cutoff = new Date(dtStr).getTime();
+                if (!isNaN(cutoff) && Date.now() > cutoff) {
+                    isExpired = true;
                 }
-                return false;
             }
 
-            if (checkExpired(recData)) {
+            if (!isActive) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (isExpired) {
                 if (formContainer) formContainer.style.display = 'none';
                 if (closedContainer) closedContainer.style.display = 'block';
                 return;
