@@ -278,31 +278,29 @@
             const successContainer = document.getElementById('app-success-container');
             const appForm = document.getElementById('grandeur-application-form');
 
-            let recData = null;
+            let dbData = null;
             if (window.GrandeurDB) {
-                try { recData = await window.GrandeurDB.getRecruitment(); } catch(e) {}
+                try { dbData = await window.GrandeurDB.getRecruitment(); } catch(e) {}
             }
-            if (!recData) {
-                const dataStr = localStorage.getItem('grandeur_admin_store');
-                if (dataStr) {
-                    try { recData = JSON.parse(dataStr).recruitment; } catch(e) {}
+            let localRec = null;
+            const dataStr = localStorage.getItem('grandeur_admin_store');
+            if (dataStr) {
+                try { localRec = JSON.parse(dataStr).recruitment; } catch(e) {}
+            }
+            const recData = { ...(localRec || {}), ...(dbData || {}) };
+
+            function checkExpired(data) {
+                if (!data) return false;
+                if (data.active === false) return true;
+                const dtStr = data.deadline_datetime || data.deadlineDatetime;
+                if (dtStr) {
+                    const cutoff = new Date(dtStr).getTime();
+                    if (!isNaN(cutoff) && Date.now() > cutoff) return true;
                 }
+                return false;
             }
 
-            // Check if active and within deadline date/time
-            let isClosed = false;
-            if (recData) {
-                if (recData.active === false) {
-                    isClosed = true;
-                } else if (recData.deadline_datetime) {
-                    const cutoff = new Date(recData.deadline_datetime).getTime();
-                    if (!isNaN(cutoff) && Date.now() > cutoff) {
-                        isClosed = true;
-                    }
-                }
-            }
-
-            if (isClosed) {
+            if (checkExpired(recData)) {
                 if (formContainer) formContainer.style.display = 'none';
                 if (closedContainer) closedContainer.style.display = 'block';
                 return;

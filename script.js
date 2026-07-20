@@ -605,24 +605,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function isRecruitmentOpen(recData) {
+        if (!recData) return false;
+        const active = typeof recData === 'object' ? recData.active !== false : !!recData;
+        if (!active) return false;
+
+        const dtStr = typeof recData === 'object' ? (recData.deadline_datetime || recData.deadlineDatetime) : null;
+        if (dtStr) {
+            const cutoff = new Date(dtStr).getTime();
+            if (!isNaN(cutoff) && Date.now() > cutoff) {
+                return false; // Date & Time Cutoff Expired!
+            }
+        }
+        return true;
+    }
+
     function applyRecruitmentState(recData) {
         if (!recData) return;
-        const active = typeof recData === 'object' ? !!recData.active : !!recData;
+        const isOpen = isRecruitmentOpen(recData);
         const title = (typeof recData === 'object' && recData.title) || 'Grandeur Recruitment Drive 2026';
         const description = (typeof recData === 'object' && recData.description) || 'Join the premier Consulting & Knowledge Cell of SSCBS.';
-        const formUrl = (typeof recData === 'object' && (recData.form_url || recData.formUrl)) || '#';
+        const formUrl = (typeof recData === 'object' && (recData.form_url || recData.formUrl)) || 'apply.html';
         const deadline = (typeof recData === 'object' && recData.deadline) || 'August 20, 2026';
 
         // Toggle nav links across all pages
         const joinNavElements = document.querySelectorAll('.nav-item-join, .footer-join-link');
         joinNavElements.forEach(el => {
-            el.style.display = active ? 'inline-block' : 'none';
+            el.style.display = isOpen ? 'inline-block' : 'none';
         });
 
         // Also handle legacy cta elements if any
         const recElements = document.querySelectorAll('.recruitment-cta-btn, .recruitment-notice');
         recElements.forEach(el => {
-            if (active) {
+            if (isOpen) {
                 el.style.display = 'inline-block';
                 if (el.tagName === 'A' && formUrl) el.href = formUrl;
             } else {
@@ -635,7 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const closedContainer = document.getElementById('join-closed-state');
 
         if (activeContainer && closedContainer) {
-            if (active) {
+            if (isOpen) {
                 activeContainer.style.display = 'block';
                 closedContainer.style.display = 'none';
 
@@ -650,16 +665,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const applyBtns = document.querySelectorAll('.join-apply-btn');
                 applyBtns.forEach(btn => {
-                    if (formUrl && formUrl !== '#') {
-                        btn.href = formUrl;
-                    }
+                    btn.href = 'apply.html';
                 });
-
-                const iframeContainer = document.getElementById('join-form-iframe-container');
-                if (iframeContainer && formUrl && formUrl.includes('google.com/forms')) {
-                    iframeContainer.innerHTML = `<iframe src="${escapeHtml(formUrl)}?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0" style="border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:#fff;">Loading…</iframe>`;
-                    iframeContainer.style.display = 'block';
-                }
             } else {
                 activeContainer.style.display = 'none';
                 closedContainer.style.display = 'block';

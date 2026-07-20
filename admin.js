@@ -221,7 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
             cachedApplications = localStore.applications;
         }
 
-        const recruitment = recruitmentData || localStore.recruitment;
+        const recruitment = {
+            ...(localStore.recruitment || {}),
+            ...(recruitmentData || {})
+        };
         const banner = bannerData || localStore.banner;
         cachedTeam = teamData !== null ? teamData : localStore.team;
         const inbox = Array.isArray(inboxData) ? inboxData : [];
@@ -229,11 +232,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Stats
         const statRecruitment = document.getElementById('stat-recruitment-status');
         const statRecruitmentSub = document.getElementById('stat-recruitment-sub');
+        const dtStr = recruitment.deadline_datetime || recruitment.deadlineDatetime;
+        const isPastCutoff = dtStr ? (new Date(dtStr).getTime() < Date.now()) : false;
+
         if (statRecruitment) {
-            if (recruitment.active) {
+            if (recruitment.active && !isPastCutoff) {
                 statRecruitment.textContent = "ACTIVE";
                 statRecruitment.style.color = "var(--admin-accent-green)";
                 if (statRecruitmentSub) statRecruitmentSub.textContent = recruitment.title || "Accepting Applications";
+            } else if (recruitment.active && isPastCutoff) {
+                statRecruitment.textContent = "EXPIRED (CUTOFF REPL.)";
+                statRecruitment.style.color = "var(--admin-danger)";
+                if (statRecruitmentSub) statRecruitmentSub.textContent = "Deadline Date & Time Passed";
             } else {
                 statRecruitment.textContent = "CLOSED";
                 statRecruitment.style.color = "var(--admin-text-muted)";
@@ -320,7 +330,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const store = getStore();
-            store.recruitment = { active, title, description, deadline, deadline_datetime: deadlineDatetime };
+            store.recruitment = {
+                ...(store.recruitment || {}),
+                active,
+                title,
+                description,
+                deadline,
+                deadline_datetime: deadlineDatetime,
+                deadlineDatetime: deadlineDatetime
+            };
             saveStore(store);
             renderDashboard();
             showToast("✅ Recruitment settings updated!");
