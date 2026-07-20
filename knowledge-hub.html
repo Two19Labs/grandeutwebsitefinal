@@ -161,7 +161,7 @@
 
                         try {
                             const data = window.GrandeurDB ? await window.GrandeurDB.getKnowledgePrimers() : [];
-                            if (Array.isArray(data) && data.length > 0) {
+                            if (Array.isArray(data)) {
                                 allPrimers = data;
                                 renderPrimersGrid(data);
                             }
@@ -217,7 +217,7 @@
         </div>
     </footer>
 
-    <script src="supabase-config.js"></script>
-    <script src="script.js"></script>
+    <script src="supabase-config.js?v=7"></script>
+    <script src="script.js?v=7"></script>
 </body>
 </html>

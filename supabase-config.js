@@ -1,6 +1,6 @@
 /* ==========================================================================
    Grandeur SSCBS - Direct Native Supabase Engine (Zero-Dependency REST API)
-   Optimized with Caching & Reduced Egress Payload
+   Real-Time Fresh Sync (No Stale Caching)
    ========================================================================== */
 
 const SUPABASE_URL = 'https://mtycgxndnaxdusqsvqqs.supabase.co';
@@ -19,54 +19,14 @@ const WRITE_HEADERS = {
     'Prefer': 'return=minimal'
 };
 
-// Smart Session Cache (10 minutes TTL)
-const CACHE_TTL_MS = 10 * 60 * 1000;
-
-function getCached(key) {
-    try {
-        const item = sessionStorage.getItem('gdb_cache_' + key);
-        if (!item) return null;
-        const parsed = JSON.parse(item);
-        if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
-            return parsed.data;
-        }
-    } catch(e) {}
-    return null;
-}
-
-function setCache(key, data) {
-    try {
-        sessionStorage.setItem('gdb_cache_' + key, JSON.stringify({
-            timestamp: Date.now(),
-            data: data
-        }));
-    } catch(e) {}
-}
-
-function clearCache(key) {
-    try {
-        if (key) {
-            sessionStorage.removeItem('gdb_cache_' + key);
-        } else {
-            Object.keys(sessionStorage).forEach(k => {
-                if (k.startsWith('gdb_cache_')) sessionStorage.removeItem(k);
-            });
-        }
-    } catch(e) {}
-}
-
 window.GrandeurDB = {
-    clearCache,
+    clearCache() {},
 
     // 1. TEAM MEMBERS CRUD (Current Team Only)
     async getTeamMembers() {
-        const cached = getCached('team_members');
-        if (cached) return cached.filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
-
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&order=created_at.asc`, { headers: READ_HEADERS });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=*&order=created_at.asc`, { headers: READ_HEADERS });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         const rows = await res.json();
-        setCache('team_members', rows || []);
         return (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
     },
 
@@ -77,7 +37,6 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('team_members');
         return true;
     },
 
@@ -88,7 +47,6 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('team_members');
         return true;
     },
 
@@ -98,22 +56,16 @@ window.GrandeurDB = {
             headers: WRITE_HEADERS
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('team_members');
         return true;
     },
 
     // 2. RECRUITMENT SETTINGS
     async getRecruitment() {
         try {
-            const cached = getCached('recruitment');
-            if (cached) return cached;
-
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=id,active,title,description,form_url,deadline`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            const data = rows.length > 0 ? rows[0] : null;
-            if (data) setCache('recruitment', data);
-            return data;
+            return rows.length > 0 ? rows[0] : null;
         } catch(e) { return null; }
     },
 
@@ -123,22 +75,16 @@ window.GrandeurDB = {
             headers: { ...WRITE_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
             body: JSON.stringify({ id: 1, ...data })
         });
-        if (res.ok) clearCache('recruitment');
         return res.ok;
     },
 
     // 3. ANNOUNCEMENTS / BANNER
     async getBanner() {
         try {
-            const cached = getCached('banner');
-            if (cached) return cached;
-
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements?select=id,active,text,btn_text,btn_url`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements?select=*`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            const data = rows.length > 0 ? rows[0] : null;
-            if (data) setCache('banner', data);
-            return data;
+            return rows.length > 0 ? rows[0] : null;
         } catch(e) { return null; }
     },
 
@@ -148,21 +94,15 @@ window.GrandeurDB = {
             headers: { ...WRITE_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
             body: JSON.stringify({ id: 1, ...data })
         });
-        if (res.ok) clearCache('banner');
         return res.ok;
     },
 
     // 4. KNOWLEDGE PRIMERS / PUBLICATIONS
     async getKnowledgePrimers() {
         try {
-            const cached = getCached('knowledge_primers');
-            if (cached) return cached;
-
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=id,title,category,date_label,read_time,pdf_url,created_at&order=created_at.desc`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=*&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            const data = await res.json();
-            setCache('knowledge_primers', data || []);
-            return data;
+            return await res.json();
         } catch(e) { return []; }
     },
 
@@ -173,7 +113,6 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('knowledge_primers');
         return true;
     },
 
@@ -184,7 +123,6 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('knowledge_primers');
         return true;
     },
 
@@ -193,21 +131,15 @@ window.GrandeurDB = {
             method: 'DELETE',
             headers: WRITE_HEADERS
         });
-        if (res.ok) clearCache('knowledge_primers');
         return res.ok;
     },
 
     // 5. ACHIEVEMENTS
     async getAchievements() {
         try {
-            const cached = getCached('achievements');
-            if (cached) return cached;
-
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=id,title,category,description,date,created_at&order=created_at.desc`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=*&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            const data = await res.json();
-            setCache('achievements', data || []);
-            return data;
+            return await res.json();
         } catch(e) { return []; }
     },
 
@@ -218,7 +150,6 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('achievements');
         return true;
     },
 
@@ -227,14 +158,13 @@ window.GrandeurDB = {
             method: 'DELETE',
             headers: WRITE_HEADERS
         });
-        if (res.ok) clearCache('achievements');
         return res.ok;
     },
 
     // 6. CONTACT INQUIRIES (INBOX)
     async getContactInquiries() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?select=id,name,email,subject,message,created_at&order=created_at.desc`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?select=*&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             return await res.json();
         } catch(e) { return []; }
@@ -261,16 +191,9 @@ window.GrandeurDB = {
     // 7. ALUMNI MEMBERS (Alumni Only)
     async getAlumniMembers() {
         try {
-            const cached = getCached('team_members');
-            let rows;
-            if (cached) {
-                rows = cached;
-            } else {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&order=created_at.asc`, { headers: READ_HEADERS });
-                if (!res.ok) return [];
-                rows = await res.json();
-                setCache('team_members', rows || []);
-            }
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=*&order=created_at.asc`, { headers: READ_HEADERS });
+            if (!res.ok) return [];
+            const rows = await res.json();
             return (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
         } catch(e) { return []; }
     },
@@ -282,7 +205,6 @@ window.GrandeurDB = {
             body: JSON.stringify({ ...data, tier: 'board' })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('team_members');
         return true;
     },
 
@@ -293,7 +215,6 @@ window.GrandeurDB = {
             body: JSON.stringify({ ...data, tier: 'board' })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('team_members');
         return true;
     },
 
@@ -303,9 +224,8 @@ window.GrandeurDB = {
             headers: WRITE_HEADERS
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        clearCache('team_members');
         return true;
     }
 };
 
-console.log("⚡ GrandeurDB Engine loaded with Egress Payload & Caching Optimizations!");
+console.log("⚡ GrandeurDB Engine loaded - Real-time fresh data sync enabled!");
