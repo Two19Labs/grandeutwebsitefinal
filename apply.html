@@ -167,15 +167,9 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-2" style="gap: 1.5rem;">
-                        <div class="form-group-app">
-                            <label for="app-phone">Phone / WhatsApp Number <span class="req">*</span></label>
-                            <input type="tel" id="app-phone" class="input-app" placeholder="e.g. +91 9876543210" required>
-                        </div>
-                        <div class="form-group-app">
-                            <label for="app-resume-link">Resume / LinkedIn / Portfolio Link <span class="req">*</span></label>
-                            <input type="url" id="app-resume-link" class="input-app" placeholder="https://drive.google.com/file/... or LinkedIn URL" required>
-                        </div>
+                    <div class="form-group-app">
+                        <label for="app-phone">Phone / WhatsApp Number <span class="req">*</span></label>
+                        <input type="tel" id="app-phone" class="input-app" placeholder="e.g. +91 9876543210" required>
                     </div>
 
                     <!-- DYNAMIC CUSTOM RECRUITMENT QUESTIONS (ONLY QUESTIONS ADDED IN ADMIN CONSOLE) -->
@@ -354,7 +348,6 @@
                         batch_year: batchEl ? batchEl.value : '',
                         wing_preference: wingEl ? wingEl.value : '',
                         why_join: whyJoinAnswer,
-                        resume_url: document.getElementById('app-resume-link') ? document.getElementById('app-resume-link').value.trim() : '',
                         case_response: caseAnswer,
                         custom_answers: customAnswers,
                         created_at: new Date().toISOString()

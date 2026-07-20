@@ -286,7 +286,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // DASHBOARD RENDER
+    function updateAdminLoader(statusText, progressPercent) {
+        const loaderText = document.getElementById('loader-status-text');
+        const loaderBar = document.getElementById('loader-bar-fill');
+        if (loaderText && statusText) loaderText.textContent = statusText;
+        if (loaderBar && typeof progressPercent === 'number') loaderBar.style.width = progressPercent + '%';
+    }
+
+    function hideAdminLoader() {
+        const loader = document.getElementById('admin-global-loader');
+        if (loader) {
+            updateAdminLoader('Ready!', 100);
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.pointerEvents = 'none';
+                setTimeout(() => { loader.style.display = 'none'; }, 400);
+            }, 300);
+        }
+    }
+
     async function renderDashboard() {
+        updateAdminLoader('⚡ Connecting to Grandeur Supabase DB...', 25);
         let recruitmentData = null;
         let bannerData = null;
         let teamData = null;
@@ -294,15 +314,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.GrandeurDB) {
             try {
+                updateAdminLoader('🔄 Syncing recruitments & candidate applications...', 50);
                 recruitmentData = await window.GrandeurDB.getRecruitment();
+                if (window.GrandeurDB.getRecruitmentApplications) {
+                    cachedApplications = await window.GrandeurDB.getRecruitmentApplications();
+                }
+
+                updateAdminLoader('👥 Loading team members, primers & alumni...', 80);
                 teamData = await window.GrandeurDB.getTeamMembers();
                 inboxData = await window.GrandeurDB.getContactInquiries();
                 cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
                 cachedAlumni = await window.GrandeurDB.getAlumniMembers();
                 cachedAchievements = await window.GrandeurDB.getAchievements();
-                if (window.GrandeurDB.getRecruitmentApplications) {
-                    cachedApplications = await window.GrandeurDB.getRecruitmentApplications();
-                }
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
             }
@@ -380,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAlumniTable(cachedAlumni);
         renderAchievementsTable(cachedAchievements);
         renderApplicationsList(cachedApplications);
+        hideAdminLoader();
     }
 
     // FORMS SUBMISSION

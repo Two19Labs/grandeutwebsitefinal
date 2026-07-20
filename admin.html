@@ -20,6 +20,20 @@
 </head>
 <body class="admin-body">
 
+    <!-- GLOBAL ADMIN LOADING OVERLAY -->
+    <div id="admin-global-loader">
+        <div class="loader-card">
+            <div class="loader-pulse-ring">
+                <img src="logo.png" alt="Grandeur Logo" class="loader-logo">
+            </div>
+            <h3 class="loader-title">Grandeur Management Console</h3>
+            <p id="loader-status-text">⚡ Connecting to Grandeur Supabase DB...</p>
+            <div class="loader-track">
+                <div class="loader-bar" id="loader-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Top Admin Header -->
     <header class="admin-header">
         <div class="admin-header-container">
@@ -121,6 +135,19 @@
                             </div>
                         </div>
 
+                        <!-- CLIENT OWNER GUIDE: RECRUITMENT -->
+                        <div class="admin-guide-card">
+                            <h4>📘 Client Owner Guide: Recruitments & Application Portal</h4>
+                            <p>Manage candidate recruitment drives, customize application form questions, and review submitted responses.</p>
+                            <ul>
+                                <li>📌 <strong>Default Candidate Details Collected:</strong> Every application form automatically asks for <strong>Full Name</strong>, <strong>Email Address</strong>, <strong>Phone / WhatsApp Number</strong>, and logs the <strong>Submission Timestamp</strong>. You do <em>not</em> need to add questions for these contact basics!</li>
+                                <li>🟢 <strong>Portal Toggle Switch:</strong> Turn the switch <strong>ON</strong> to enable the <em>Join Grandeur</em> page link across the website header & footer. Turn it <strong>OFF</strong> to hide the recruitment link completely.</li>
+                                <li>⏱️ <strong>Automatic Form Expiry Cutoff:</strong> Set a date & time in the <code>Automatic Cutoff Date & Time</code> field. Once that minute arrives, candidate submissions close automatically and visitors see: <em>"Thank you for your interest, we are not accepting applications anymore"</em> with a button back to home.</li>
+                                <li>📋 <strong>Custom Questions Builder:</strong> Click <code>➕ Add Custom Question</code> to create drive-specific questions (text inputs, long paragraphs, or dropdown choices). Questions rendered on the website update live.</li>
+                                <li>📥 <strong>Managing Submissions:</strong> View all candidate submissions in the card below. After reviewing candidate responses, click <strong>🗑️ Delete Application</strong> to clear old records and prevent database limit overruns.</li>
+                            </ul>
+                        </div>
+
                         <div class="admin-card">
                             <div class="card-header-flex">
                                 <div>
@@ -196,6 +223,17 @@
                             <button class="btn btn-primary" id="btn-open-add-member-modal">➕ Add New Member</button>
                         </div>
 
+                        <!-- CLIENT OWNER GUIDE: TEAM -->
+                        <div class="admin-guide-card">
+                            <h4>👥 Client Owner Guide: Managing Cell Team Members</h4>
+                            <p>Add, edit, or remove Grandeur members displayed on the official Team page.</p>
+                            <ul>
+                                <li>👑 <strong>Tier Classifications:</strong> Select <code>Board of Directors</code> for Executive Leadership, <code>Senior Core</code> for Wing Heads & Seniors, or <code>Junior Core</code> for Inducted Analysts. Members automatically group into these tiers on the website.</li>
+                                <li>🖼️ <strong>Profile Images:</strong> Upload image files or paste direct URLs. Square portrait photos work best.</li>
+                                <li>✏️ <strong>Live Updates:</strong> Clicking <em>Edit Member</em> updates their role, LinkedIn URL, or bio instantly on the website.</li>
+                            </ul>
+                        </div>
+
                         <!-- Filter Bar -->
                         <div class="admin-filter-bar">
                             <div class="filter-group">
@@ -246,6 +284,17 @@
                             <button class="btn btn-primary" id="btn-open-add-primer-modal">➕ Add New Primer</button>
                         </div>
 
+                        <!-- CLIENT OWNER GUIDE: KNOWLEDGE HUB -->
+                        <div class="admin-guide-card">
+                            <h4>📚 Client Owner Guide: Publishing Primers & Research</h4>
+                            <p>Publish consulting primers, sector deep-dives, and market case reports on the Knowledge Hub page.</p>
+                            <ul>
+                                <li>📄 <strong>Document Links:</strong> Provide direct PDF drive links or article URLs so visitors can download or read your publications.</li>
+                                <li>🏷️ <strong>Category Tags:</strong> Categorize papers into <em>Consulting Primers</em>, <em>Industry Analysis</em>, or <em>Case Solutions</em>.</li>
+                                <li>⭐ <strong>Featured Flag:</strong> Highlight top research papers at the top of the Knowledge Hub page.</li>
+                            </ul>
+                        </div>
+
                         <div class="admin-card">
                             <div class="table-responsive">
                                 <table class="admin-table">
@@ -274,6 +323,16 @@
                                 <p>Manage case fest podium finishes and national competitive awards.</p>
                             </div>
                             <button class="btn btn-primary" id="btn-open-add-achievement-modal">➕ Add Achievement</button>
+                        </div>
+
+                        <!-- CLIENT OWNER GUIDE: ACHIEVEMENTS -->
+                        <div class="admin-guide-card">
+                            <h4>🏆 Client Owner Guide: Highlighting Victories & Milestones</h4>
+                            <p>Feature competition wins, podium finishes, and cell milestones on the Achievements page.</p>
+                            <ul>
+                                <li>🥇 <strong>Ranks & Titles:</strong> Highlight National Winners, 1st Runners Up, or Finalists at top institutions (IITs, IIMs, SRCC, Corporate cases).</li>
+                                <li>📅 <strong>Year & Event:</strong> Add event dates and team member names to showcase student excellence.</li>
+                            </ul>
                         </div>
 
                         <div class="admin-card">
@@ -305,11 +364,14 @@
                             </div>
                         </div>
 
-                        <div class="admin-info-banner">
-                            <span class="banner-icon">💡</span>
-                            <div>
-                                <strong>Database Storage Note:</strong> Please delete processed or old inquiries once done to prevent inbox clutter and ensure storage limits are not exceeded.
-                            </div>
+                        <!-- CLIENT OWNER GUIDE: INBOX -->
+                        <div class="admin-guide-card">
+                            <h4>📬 Client Owner Guide: Inquiries & Database Maintenance</h4>
+                            <p>Review and clear inquiries sent via the website <em>Contact Us</em> page.</p>
+                            <ul>
+                                <li>📧 <strong>Responding:</strong> Click candidate or corporate email links directly to open your mail client and reply.</li>
+                                <li>⚠️ <strong>Storage Cleanup Warning:</strong> To maintain database speed and avoid Supabase tier storage limits, please click <strong>🗑️ Delete Inquiry</strong> once an inquiry has been addressed or resolved.</li>
+                            </ul>
                         </div>
 
                         <div class="admin-card">
@@ -327,6 +389,16 @@
                                 <p>Add, edit, or remove past members displayed on the Wall of Alumni.</p>
                             </div>
                             <button class="btn btn-primary" id="btn-open-add-alumni-modal">➕ Add Alumni Member</button>
+                        </div>
+
+                        <!-- CLIENT OWNER GUIDE: ALUMNI -->
+                        <div class="admin-guide-card">
+                            <h4>🎓 Client Owner Guide: Alumni Network & Placement Directory</h4>
+                            <p>Manage past Grandeur members and their corporate placement updates (McKinsey, BCG, Bain, Big 4, top firms).</p>
+                            <ul>
+                                <li>🎓 <strong>Graduation Batch:</strong> Group alumni by graduation year (e.g. <em>Batch of 2025</em>).</li>
+                                <li>💼 <strong>Current Corporate Position:</strong> Update alumni roles (e.g. <em>Associate @ McKinsey & Company</em>) to inspire incoming students.</li>
+                            </ul>
                         </div>
 
                         <div class="admin-card">
