@@ -219,7 +219,7 @@
 
             if ((!achievements || achievements.length === 0) && window.SUPABASE_ANON_KEY) {
                 try {
-                    const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?select=*&order=created_at.desc', {
+                    const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?select=id,title,category,position,date,description,student_name,image1,image2,created_at&order=created_at.desc', {
                         headers: {
                             'apikey': window.SUPABASE_ANON_KEY,
                             'Authorization': 'Bearer ' + window.SUPABASE_ANON_KEY

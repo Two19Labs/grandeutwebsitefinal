@@ -1,6 +1,6 @@
 /* ==========================================================================
    Grandeur SSCBS - Direct Native Supabase Engine (Zero-Dependency REST API)
-   Real-Time Live Sync (Bypasses Stale Browser LocalStorage/SessionStorage Caches)
+   Optimized Bandwidth & High Performance Smart Caching Engine
    ========================================================================== */
 
 const SUPABASE_URL = 'https://mtycgxndnaxdusqsvqqs.supabase.co';
@@ -19,21 +19,31 @@ const WRITE_HEADERS = {
     'Prefer': 'return=minimal'
 };
 
-// Purge all legacy/stale local caches immediately
-(function purgeLegacyCaches() {
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes session TTL
+
+function getSessionCachedData(key) {
     try {
-        if (typeof window !== 'undefined') {
-            ['sessionStorage', 'localStorage'].forEach(storageType => {
-                const store = window[storageType];
-                if (store) {
-                    Object.keys(store).forEach(k => {
-                        if (k.startsWith('gdb_cache_')) store.removeItem(k);
-                    });
-                }
-            });
+        if (typeof window === 'undefined' || !window.sessionStorage) return null;
+        const raw = window.sessionStorage.getItem('gdb_cache_' + key);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
+            return parsed.data;
         }
     } catch(e) {}
-})();
+    return null;
+}
+
+function setSessionCachedData(key, data) {
+    try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+            window.sessionStorage.setItem('gdb_cache_' + key, JSON.stringify({
+                timestamp: Date.now(),
+                data: data
+            }));
+        }
+    } catch(e) {}
+}
 
 function sortPrimersByYearDesc(primers) {
     return (primers || []).sort((a, b) => {
@@ -68,10 +78,14 @@ window.GrandeurDB = {
 
     // 1. TEAM MEMBERS CRUD (Current Team Only)
     async getTeamMembers() {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=*&order=created_at.asc`, { headers: READ_HEADERS });
+        const cached = getSessionCachedData('team_members');
+        if (cached) return cached;
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=not.ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         const rows = await res.json();
-        return (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
+        const result = (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
+        setSessionCachedData('team_members', result);
+        return result;
     },
 
     async insertTeamMember(data) {
@@ -81,6 +95,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -91,6 +106,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -100,16 +116,21 @@ window.GrandeurDB = {
             headers: WRITE_HEADERS
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
     // 2. RECRUITMENT SETTINGS
     async getRecruitment() {
         try {
+            const cached = getSessionCachedData('recruitment');
+            if (cached) return cached;
             const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*&id=eq.1`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            return (rows && rows.length > 0) ? rows[0] : null;
+            const result = (rows && rows.length > 0) ? rows[0] : null;
+            setSessionCachedData('recruitment', result);
+            return result;
         } catch(e) { return null; }
     },
 
@@ -149,10 +170,14 @@ window.GrandeurDB = {
     // 3. ANNOUNCEMENTS / BANNER
     async getBanner() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements?select=*`, { headers: READ_HEADERS });
+            const cached = getSessionCachedData('banner');
+            if (cached) return cached;
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements?select=id,text,link,active,created_at`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            return rows.length > 0 ? rows[0] : null;
+            const result = rows.length > 0 ? rows[0] : null;
+            setSessionCachedData('banner', result);
+            return result;
         } catch(e) { return null; }
     },
 
@@ -162,16 +187,21 @@ window.GrandeurDB = {
             headers: { ...WRITE_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
             body: JSON.stringify({ id: 1, ...data })
         });
+        window.GrandeurDB.clearCache();
         return res.ok;
     },
 
-    // 4. KNOWLEDGE PRIMERS / PUBLICATIONS (Real-Time Live Query Sorted by Descending Year)
+    // 4. KNOWLEDGE PRIMERS / PUBLICATIONS
     async getKnowledgePrimers() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=*&order=created_at.desc`, { headers: READ_HEADERS });
+            const cached = getSessionCachedData('knowledge_primers');
+            if (cached) return cached;
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=id,title,category,date_label,read_time,pdf_url,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             const rows = await res.json();
-            return sortPrimersByYearDesc(rows);
+            const result = sortPrimersByYearDesc(rows);
+            setSessionCachedData('knowledge_primers', result);
+            return result;
         } catch(e) { return []; }
     },
 
@@ -182,6 +212,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -192,6 +223,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -200,15 +232,20 @@ window.GrandeurDB = {
             method: 'DELETE',
             headers: WRITE_HEADERS
         });
+        window.GrandeurDB.clearCache();
         return res.ok;
     },
 
     // 5. ACHIEVEMENTS
     async getAchievements() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=*&order=created_at.desc`, { headers: READ_HEADERS });
+            const cached = getSessionCachedData('achievements');
+            if (cached) return cached;
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=id,title,category,position,date,description,student_name,image1,image2,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            return await res.json();
+            const result = await res.json();
+            setSessionCachedData('achievements', result);
+            return result;
         } catch(e) { return []; }
     },
 
@@ -219,6 +256,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -229,6 +267,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -237,13 +276,14 @@ window.GrandeurDB = {
             method: 'DELETE',
             headers: WRITE_HEADERS
         });
+        window.GrandeurDB.clearCache();
         return res.ok;
     },
 
     // 6. CONTACT INQUIRIES (INBOX)
     async getContactInquiries() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?select=*&order=created_at.desc`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?select=id,name,email,subject,message,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             return await res.json();
         } catch(e) { return []; }
@@ -270,10 +310,14 @@ window.GrandeurDB = {
     // 7. ALUMNI MEMBERS (Alumni Only)
     async getAlumniMembers() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=*&order=created_at.asc`, { headers: READ_HEADERS });
+            const cached = getSessionCachedData('alumni_members');
+            if (cached) return cached;
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             const rows = await res.json();
-            return (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
+            const result = (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
+            setSessionCachedData('alumni_members', result);
+            return result;
         } catch(e) { return []; }
     },
 
@@ -284,6 +328,7 @@ window.GrandeurDB = {
             body: JSON.stringify({ ...data, tier: 'board' })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -294,6 +339,7 @@ window.GrandeurDB = {
             body: JSON.stringify({ ...data, tier: 'board' })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -303,13 +349,14 @@ window.GrandeurDB = {
             headers: WRITE_HEADERS
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
     // 8. RECRUITMENT APPLICATIONS
     async getRecruitmentApplications() {
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications?select=*&order=created_at.desc`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications?select=id,full_name,email,phone,course,year,team_preference,answers,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             return await res.json();
         } catch(e) { return []; }
@@ -334,4 +381,5 @@ window.GrandeurDB = {
     }
 };
 
-console.log("⚡ GrandeurDB Engine loaded - Descending Year Sorting Enabled!");
+console.log("⚡ GrandeurDB Optimized Egress Engine loaded!");
+

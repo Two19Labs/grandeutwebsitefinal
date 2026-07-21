@@ -1453,7 +1453,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         img.onload = function() {
                             const canvas = document.createElement('canvas');
                             const ctx = canvas.getContext('2d');
-                            const maxDim = 800;
+                            const maxDim = 600;
                             let width = img.width;
                             let height = img.height;
                             if (width > height) {
@@ -1464,7 +1464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             canvas.width = width;
                             canvas.height = height;
                             ctx.drawImage(img, 0, 0, width, height);
-                            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.80);
+                            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
                             if (hiddenInput) hiddenInput.value = compressedBase64;
                             if (previewImg) { previewImg.src = compressedBase64; previewImg.style.display = 'block'; }
                             if (previewIcon) previewIcon.style.display = 'none';
