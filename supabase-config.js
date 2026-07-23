@@ -78,14 +78,10 @@ window.GrandeurDB = {
 
     // 1. TEAM MEMBERS CRUD (Current Team Only)
     async getTeamMembers() {
-        const cached = getSessionCachedData('team_members');
-        if (cached) return cached;
         const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=not.ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         const rows = await res.json();
-        const result = (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
-        setSessionCachedData('team_members', result);
-        return result;
+        return (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
     },
 
     async insertTeamMember(data) {
@@ -123,14 +119,10 @@ window.GrandeurDB = {
     // 2. RECRUITMENT SETTINGS
     async getRecruitment() {
         try {
-            const cached = getSessionCachedData('recruitment');
-            if (cached) return cached;
             const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*&id=eq.1`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            const result = (rows && rows.length > 0) ? rows[0] : null;
-            setSessionCachedData('recruitment', result);
-            return result;
+            return (rows && rows.length > 0) ? rows[0] : null;
         } catch(e) { return null; }
     },
 
@@ -170,14 +162,10 @@ window.GrandeurDB = {
     // 3. ANNOUNCEMENTS / BANNER
     async getBanner() {
         try {
-            const cached = getSessionCachedData('banner');
-            if (cached) return cached;
             const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements?select=id,text,link,active,created_at`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            const result = rows.length > 0 ? rows[0] : null;
-            setSessionCachedData('banner', result);
-            return result;
+            return rows.length > 0 ? rows[0] : null;
         } catch(e) { return null; }
     },
 
@@ -194,14 +182,10 @@ window.GrandeurDB = {
     // 4. KNOWLEDGE PRIMERS / PUBLICATIONS
     async getKnowledgePrimers() {
         try {
-            const cached = getSessionCachedData('knowledge_primers');
-            if (cached) return cached;
             const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=id,title,category,date_label,read_time,pdf_url,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             const rows = await res.json();
-            const result = sortPrimersByYearDesc(rows);
-            setSessionCachedData('knowledge_primers', result);
-            return result;
+            return sortPrimersByYearDesc(rows);
         } catch(e) { return []; }
     },
 
@@ -239,13 +223,9 @@ window.GrandeurDB = {
     // 5. ACHIEVEMENTS
     async getAchievements() {
         try {
-            const cached = getSessionCachedData('achievements');
-            if (cached) return cached;
             const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=id,event_name,position,year,team_name,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            const result = await res.json();
-            setSessionCachedData('achievements', result);
-            return result;
+            return await res.json();
         } catch(e) { return []; }
     },
 
@@ -310,14 +290,10 @@ window.GrandeurDB = {
     // 7. ALUMNI MEMBERS (Alumni Only)
     async getAlumniMembers() {
         try {
-            const cached = getSessionCachedData('alumni_members');
-            if (cached) return cached;
             const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             const rows = await res.json();
-            const result = (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
-            setSessionCachedData('alumni_members', result);
-            return result;
+            return (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
         } catch(e) { return []; }
     },
 
