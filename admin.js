@@ -1238,8 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 roleAndPlacement = parts.slice(1).join('|').trim();
             }
             const roleSubParts = roleAndPlacement.split('•');
-            const formerRole = roleSubParts[0] ? roleSubParts[0].trim() : 'Alumnus';
-            const placement = roleSubParts[1] ? roleSubParts[1].trim() : '—';
+            const placement = roleSubParts.length > 1 ? roleSubParts[1].trim() : roleSubParts[0].trim();
 
             return `
                 <tr>
@@ -1250,8 +1249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </td>
                     <td><span class="tier-badge tier-core">${escapeHtml(batch)}</span></td>
-                    <td>${escapeHtml(formerRole)}</td>
-                    <td>${escapeHtml(placement)}</td>
+                    <td>${escapeHtml(placement || '—')}</td>
                     <td style="text-align: right;">
                         <div class="action-btns-group" style="justify-content: flex-end;">
                             ${item.linkedin ? `<a href="${escapeHtml(item.linkedin)}" target="_blank" class="btn-icon" title="LinkedIn" style="text-decoration:none;">🔗</a>` : ''}
@@ -1270,7 +1268,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputId = document.getElementById('alumni-edit-id');
         const inputName = document.getElementById('alumni-name');
         const inputBatch = document.getElementById('alumni-batch');
-        const inputFormerRole = document.getElementById('alumni-former-role');
         const inputPlacement = document.getElementById('alumni-placement');
         const inputLinkedin = document.getElementById('alumni-linkedin');
 
@@ -1288,12 +1285,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (parts.length > 1) {
                 inputBatch.value = parts[0].replace(/^Batch of\s*/i, '').trim();
                 const roleSub = parts.slice(1).join('|').trim().split('•');
-                inputFormerRole.value = roleSub[0] ? roleSub[0].trim() : '';
-                inputPlacement.value = roleSub[1] ? roleSub[1].trim() : '';
+                inputPlacement.value = roleSub.length > 1 ? roleSub[1].trim() : roleSub[0].trim();
             } else {
                 inputBatch.value = "2025";
-                inputFormerRole.value = alumnus.role || "";
-                inputPlacement.value = "";
+                const roleSub = (alumnus.role || "").split('•');
+                inputPlacement.value = roleSub.length > 1 ? roleSub[1].trim() : roleSub[0].trim();
             }
             inputLinkedin.value = alumnus.linkedin || "";
 
@@ -1307,7 +1303,6 @@ document.addEventListener('DOMContentLoaded', () => {
             inputId.value = "";
             inputName.value = "";
             inputBatch.value = "2025";
-            inputFormerRole.value = "";
             inputPlacement.value = "";
             inputLinkedin.value = "";
         }
@@ -1328,12 +1323,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const editId = document.getElementById('alumni-edit-id').value;
             const name = document.getElementById('alumni-name').value.trim();
             const batch = document.getElementById('alumni-batch').value.trim();
-            const formerRole = document.getElementById('alumni-former-role').value.trim();
             const placement = document.getElementById('alumni-placement').value.trim();
             const linkedin = document.getElementById('alumni-linkedin').value.trim();
             const photo = alumniPhotoInput ? alumniPhotoInput.value : "";
 
-            const formattedRole = `Batch of ${batch.replace(/^Batch of\s*/i, '')} | ${formerRole} • ${placement}`;
+            const formattedRole = `Batch of ${batch.replace(/^Batch of\s*/i, '')} | ${placement}`;
 
             const saveBtn = document.getElementById('btn-save-alumni');
             if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Saving...'; }

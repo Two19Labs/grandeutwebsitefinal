@@ -124,16 +124,14 @@
                                         const parts = (item.role || '').split('|');
                                         let roleAndPlacement = parts.length > 1 ? parts.slice(1).join('|').trim() : item.role || '';
                                         const roleSubParts = roleAndPlacement.split('•');
-                                        const formerRole = roleSubParts[0] ? roleSubParts[0].trim() : 'Alumnus';
-                                        const placement = roleSubParts[1] ? roleSubParts[1].trim() : '';
+                                        const placement = roleSubParts.length > 1 ? roleSubParts[1].trim() : roleSubParts[0].trim();
 
                                         return `
                                             <div class="team-card">
                                                 ${item.photo ? `<img src="${item.photo}" alt="${item.name}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin: 1rem auto 0.5rem; border: 3px solid var(--primary-light); display: block;">` : `<div class="avatar-placeholder" style="width: 110px; height: 110px; border-radius: 50%; margin: 1rem auto 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🎓</div>`}
                                                 <div class="team-info">
                                                     <h3 class="team-name" style="margin-bottom: 0.35rem;">${item.name}</h3>
-                                                    <span class="team-role" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem;">${formerRole}</span>
-                                                    ${placement ? `<span class="team-role" style="display: block; color: var(--primary-light); font-weight: 500; font-size: 0.9rem; margin-bottom: 0.4rem;">${placement}</span>` : ''}
+                                                    ${placement ? `<span class="team-role" style="display: block; color: var(--primary-light); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem;">${placement}</span>` : ''}
                                                     ${item.linkedin ? `<div style="margin-top: 0.4rem;"><a href="${item.linkedin}" target="_blank" rel="noopener noreferrer" style="color: #0077b5; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem;">LinkedIn ↗</a></div>` : ''}
                                                 </div>
                                             </div>
@@ -154,7 +152,7 @@
                                     <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted); background: #ffffff; border: 1px dashed var(--border); border-radius: 16px; max-width: 600px; margin: 2rem auto;">
                                         <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎓</div>
                                         <h3 style="color: var(--dark); margin-bottom: 0.5rem;">No Alumni Members Listed Yet</h3>
-                                        <p style="font-size: 0.95rem;">Use the Grandeur Admin Console to add alumni members, batch years, roles, and placements.</p>
+                                        <p style="font-size: 0.95rem;">Use the Grandeur Admin Console to add alumni members, batch years, and placements.</p>
                                     </div>
                                 `;
                             }
