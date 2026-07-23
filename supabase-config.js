@@ -241,7 +241,7 @@ window.GrandeurDB = {
         try {
             const cached = getSessionCachedData('achievements');
             if (cached) return cached;
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=id,title,category,position,date,description,student_name,image1,image2,created_at&order=created_at.desc`, { headers: READ_HEADERS });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=id,event_name,position,year,team_name,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             const result = await res.json();
             setSessionCachedData('achievements', result);

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Achievements | Grandeur SSCBS</title>
     <meta name="description" content="View the case competition wins and national podium finishes achieved by Grandeur, Consulting & Knowledge Cell of SSCBS.">
-    <link rel="stylesheet" href="style.css?v=21">
+    <link rel="stylesheet" href="style.css?v=22">
     <!-- Vercel Web Analytics -->
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -203,8 +203,8 @@
     </footer>
 
     <!-- Supabase JS Client & Configuration -->
-    <script src="supabase-config.js?v=21"></script>
-    <script src="script.js?v=21"></script>
+    <script src="supabase-config.js?v=22"></script>
+    <script src="script.js?v=22"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('achievements-live-container');
@@ -219,7 +219,7 @@
 
             if ((!achievements || achievements.length === 0) && window.SUPABASE_ANON_KEY) {
                 try {
-                    const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?select=id,title,category,position,date,description,student_name,image1,image2,created_at&order=created_at.desc', {
+                    const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?select=id,event_name,position,year,team_name,created_at&order=created_at.desc', {
                         headers: {
                             'apikey': window.SUPABASE_ANON_KEY,
                             'Authorization': 'Bearer ' + window.SUPABASE_ANON_KEY
