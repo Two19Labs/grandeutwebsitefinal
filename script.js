@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {}
         }
 
-        if (window.GrandeurDB) {
+        if (window.GrandeurDB && typeof window.GrandeurDB.getRecruitment === 'function') {
             try {
                 recData = await window.GrandeurDB.getRecruitment();
             } catch (err) {
@@ -569,19 +569,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const localRec = (localStore && localStore.recruitment) ? localStore.recruitment : {};
+
+        let isActive = false;
+        if (recData && typeof recData === 'object' && recData.active !== undefined && recData.active !== null) {
+            isActive = recData.active === true || recData.active === 'true';
+        } else if (localStore && localStore.recruitment && localStore.recruitment.active !== undefined) {
+            isActive = localRec.active === true || localRec.active === 'true';
+        }
+
         const finalRec = {
-            active: true,
-            title: "Grandeur Recruitment Drive 2026",
-            description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
-            deadline: "August 20, 2026",
-            deadline_datetime: "",
-            ...(recData || {}),
-            ...localRec
+            active: isActive,
+            title: recData?.title || localRec?.title || "Grandeur Recruitment Drive 2026",
+            description: recData?.description || localRec?.description || "Join the premier Consulting & Knowledge Cell of SSCBS.",
+            deadline: recData?.deadline || localRec?.deadline || "August 20, 2026",
+            deadline_datetime: recData?.deadline_datetime || localRec?.deadline_datetime || ""
         };
 
-        if (finalRec) {
-            applyRecruitmentState(finalRec);
-        }
+        applyRecruitmentState(finalRec);
 
         if (teamHierarchy) {
             if (window.GrandeurDB) {
@@ -600,8 +604,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function isRecruitmentActive(recData) {
-        if (!recData) return true;
-        return typeof recData === 'object' ? recData.active !== false : !!recData;
+        if (!recData || typeof recData !== 'object') return false;
+        return recData.active === true || recData.active === 'true';
     }
 
     function isRecruitmentExpired(recData) {
@@ -628,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Header & footer "Join Grandeur" nav links:
         const joinNavElements = document.querySelectorAll('.nav-item-join, .footer-join-link');
         joinNavElements.forEach(el => {
-            el.style.display = isActive ? 'inline-block' : 'none';
+            el.style.display = (isActive && !isExpired) ? 'inline-block' : 'none';
         });
 
         // 2. Render Join Us page states
