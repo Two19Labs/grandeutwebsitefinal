@@ -2725,6 +2725,106 @@ a.resources-badge:hover {
     }
 }
 
+/* ==========================================================================
+   Faculty Mentors Section Styling
+   ========================================================================== */
+.faculty-section {
+    background: var(--bg-alt);
+    padding: 5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.faculty-grid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 3rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.faculty-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+    width: 320px;
+    max-width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.faculty-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(var(--primary-rgb), 0.3);
+}
+
+.faculty-avatar-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin-bottom: 1.5rem;
+}
+
+.faculty-img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-light);
+    box-shadow: var(--shadow-md);
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.faculty-card:hover .faculty-img {
+    transform: scale(1.04);
+}
+
+.faculty-avatar-placeholder {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    border: 4px solid var(--primary-light);
+    box-shadow: var(--shadow-md);
+}
+
+.faculty-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.35rem;
+}
+
+.faculty-role {
+    font-size: 0.85rem;
+    color: var(--primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 1.25rem;
+}
+
+.faculty-social {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 
 
