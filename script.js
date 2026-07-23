@@ -769,37 +769,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.renderDynamicTeamGrid = renderDynamicTeamGrid;
 
     function parseAchievementMeta(item) {
-        let teamName = '';
-        let members = '';
         let description = item.description || '';
-        let photos = [];
 
         if (item.team_name) {
             try {
                 const parsed = JSON.parse(item.team_name);
                 if (parsed && typeof parsed === 'object') {
-                    teamName = parsed.teamName || parsed.team || '';
-                    members = parsed.members || '';
                     if (parsed.description) description = parsed.description;
-                    if (Array.isArray(parsed.photos)) photos = parsed.photos;
-                } else {
-                    teamName = item.team_name;
                 }
-            } catch (e) {
-                teamName = item.team_name;
-            }
-        }
-
-        if (!members && teamName.includes('(') && teamName.includes(')')) {
-            const match = teamName.match(/^(.*?)\((.*?)\)$/);
-            if (match) {
-                teamName = match[1].trim();
-                members = match[2].trim();
-            }
-        }
-
-        if (photos.length === 0 && item.image_url) {
-            photos.push(item.image_url);
+            } catch (e) {}
         }
 
         return {
@@ -807,10 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: item.event_name || item.title || 'Untitled Competition',
             position: item.position || item.category || 'Winner',
             year: item.year || item.date_label || '2026',
-            teamName: teamName || 'Team Grandeur',
-            members: members || '',
-            description: description,
-            photos: photos
+            description: description
         };
     }
 
@@ -847,83 +822,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 rankIcon = '🌟';
             }
 
-            let mediaHtml = '';
-            if (meta.photos.length > 0) {
-                const slides = meta.photos.map((src, i) => `
-                    <img src="${escapeHtml(src)}" class="achievement-media-slide ${i === 0 ? 'active' : ''}" alt="${escapeHtml(meta.title)}" data-slide-idx="${i}">
-                `).join('');
-
-                const dots = meta.photos.length > 1 ? `
-                    <div class="achievement-slider-dots">
-                        ${meta.photos.map((_, i) => `<span class="achievement-slider-dot ${i === 0 ? 'active' : ''}" data-dot-idx="${i}"></span>`).join('')}
-                    </div>
-                ` : '';
-
-                mediaHtml = `
-                    <div class="achievement-card-media" id="achieve-card-media-${cardIdx}">
-                        ${slides}
-                        ${dots}
-                        <span class="achievement-year-badge">${escapeHtml(meta.year)}</span>
-                        <span class="achievement-rank-pill ${rankClass}">${rankIcon} ${escapeHtml(meta.position)}</span>
-                    </div>
-                `;
-            } else {
-                mediaHtml = `
-                    <div class="achievement-card-media" style="display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);">
-                        <span style="font-size: 4rem; opacity: 0.85;">🏆</span>
-                        <span class="achievement-year-badge">${escapeHtml(meta.year)}</span>
-                        <span class="achievement-rank-pill ${rankClass}">${rankIcon} ${escapeHtml(meta.position)}</span>
-                    </div>
-                `;
-            }
-
             return `
-                <div class="achievement-live-card" data-card-index="${cardIdx}">
-                    ${mediaHtml}
-                    <div class="achievement-card-content">
-                        <h3 class="achievement-card-title">${escapeHtml(meta.title)}</h3>
-                        <div class="achievement-card-team-name">
-                            <span>🏆</span> <strong>Team:</strong> ${escapeHtml(meta.teamName)}
-                        </div>
-                        ${meta.members ? `
-                        <div class="achievement-card-team-members">
-                            <span>👥</span> <strong>Members:</strong> ${escapeHtml(meta.members)}
-                        </div>` : ''}
-                        <p class="achievement-card-desc">${escapeHtml(meta.description || 'Secured top podium finish demonstrating structured problem solving.')}</p>
+                <div class="achievement-live-card" style="padding: 1.5rem;" data-card-index="${cardIdx}">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(226, 232, 240, 0.8);">
+                        <span style="background: #e2e8f0; color: #0f1d3a; font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 6px; letter-spacing: 0.03em;">📅 ${escapeHtml(meta.year)}</span>
+                        <span class="achievement-rank-pill ${rankClass}" style="position: static; box-shadow: none;">${rankIcon} ${escapeHtml(meta.position)}</span>
                     </div>
+                    <h3 class="achievement-card-title" style="font-size: 1.15rem; margin-bottom: ${meta.description ? '0.5rem' : '0'};">${escapeHtml(meta.title)}</h3>
+                    ${meta.description ? `<p class="achievement-card-desc" style="margin-top: 0.25rem;">${escapeHtml(meta.description)}</p>` : ''}
                 </div>
             `;
         }).join('');
-
-        sorted.forEach((item, cardIdx) => {
-            const meta = parseAchievementMeta(item);
-            if (meta.photos.length > 1) {
-                const mediaBox = document.getElementById(`achieve-card-media-${cardIdx}`);
-                if (!mediaBox) return;
-
-                const slides = mediaBox.querySelectorAll('.achievement-media-slide');
-                const dots = mediaBox.querySelectorAll('.achievement-slider-dot');
-                let currentIdx = 0;
-
-                function goToSlide(idx) {
-                    currentIdx = idx;
-                    slides.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
-                    dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
-                }
-
-                const autoTimer = setInterval(() => {
-                    goToSlide((currentIdx + 1) % slides.length);
-                }, 3000);
-
-                dots.forEach((dot, i) => {
-                    dot.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        clearInterval(autoTimer);
-                        goToSlide(i);
-                    });
-                });
-            }
-        });
     }
 
     window.renderDynamicAchievements = renderDynamicAchievements;

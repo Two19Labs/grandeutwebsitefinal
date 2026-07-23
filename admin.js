@@ -1386,37 +1386,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const formAchievementModal = document.getElementById('form-achievement-modal');
 
     function parseAchievementMeta(item) {
-        let teamName = '';
-        let members = '';
         let description = item.description || '';
-        let photos = [];
 
         if (item.team_name) {
             try {
                 const parsed = JSON.parse(item.team_name);
                 if (parsed && typeof parsed === 'object') {
-                    teamName = parsed.teamName || parsed.team || '';
-                    members = parsed.members || '';
                     if (parsed.description) description = parsed.description;
-                    if (Array.isArray(parsed.photos)) photos = parsed.photos;
-                } else {
-                    teamName = item.team_name;
                 }
-            } catch (e) {
-                teamName = item.team_name;
-            }
-        }
-
-        if (!members && teamName.includes('(') && teamName.includes(')')) {
-            const match = teamName.match(/^(.*?)\((.*?)\)$/);
-            if (match) {
-                teamName = match[1].trim();
-                members = match[2].trim();
-            }
-        }
-
-        if (photos.length === 0 && item.image_url) {
-            photos.push(item.image_url);
+            } catch (e) {}
         }
 
         return {
@@ -1424,53 +1402,9 @@ document.addEventListener('DOMContentLoaded', () => {
             title: item.event_name || item.title || 'Untitled Competition',
             position: item.position || item.category || 'Winner',
             year: item.year || item.date_label || '2026',
-            teamName: teamName || 'Team Grandeur',
-            members: members || '',
-            description: description,
-            photos: photos
+            description: description
         };
     }
-
-    [1, 2, 3].forEach(num => {
-        const fileInput = document.getElementById(`achievement-photo-${num}-file`);
-        const hiddenInput = document.getElementById(`achievement-photo-${num}`);
-        const previewImg = document.getElementById(`achievement-photo-${num}-preview-img`);
-        const previewIcon = document.getElementById(`achievement-photo-${num}-preview-icon`);
-
-        if (fileInput) {
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        const img = new Image();
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            const maxDim = 600;
-                            let width = img.width;
-                            let height = img.height;
-                            if (width > height) {
-                                if (width > maxDim) { height *= maxDim / width; width = maxDim; }
-                            } else {
-                                if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-                            }
-                            canvas.width = width;
-                            canvas.height = height;
-                            ctx.drawImage(img, 0, 0, width, height);
-                            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
-                            if (hiddenInput) hiddenInput.value = compressedBase64;
-                            if (previewImg) { previewImg.src = compressedBase64; previewImg.style.display = 'block'; }
-                            if (previewIcon) previewIcon.style.display = 'none';
-                            showToast(`✅ Photo ${num} optimized (${(compressedBase64.length / 1024).toFixed(0)}KB)`);
-                        };
-                        img.src = evt.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-    });
 
     function renderAchievementsTable(list = cachedAchievements) {
         if (!achievementsTableBody) return;
@@ -1488,27 +1422,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         achievementsTableBody.innerHTML = sorted.map(item => {
             const meta = parseAchievementMeta(item);
-            const thumbHtml = meta.photos.length > 0 ?
-                `<img src="${meta.photos[0]}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--admin-gold);">` :
-                `<div style="width:40px; height:40px; border-radius:6px; background:#0f172a; border:1px dashed var(--admin-gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🏆</div>`;
-            
             const badgeClass = meta.position.toLowerCase().includes('1st') || meta.position.toLowerCase().includes('winner') ? 'tier-board' : 'tier-coordinators';
 
             return `
                 <tr>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:0.75rem;">
-                            ${thumbHtml}
-                            <div>
-                                <strong style="display:block;">${escapeHtml(meta.title)}</strong>
-                                <small style="color:var(--admin-gold); font-weight:600;">${escapeHtml(meta.teamName)}</small>
-                                ${meta.members ? `<small style="color:var(--admin-text-muted); display:block;">👥 ${escapeHtml(meta.members)}</small>` : ''}
-                            </div>
-                        </div>
-                    </td>
+                    <td><strong>${escapeHtml(meta.title)}</strong></td>
                     <td><span class="tier-badge ${badgeClass}">${escapeHtml(meta.position)}</span></td>
-                    <td><div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(meta.description || '—')}</div></td>
                     <td><strong>${escapeHtml(meta.year)}</strong></td>
+                    <td><div style="max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(meta.description || '—')}</div></td>
                     <td style="text-align: right;">
                         <div class="action-btns-group" style="justify-content: flex-end;">
                             <button class="btn-icon" onclick="editAchievement('${meta.id}')" title="Edit">✏️</button>
@@ -1520,23 +1441,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    function setPhotoSlot(num, url) {
-        const fileInput = document.getElementById(`achievement-photo-${num}-file`);
-        const hiddenInput = document.getElementById(`achievement-photo-${num}`);
-        const previewImg = document.getElementById(`achievement-photo-${num}-preview-img`);
-        const previewIcon = document.getElementById(`achievement-photo-${num}-preview-icon`);
-
-        if (fileInput) fileInput.value = '';
-        if (hiddenInput) hiddenInput.value = url || '';
-        if (url) {
-            if (previewImg) { previewImg.src = url; previewImg.style.display = 'block'; }
-            if (previewIcon) previewIcon.style.display = 'none';
-        } else {
-            if (previewImg) { previewImg.src = ''; previewImg.style.display = 'none'; }
-            if (previewIcon) previewIcon.style.display = 'block';
-        }
-    }
-
     function openAchievementModal(item = null) {
         if (!modalAchievement) return;
         const modalTitle = document.getElementById('modal-achievement-title');
@@ -1544,8 +1448,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputTitle = document.getElementById('achievement-title');
         const inputCat = document.getElementById('achievement-category');
         const inputDate = document.getElementById('achievement-date');
-        const inputTeamName = document.getElementById('achievement-team-name');
-        const inputTeamMembers = document.getElementById('achievement-team-members');
         const inputDesc = document.getElementById('achievement-description');
 
         if (item) {
@@ -1555,26 +1457,14 @@ document.addEventListener('DOMContentLoaded', () => {
             inputTitle.value = meta.title;
             inputCat.value = meta.position;
             inputDate.value = meta.year;
-            if (inputTeamName) inputTeamName.value = meta.teamName;
-            if (inputTeamMembers) inputTeamMembers.value = meta.members;
             inputDesc.value = meta.description;
-
-            setPhotoSlot(1, meta.photos[0] || '');
-            setPhotoSlot(2, meta.photos[1] || '');
-            setPhotoSlot(3, meta.photos[2] || '');
         } else {
             modalTitle.textContent = "Add Achievement";
             inputId.value = "";
             inputTitle.value = "";
             inputCat.value = "";
             inputDate.value = "2026";
-            if (inputTeamName) inputTeamName.value = "";
-            if (inputTeamMembers) inputTeamMembers.value = "";
             inputDesc.value = "";
-
-            setPhotoSlot(1, '');
-            setPhotoSlot(2, '');
-            setPhotoSlot(3, '');
         }
         modalAchievement.style.display = 'flex';
     }
@@ -1594,21 +1484,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const title = document.getElementById('achievement-title').value.trim();
             const position = document.getElementById('achievement-category').value.trim();
             const year = document.getElementById('achievement-date').value.trim();
-            const teamName = document.getElementById('achievement-team-name')?.value.trim() || '';
-            const members = document.getElementById('achievement-team-members')?.value.trim() || '';
             const description = document.getElementById('achievement-description').value.trim();
 
-            const p1 = document.getElementById('achievement-photo-1').value.trim();
-            const p2 = document.getElementById('achievement-photo-2').value.trim();
-            const p3 = document.getElementById('achievement-photo-3').value.trim();
-
-            const photos = [p1, p2, p3].filter(Boolean);
-
             const metaObj = {
-                teamName: teamName,
-                members: members,
-                description: description,
-                photos: photos
+                description: description
             };
 
             const payload = {
