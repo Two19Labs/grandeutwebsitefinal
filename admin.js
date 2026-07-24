@@ -1579,7 +1579,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     event_name: meta.title,
                     position: meta.position,
                     year: meta.year,
-                    display_order: i,
                     team_name: JSON.stringify(metaObj)
                 };
 
@@ -1668,7 +1667,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 event_name: title,
                 position: position,
                 year: year,
-                display_order: display_order,
                 team_name: JSON.stringify(metaObj)
             };
 
