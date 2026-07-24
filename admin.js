@@ -1447,6 +1447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let description = item.description || '';
         let display_order = (item.display_order !== undefined && item.display_order !== null) ? item.display_order : undefined;
         let logo = item.logo || '';
+        let members = '';
 
         if (item.team_name) {
             try {
@@ -1455,8 +1456,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (parsed.description) description = parsed.description;
                     if (parsed.display_order !== undefined && parsed.display_order !== null) display_order = parsed.display_order;
                     if (parsed.logo) logo = parsed.logo;
+                    if (parsed.members) members = parsed.members;
                 }
-            } catch (e) {}
+            } catch (e) {
+                if (typeof item.team_name === 'string') {
+                    members = item.team_name;
+                }
+            }
         }
 
         return {
@@ -1465,6 +1471,7 @@ document.addEventListener('DOMContentLoaded', () => {
             position: item.position || item.category || 'Winner',
             year: item.year || item.date_label || '2026',
             description: description,
+            members: members,
             display_order: display_order,
             logo: logo
         };
@@ -1498,6 +1505,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isFirst = idx === 0;
             const isLast = idx === sorted.length - 1;
 
+            const detailText = meta.members ? `👥 ${meta.members}${meta.description ? ' | ' + meta.description : ''}` : (meta.description || '—');
+
             return `
                 <tr>
                     <td style="text-align:center;">
@@ -1510,7 +1519,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><strong>${escapeHtml(meta.title)}</strong></td>
                     <td><span class="tier-badge ${badgeClass}">${escapeHtml(meta.position)}</span></td>
                     <td><strong>${escapeHtml(meta.year)}</strong></td>
-                    <td><div style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(meta.description || '—')}</div></td>
+                    <td><div style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(detailText)}</div></td>
                     <td style="text-align: right;">
                         <div class="action-btns-group" style="justify-content: flex-end;">
                             <button class="btn-icon" onclick="editAchievement('${meta.id}')" title="Edit">✏️</button>
@@ -1543,6 +1552,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const meta = parseAchievementMeta(item);
             const metaObj = {
                 description: meta.description,
+                members: meta.members,
                 display_order: i,
                 logo: meta.logo
             };
@@ -1577,6 +1587,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const meta = parseAchievementMeta(item);
             const metaObj = {
                 description: meta.description,
+                members: meta.members,
                 display_order: i,
                 logo: meta.logo
             };
@@ -1598,6 +1609,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const metaObj = {
                     description: meta.description,
+                    members: meta.members,
                     display_order: i,
                     logo: meta.logo
                 };
@@ -1632,6 +1644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputTitle = document.getElementById('achievement-title');
         const inputCat = document.getElementById('achievement-category');
         const inputDate = document.getElementById('achievement-date');
+        const inputMembers = document.getElementById('achievement-members');
         const inputDesc = document.getElementById('achievement-description');
 
         if (logoFileInput) logoFileInput.value = '';
@@ -1643,7 +1656,8 @@ document.addEventListener('DOMContentLoaded', () => {
             inputTitle.value = meta.title;
             inputCat.value = meta.position;
             inputDate.value = meta.year;
-            inputDesc.value = meta.description;
+            if (inputMembers) inputMembers.value = meta.members || '';
+            inputDesc.value = meta.description || '';
             if (logoHiddenInput) logoHiddenInput.value = meta.logo || '';
             updateLogoPreview(meta.logo || '');
         } else {
@@ -1652,6 +1666,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputTitle.value = "";
             inputCat.value = "";
             inputDate.value = "2026";
+            if (inputMembers) inputMembers.value = "";
             inputDesc.value = "";
             if (logoHiddenInput) logoHiddenInput.value = '';
             updateLogoPreview('');
@@ -1674,6 +1689,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const title = document.getElementById('achievement-title').value.trim();
             const position = document.getElementById('achievement-category').value.trim();
             const year = document.getElementById('achievement-date').value.trim();
+            const members = document.getElementById('achievement-members') ? document.getElementById('achievement-members').value.trim() : '';
             const description = document.getElementById('achievement-description').value.trim();
             const logo = logoHiddenInput ? logoHiddenInput.value.trim() : '';
 
@@ -1690,6 +1706,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const metaObj = {
                 description: description,
+                members: members,
                 display_order: display_order,
                 logo: logo
             };

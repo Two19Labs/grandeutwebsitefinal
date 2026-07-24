@@ -776,6 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let description = item.description || '';
         let display_order = (item.display_order !== undefined && item.display_order !== null) ? item.display_order : undefined;
         let logo = item.logo || '';
+        let members = '';
 
         if (item.team_name) {
             try {
@@ -784,8 +785,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (parsed.description) description = parsed.description;
                     if (parsed.display_order !== undefined && parsed.display_order !== null) display_order = parsed.display_order;
                     if (parsed.logo) logo = parsed.logo;
+                    if (parsed.members) members = parsed.members;
                 }
-            } catch (e) {}
+            } catch (e) {
+                if (typeof item.team_name === 'string') {
+                    members = item.team_name;
+                }
+            }
         }
 
         return {
@@ -794,6 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
             position: item.position || item.category || 'Winner',
             year: item.year || item.date_label || '2026',
             description: description,
+            members: members,
             display_order: display_order,
             logo: logo
         };
@@ -849,7 +856,27 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <h3 class="achievement-card-title" style="font-size: 1.18rem; font-weight: 700; color: #0f1d3a; line-height: 1.4; margin: 0;">${escapeHtml(meta.title)}</h3>
-                    ${meta.description ? `<div class="achievement-desc-box">${escapeHtml(meta.description)}</div>` : ''}
+                    
+                    <div class="achievement-card-bottom">
+                        ${meta.members ? `
+                            <div class="achievement-members-box">
+                                <span class="achievement-box-label">👥 Team Members</span>
+                                <div class="achievement-members-names">${escapeHtml(meta.members)}</div>
+                            </div>
+                        ` : ''}
+
+                        ${meta.description ? `
+                            <div class="achievement-desc-box">
+                                ${escapeHtml(meta.description)}
+                            </div>
+                        ` : ''}
+
+                        ${(!meta.members && !meta.description) ? `
+                            <div class="achievement-footer-tag">
+                                <span>🏆 Grandeur Competitive Victory</span>
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>
             `;
         }).join('');

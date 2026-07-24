@@ -2618,16 +2618,58 @@ a.resources-badge:hover {
     object-fit: contain;
 }
 
-.achievement-desc-box {
-    margin-top: 0.85rem;
-    padding: 0.75rem 0.95rem;
+.achievement-card-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding-top: 1rem;
+}
+
+.achievement-members-box {
+    padding: 0.65rem 0.85rem;
     background: #f8fafc;
     border-radius: 10px;
     border-left: 3px solid #d97706;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.achievement-box-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #d97706;
+}
+
+.achievement-members-names {
     font-size: 0.92rem;
+    font-weight: 600;
+    color: #0f1d3a;
+    line-height: 1.4;
+}
+
+.achievement-desc-box {
+    padding: 0.65rem 0.85rem;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.88rem;
     color: #475569;
-    line-height: 1.55;
-    font-weight: 450;
+    line-height: 1.5;
+}
+
+.achievement-footer-tag {
+    margin-top: 0.3rem;
+    padding-top: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
 .achievement-card-media {
