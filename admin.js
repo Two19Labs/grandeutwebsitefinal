@@ -1539,7 +1539,21 @@ document.addEventListener('DOMContentLoaded', () => {
         sorted[idx] = sorted[idx - 1];
         sorted[idx - 1] = temp;
 
-        await saveNewAchievementOrder(sorted);
+        sorted.forEach((item, i) => {
+            const meta = parseAchievementMeta(item);
+            const metaObj = {
+                description: meta.description,
+                display_order: i,
+                logo: meta.logo
+            };
+            item.team_name = JSON.stringify(metaObj);
+            item.display_order = i;
+        });
+
+        cachedAchievements = sorted;
+        renderAchievementsTable(cachedAchievements);
+
+        await saveNewAchievementOrder(cachedAchievements);
     };
 
     window.moveAchievementDown = async function(id) {
@@ -1559,14 +1573,27 @@ document.addEventListener('DOMContentLoaded', () => {
         sorted[idx] = sorted[idx + 1];
         sorted[idx + 1] = temp;
 
-        await saveNewAchievementOrder(sorted);
+        sorted.forEach((item, i) => {
+            const meta = parseAchievementMeta(item);
+            const metaObj = {
+                description: meta.description,
+                display_order: i,
+                logo: meta.logo
+            };
+            item.team_name = JSON.stringify(metaObj);
+            item.display_order = i;
+        });
+
+        cachedAchievements = sorted;
+        renderAchievementsTable(cachedAchievements);
+
+        await saveNewAchievementOrder(cachedAchievements);
     };
 
     async function saveNewAchievementOrder(sortedList) {
         showToast("⏳ Saving new order...");
         try {
-            for (let i = 0; i < sortedList.length; i++) {
-                const item = sortedList[i];
+            await Promise.all(sortedList.map(async (item, i) => {
                 const meta = parseAchievementMeta(item);
 
                 const metaObj = {
@@ -1585,6 +1612,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.GrandeurDB) {
                     await window.GrandeurDB.updateAchievement(meta.id, payload);
                 }
+            }));
+
+            if (window.GrandeurDB && typeof window.GrandeurDB.clearCache === 'function') {
+                window.GrandeurDB.clearCache();
             }
             showToast("✅ Achievement order updated!");
             await renderDashboard();
