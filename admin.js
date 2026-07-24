@@ -1385,14 +1385,76 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancelAchievementModal = document.getElementById('btn-cancel-achievement-modal');
     const formAchievementModal = document.getElementById('form-achievement-modal');
 
+    const logoFileInput = document.getElementById('achievement-logo-file');
+    const logoHiddenInput = document.getElementById('achievement-logo');
+    const logoPreviewImg = document.getElementById('achievement-logo-preview-img');
+    const logoPreviewIcon = document.getElementById('achievement-logo-preview-icon');
+
+    if (logoFileInput) {
+        logoFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            showToast(`⏳ Processing logo...`);
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 400;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/png', 0.85);
+                    if (logoHiddenInput) logoHiddenInput.value = compressedBase64;
+                    updateLogoPreview(compressedBase64);
+                    showToast(`✅ Logo optimized!`);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function updateLogoPreview(url) {
+        if (url && logoPreviewImg && logoPreviewIcon) {
+            logoPreviewImg.src = url;
+            logoPreviewImg.style.display = 'block';
+            logoPreviewIcon.style.display = 'none';
+        } else if (logoPreviewImg && logoPreviewIcon) {
+            logoPreviewImg.src = '';
+            logoPreviewImg.style.display = 'none';
+            logoPreviewIcon.style.display = 'block';
+        }
+    }
+
     function parseAchievementMeta(item) {
         let description = item.description || '';
+        let display_order = (item.display_order !== undefined && item.display_order !== null) ? item.display_order : undefined;
+        let logo = item.logo || '';
 
         if (item.team_name) {
             try {
                 const parsed = JSON.parse(item.team_name);
                 if (parsed && typeof parsed === 'object') {
                     if (parsed.description) description = parsed.description;
+                    if (parsed.display_order !== undefined && parsed.display_order !== null) display_order = parsed.display_order;
+                    if (parsed.logo) logo = parsed.logo;
                 }
             } catch (e) {}
         }
@@ -1402,34 +1464,53 @@ document.addEventListener('DOMContentLoaded', () => {
             title: item.event_name || item.title || 'Untitled Competition',
             position: item.position || item.category || 'Winner',
             year: item.year || item.date_label || '2026',
-            description: description
+            description: description,
+            display_order: display_order,
+            logo: logo
         };
     }
 
     function renderAchievementsTable(list = cachedAchievements) {
         if (!achievementsTableBody) return;
         if (!list || list.length === 0) {
-            achievementsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No achievements recorded yet. Click "Add Achievement" to publish one.</td></tr>`;
+            achievementsTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No achievements recorded yet. Click "Add Achievement" to publish one.</td></tr>`;
             return;
         }
 
-        // Sort descending by year
+        // Sort ascending by display_order, fallback to year descending
         const sorted = [...list].sort((a, b) => {
             const metaA = parseAchievementMeta(a);
             const metaB = parseAchievementMeta(b);
+            const orderA = metaA.display_order !== undefined ? metaA.display_order : 9999;
+            const orderB = metaB.display_order !== undefined ? metaB.display_order : 9999;
+            if (orderA !== orderB) return orderA - orderB;
             return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
         });
 
-        achievementsTableBody.innerHTML = sorted.map(item => {
+        achievementsTableBody.innerHTML = sorted.map((item, idx) => {
             const meta = parseAchievementMeta(item);
             const badgeClass = meta.position.toLowerCase().includes('1st') || meta.position.toLowerCase().includes('winner') ? 'tier-board' : 'tier-coordinators';
 
+            const logoHtml = meta.logo ?
+                `<img src="${escapeHtml(meta.logo)}" style="width:36px; height:36px; border-radius:6px; object-fit:contain; background:#ffffff; padding:2px; border:1px solid var(--admin-border);">` :
+                `<div style="width:36px; height:36px; border-radius:6px; background:#0f172a; border:1px dashed var(--admin-border); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🏛️</div>`;
+
+            const isFirst = idx === 0;
+            const isLast = idx === sorted.length - 1;
+
             return `
                 <tr>
+                    <td style="text-align:center;">
+                        <div style="display:flex; gap:3px; justify-content:center; align-items:center;">
+                            <button class="btn-icon" onclick="moveAchievementUp('${meta.id}')" title="Move Up" ${isFirst ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>⬆️</button>
+                            <button class="btn-icon" onclick="moveAchievementDown('${meta.id}')" title="Move Down" ${isLast ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>⬇️</button>
+                        </div>
+                    </td>
+                    <td>${logoHtml}</td>
                     <td><strong>${escapeHtml(meta.title)}</strong></td>
                     <td><span class="tier-badge ${badgeClass}">${escapeHtml(meta.position)}</span></td>
                     <td><strong>${escapeHtml(meta.year)}</strong></td>
-                    <td><div style="max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(meta.description || '—')}</div></td>
+                    <td><div style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(meta.description || '—')}</div></td>
                     <td style="text-align: right;">
                         <div class="action-btns-group" style="justify-content: flex-end;">
                             <button class="btn-icon" onclick="editAchievement('${meta.id}')" title="Edit">✏️</button>
@@ -1441,6 +1522,79 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
+    window.moveAchievementUp = async function(id) {
+        const sorted = [...cachedAchievements].sort((a, b) => {
+            const metaA = parseAchievementMeta(a);
+            const metaB = parseAchievementMeta(b);
+            const orderA = metaA.display_order !== undefined ? metaA.display_order : 9999;
+            const orderB = metaB.display_order !== undefined ? metaB.display_order : 9999;
+            if (orderA !== orderB) return orderA - orderB;
+            return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
+        });
+
+        const idx = sorted.findIndex(item => item.id === id);
+        if (idx <= 0) return;
+
+        const temp = sorted[idx];
+        sorted[idx] = sorted[idx - 1];
+        sorted[idx - 1] = temp;
+
+        await saveNewAchievementOrder(sorted);
+    };
+
+    window.moveAchievementDown = async function(id) {
+        const sorted = [...cachedAchievements].sort((a, b) => {
+            const metaA = parseAchievementMeta(a);
+            const metaB = parseAchievementMeta(b);
+            const orderA = metaA.display_order !== undefined ? metaA.display_order : 9999;
+            const orderB = metaB.display_order !== undefined ? metaB.display_order : 9999;
+            if (orderA !== orderB) return orderA - orderB;
+            return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
+        });
+
+        const idx = sorted.findIndex(item => item.id === id);
+        if (idx < 0 || idx >= sorted.length - 1) return;
+
+        const temp = sorted[idx];
+        sorted[idx] = sorted[idx + 1];
+        sorted[idx + 1] = temp;
+
+        await saveNewAchievementOrder(sorted);
+    };
+
+    async function saveNewAchievementOrder(sortedList) {
+        showToast("⏳ Saving new order...");
+        try {
+            for (let i = 0; i < sortedList.length; i++) {
+                const item = sortedList[i];
+                const meta = parseAchievementMeta(item);
+
+                const metaObj = {
+                    description: meta.description,
+                    display_order: i,
+                    logo: meta.logo
+                };
+
+                const payload = {
+                    event_name: meta.title,
+                    position: meta.position,
+                    year: meta.year,
+                    display_order: i,
+                    team_name: JSON.stringify(metaObj)
+                };
+
+                if (window.GrandeurDB) {
+                    await window.GrandeurDB.updateAchievement(meta.id, payload);
+                }
+            }
+            showToast("✅ Achievement order updated!");
+            await renderDashboard();
+        } catch(err) {
+            console.error("Order save error:", err);
+            showToast(`⚠️ Order save failed: ${err.message}`);
+        }
+    }
+
     function openAchievementModal(item = null) {
         if (!modalAchievement) return;
         const modalTitle = document.getElementById('modal-achievement-title');
@@ -1450,6 +1604,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputDate = document.getElementById('achievement-date');
         const inputDesc = document.getElementById('achievement-description');
 
+        if (logoFileInput) logoFileInput.value = '';
+
         if (item) {
             const meta = parseAchievementMeta(item);
             modalTitle.textContent = "Edit Achievement";
@@ -1458,6 +1614,8 @@ document.addEventListener('DOMContentLoaded', () => {
             inputCat.value = meta.position;
             inputDate.value = meta.year;
             inputDesc.value = meta.description;
+            if (logoHiddenInput) logoHiddenInput.value = meta.logo || '';
+            updateLogoPreview(meta.logo || '');
         } else {
             modalTitle.textContent = "Add Achievement";
             inputId.value = "";
@@ -1465,6 +1623,8 @@ document.addEventListener('DOMContentLoaded', () => {
             inputCat.value = "";
             inputDate.value = "2026";
             inputDesc.value = "";
+            if (logoHiddenInput) logoHiddenInput.value = '';
+            updateLogoPreview('');
         }
         modalAchievement.style.display = 'flex';
     }
@@ -1485,15 +1645,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const position = document.getElementById('achievement-category').value.trim();
             const year = document.getElementById('achievement-date').value.trim();
             const description = document.getElementById('achievement-description').value.trim();
+            const logo = logoHiddenInput ? logoHiddenInput.value.trim() : '';
+
+            let display_order = 0;
+            if (editId) {
+                const existing = cachedAchievements.find(a => a.id === editId);
+                if (existing) {
+                    const exMeta = parseAchievementMeta(existing);
+                    display_order = exMeta.display_order !== undefined ? exMeta.display_order : 0;
+                }
+            } else {
+                display_order = cachedAchievements.length;
+            }
 
             const metaObj = {
-                description: description
+                description: description,
+                display_order: display_order,
+                logo: logo
             };
 
             const payload = {
                 event_name: title,
                 position: position,
                 year: year,
+                display_order: display_order,
                 team_name: JSON.stringify(metaObj)
             };
 
