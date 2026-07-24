@@ -837,19 +837,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const logoMarkup = meta.logo ?
                 `<div class="achievement-institution-logo-wrap"><img src="${escapeHtml(meta.logo)}" alt="${escapeHtml(meta.title)} Logo" class="achievement-institution-logo"></div>` :
-                `<div class="achievement-institution-logo-wrap fallback"><span style="font-size: 1.4rem;">🏛️</span></div>`;
+                `<div class="achievement-institution-logo-wrap fallback"><span style="font-size: 1.5rem;">🏛️</span></div>`;
 
             return `
-                <div class="achievement-live-card" style="padding: 1.6rem; display: flex; flex-direction: column;" data-card-index="${cardIdx}">
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem;">
+                <div class="achievement-live-card" style="padding: 1.75rem; display: flex; flex-direction: column;" data-card-index="${cardIdx}">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; margin-bottom: 1.15rem; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(226, 232, 240, 0.8);">
                         ${logoMarkup}
-                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
-                            <span class="achievement-rank-pill ${rankClass}" style="position: static; box-shadow: none; font-size: 0.82rem; font-weight: 700; padding: 0.3rem 0.75rem;">${rankIcon} ${escapeHtml(meta.position)}</span>
-                            <span style="background: #f1f5f9; color: #0f1d3a; font-size: 0.78rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; letter-spacing: 0.03em; border: 1px solid #e2e8f0;">${escapeHtml(meta.year)}</span>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem;">
+                            <span class="achievement-rank-pill ${rankClass}" style="position: static; box-shadow: 0 2px 8px rgba(0,0,0,0.12); font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.8rem; border-radius: 20px;">${rankIcon} ${escapeHtml(meta.position)}</span>
+                            <span style="background: #f1f5f9; color: #0f1d3a; font-size: 0.78rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 6px; letter-spacing: 0.04em; border: 1px solid #e2e8f0;">${escapeHtml(meta.year)}</span>
                         </div>
                     </div>
-                    <h3 class="achievement-card-title" style="font-size: 1.15rem; font-weight: 700; margin-bottom: ${meta.description ? '0.5rem' : '0'}; color: var(--primary); line-height: 1.35;">${escapeHtml(meta.title)}</h3>
-                    ${meta.description ? `<p class="achievement-card-desc" style="margin-top: 0.25rem; font-size: 0.92rem; color: var(--text-muted); line-height: 1.5;">${escapeHtml(meta.description)}</p>` : ''}
+                    <h3 class="achievement-card-title" style="font-size: 1.18rem; font-weight: 700; color: #0f1d3a; line-height: 1.4; margin: 0;">${escapeHtml(meta.title)}</h3>
+                    ${meta.description ? `<div class="achievement-desc-box">${escapeHtml(meta.description)}</div>` : ''}
                 </div>
             `;
         }).join('');

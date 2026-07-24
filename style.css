@@ -2544,55 +2544,90 @@ a.resources-badge:hover {
     }
 }
 
-/* Live Achievements Card Grid & Auto-Swiping Photo Slider */
+/* Live Achievements Premium Card Grid & Responsive Styling */
 .achievements-live-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+    gap: 2.2rem;
+    margin-top: 2.5rem;
 }
 
 .achievement-live-card {
     background: #ffffff;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
+.achievement-live-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #d97706, #0f1d3a, #2563eb);
+    opacity: 0.85;
+    transition: opacity 0.3s ease, height 0.3s ease;
+}
+
 .achievement-live-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 22px 45px -10px rgba(15, 23, 42, 0.12), 0 8px 20px -6px rgba(15, 23, 42, 0.06);
+    border-color: rgba(217, 119, 6, 0.4);
+}
+
+.achievement-live-card:hover::before {
+    height: 5px;
+    opacity: 1;
 }
 
 .achievement-institution-logo-wrap {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
-    padding: 4px;
+    padding: 6px;
+    transition: transform 0.3s ease;
+}
+
+.achievement-live-card:hover .achievement-institution-logo-wrap {
+    transform: scale(1.05);
 }
 
 .achievement-institution-logo-wrap.fallback {
-    background: #f8fafc;
-    border-style: dashed;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px dashed #cbd5e1;
 }
 
 .achievement-institution-logo {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+.achievement-desc-box {
+    margin-top: 0.85rem;
+    padding: 0.75rem 0.95rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    border-left: 3px solid #d97706;
+    font-size: 0.92rem;
+    color: #475569;
+    line-height: 1.55;
+    font-weight: 450;
 }
 
 .achievement-card-media {
