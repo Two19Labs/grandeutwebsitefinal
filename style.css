@@ -2545,11 +2545,44 @@ a.resources-badge:hover {
 }
 
 /* Live Achievements Premium Card Grid & Responsive Styling */
+.achievement-category-section {
+    margin-bottom: 3.5rem;
+}
+
+.achievement-tier-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.85rem;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+
+.achievement-tier-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f1d3a;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+}
+
+.achievement-count-pill {
+    background: rgba(15, 29, 58, 0.06);
+    color: #0f1d3a;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    border: 1px solid rgba(15, 29, 58, 0.12);
+}
+
 .achievements-live-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: 2.2rem;
-    margin-top: 2.5rem;
+    margin-top: 1.5rem;
 }
 
 .achievement-live-card {

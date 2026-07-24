@@ -777,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let display_order = (item.display_order !== undefined && item.display_order !== null) ? item.display_order : undefined;
         let logo = item.logo || '';
         let members = '';
+        let category_tier = '';
 
         if (item.team_name) {
             try {
@@ -786,11 +787,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (parsed.display_order !== undefined && parsed.display_order !== null) display_order = parsed.display_order;
                     if (parsed.logo) logo = parsed.logo;
                     if (parsed.members) members = parsed.members;
+                    if (parsed.category_tier) category_tier = parsed.category_tier;
                 }
             } catch (e) {
                 if (typeof item.team_name === 'string') {
                     members = item.team_name;
                 }
+            }
+        }
+
+        if (!category_tier) {
+            const combined = ((item.event_name || '') + ' ' + (item.position || '') + ' ' + description).toLowerCase();
+            if (combined.includes('bain') || combined.includes('mckinsey') || combined.includes('bcg') || combined.includes('deloitte') || combined.includes('plum') || combined.includes('global') || combined.includes('gmcc')) {
+                category_tier = 'global';
+            } else if (combined.includes('iim') || combined.includes('iit') || combined.includes('xlri') || combined.includes('fms') || combined.includes('spjimr') || combined.includes('b-school') || combined.includes('melbourne')) {
+                category_tier = 'top_bschools';
+            } else {
+                category_tier = 'du_circuit';
             }
         }
 
@@ -801,9 +814,69 @@ document.addEventListener('DOMContentLoaded', () => {
             year: item.year || item.date_label || '2026',
             description: description,
             members: members,
+            category_tier: category_tier,
             display_order: display_order,
             logo: logo
         };
+    }
+
+    function renderSingleAchievementCard(item, cardIdx) {
+        const meta = parseAchievementMeta(item);
+        
+        const posLower = meta.position.toLowerCase();
+        let rankClass = 'rank-general';
+        let rankIcon = '🏆';
+        if (posLower.includes('1st') || posLower.includes('winner')) {
+            rankClass = 'rank-gold';
+            rankIcon = '🥇';
+        } else if (posLower.includes('2nd') || posLower.includes('runner')) {
+            rankClass = 'rank-silver';
+            rankIcon = '🥈';
+        } else if (posLower.includes('3rd') || posLower.includes('podium')) {
+            rankClass = 'rank-bronze';
+            rankIcon = '🥉';
+        } else if (posLower.includes('finalist') || posLower.includes('qualifier')) {
+            rankClass = 'rank-general';
+            rankIcon = '🌟';
+        }
+
+        const logoMarkup = meta.logo ?
+            `<div class="achievement-institution-logo-wrap"><img src="${escapeHtml(meta.logo)}" alt="${escapeHtml(meta.title)} Logo" class="achievement-institution-logo"></div>` :
+            `<div class="achievement-institution-logo-wrap fallback"><span style="font-size: 1.5rem;">🏛️</span></div>`;
+
+        return `
+            <div class="achievement-live-card" style="padding: 1.75rem; display: flex; flex-direction: column;" data-card-index="${cardIdx}">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; margin-bottom: 1.15rem; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(226, 232, 240, 0.8);">
+                    ${logoMarkup}
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem;">
+                        <span class="achievement-rank-pill ${rankClass}" style="position: static; box-shadow: 0 2px 8px rgba(0,0,0,0.12); font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.8rem; border-radius: 20px;">${rankIcon} ${escapeHtml(meta.position)}</span>
+                        <span style="background: #f1f5f9; color: #0f1d3a; font-size: 0.78rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 6px; letter-spacing: 0.04em; border: 1px solid #e2e8f0;">${escapeHtml(meta.year)}</span>
+                    </div>
+                </div>
+                <h3 class="achievement-card-title" style="font-size: 1.18rem; font-weight: 700; color: #0f1d3a; line-height: 1.4; margin: 0;">${escapeHtml(meta.title)}</h3>
+                
+                <div class="achievement-card-bottom">
+                    ${meta.members ? `
+                        <div class="achievement-members-box">
+                            <span class="achievement-box-label">👥 Team Members</span>
+                            <div class="achievement-members-names">${escapeHtml(meta.members)}</div>
+                        </div>
+                    ` : ''}
+
+                    ${meta.description ? `
+                        <div class="achievement-desc-box">
+                            ${escapeHtml(meta.description)}
+                        </div>
+                    ` : ''}
+
+                    ${(!meta.members && !meta.description) ? `
+                        <div class="achievement-footer-tag">
+                            <span>🏆 Grandeur Competitive Victory</span>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
     }
 
     function renderDynamicAchievements(achievementsList, container) {
@@ -813,73 +886,61 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const sorted = [...achievementsList].sort((a, b) => {
-            const metaA = parseAchievementMeta(a);
-            const metaB = parseAchievementMeta(b);
-            const orderA = metaA.display_order !== undefined ? metaA.display_order : 9999;
-            const orderB = metaB.display_order !== undefined ? metaB.display_order : 9999;
-            if (orderA !== orderB) return orderA - orderB;
-            return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
+        const tierDefs = [
+            { key: 'global', title: 'Global Corporate Victories', icon: '🌐' },
+            { key: 'top_bschools', title: 'IIMs, IITs & Premier B-Schools', icon: '🏛️' },
+            { key: 'du_circuit', title: 'DU Circuit & National Forums', icon: '🎓' }
+        ];
+
+        const grouped = {
+            global: [],
+            top_bschools: [],
+            du_circuit: []
+        };
+
+        achievementsList.forEach(item => {
+            const meta = parseAchievementMeta(item);
+            const key = grouped[meta.category_tier] ? meta.category_tier : 'du_circuit';
+            grouped[key].push(item);
         });
 
-        container.innerHTML = sorted.map((item, cardIdx) => {
-            const meta = parseAchievementMeta(item);
-            
-            const posLower = meta.position.toLowerCase();
-            let rankClass = 'rank-general';
-            let rankIcon = '🏆';
-            if (posLower.includes('1st') || posLower.includes('winner')) {
-                rankClass = 'rank-gold';
-                rankIcon = '🥇';
-            } else if (posLower.includes('2nd') || posLower.includes('runner')) {
-                rankClass = 'rank-silver';
-                rankIcon = '🥈';
-            } else if (posLower.includes('3rd') || posLower.includes('podium')) {
-                rankClass = 'rank-bronze';
-                rankIcon = '🥉';
-            } else if (posLower.includes('finalist') || posLower.includes('qualifier')) {
-                rankClass = 'rank-general';
-                rankIcon = '🌟';
-            }
+        // Sort items inside each tier by display_order
+        Object.keys(grouped).forEach(k => {
+            grouped[k].sort((a, b) => {
+                const metaA = parseAchievementMeta(a);
+                const metaB = parseAchievementMeta(b);
+                const orderA = metaA.display_order !== undefined ? metaA.display_order : 9999;
+                const orderB = metaB.display_order !== undefined ? metaB.display_order : 9999;
+                if (orderA !== orderB) return orderA - orderB;
+                return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
+            });
+        });
 
-            const logoMarkup = meta.logo ?
-                `<div class="achievement-institution-logo-wrap"><img src="${escapeHtml(meta.logo)}" alt="${escapeHtml(meta.title)} Logo" class="achievement-institution-logo"></div>` :
-                `<div class="achievement-institution-logo-wrap fallback"><span style="font-size: 1.5rem;">🏛️</span></div>`;
+        let cardCounter = 0;
+        let html = '';
 
-            return `
-                <div class="achievement-live-card" style="padding: 1.75rem; display: flex; flex-direction: column;" data-card-index="${cardIdx}">
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; margin-bottom: 1.15rem; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(226, 232, 240, 0.8);">
-                        ${logoMarkup}
-                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem;">
-                            <span class="achievement-rank-pill ${rankClass}" style="position: static; box-shadow: 0 2px 8px rgba(0,0,0,0.12); font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.8rem; border-radius: 20px;">${rankIcon} ${escapeHtml(meta.position)}</span>
-                            <span style="background: #f1f5f9; color: #0f1d3a; font-size: 0.78rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 6px; letter-spacing: 0.04em; border: 1px solid #e2e8f0;">${escapeHtml(meta.year)}</span>
+        tierDefs.forEach(tier => {
+            const items = grouped[tier.key];
+            if (items && items.length > 0) {
+                html += `
+                    <div class="achievement-category-section" style="margin-bottom: 3.5rem;">
+                        <div class="achievement-tier-header">
+                            <h3 class="achievement-tier-title">${tier.icon} ${tier.title}</h3>
+                            <span class="achievement-count-pill">${items.length} ${items.length === 1 ? 'Victory' : 'Victories'}</span>
+                        </div>
+                        <div class="achievements-live-grid">
+                            ${items.map(item => renderSingleAchievementCard(item, cardCounter++)).join('')}
                         </div>
                     </div>
-                    <h3 class="achievement-card-title" style="font-size: 1.18rem; font-weight: 700; color: #0f1d3a; line-height: 1.4; margin: 0;">${escapeHtml(meta.title)}</h3>
-                    
-                    <div class="achievement-card-bottom">
-                        ${meta.members ? `
-                            <div class="achievement-members-box">
-                                <span class="achievement-box-label">👥 Team Members</span>
-                                <div class="achievement-members-names">${escapeHtml(meta.members)}</div>
-                            </div>
-                        ` : ''}
+                `;
+            }
+        });
 
-                        ${meta.description ? `
-                            <div class="achievement-desc-box">
-                                ${escapeHtml(meta.description)}
-                            </div>
-                        ` : ''}
+        if (!html) {
+            html = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">No achievements published yet. Check back soon!</div>`;
+        }
 
-                        ${(!meta.members && !meta.description) ? `
-                            <div class="achievement-footer-tag">
-                                <span>🏆 Grandeur Competitive Victory</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('');
+        container.innerHTML = html;
     }
 
     window.renderDynamicAchievements = renderDynamicAchievements;

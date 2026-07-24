@@ -1448,6 +1448,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let display_order = (item.display_order !== undefined && item.display_order !== null) ? item.display_order : undefined;
         let logo = item.logo || '';
         let members = '';
+        let category_tier = '';
 
         if (item.team_name) {
             try {
@@ -1457,11 +1458,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (parsed.display_order !== undefined && parsed.display_order !== null) display_order = parsed.display_order;
                     if (parsed.logo) logo = parsed.logo;
                     if (parsed.members) members = parsed.members;
+                    if (parsed.category_tier) category_tier = parsed.category_tier;
                 }
             } catch (e) {
                 if (typeof item.team_name === 'string') {
                     members = item.team_name;
                 }
+            }
+        }
+
+        if (!category_tier) {
+            const combined = ((item.event_name || '') + ' ' + (item.position || '') + ' ' + description).toLowerCase();
+            if (combined.includes('bain') || combined.includes('mckinsey') || combined.includes('bcg') || combined.includes('deloitte') || combined.includes('plum') || combined.includes('global') || combined.includes('gmcc')) {
+                category_tier = 'global';
+            } else if (combined.includes('iim') || combined.includes('iit') || combined.includes('xlri') || combined.includes('fms') || combined.includes('spjimr') || combined.includes('b-school') || combined.includes('melbourne')) {
+                category_tier = 'top_bschools';
+            } else {
+                category_tier = 'du_circuit';
             }
         }
 
@@ -1472,6 +1485,7 @@ document.addEventListener('DOMContentLoaded', () => {
             year: item.year || item.date_label || '2026',
             description: description,
             members: members,
+            category_tier: category_tier,
             display_order: display_order,
             logo: logo
         };
@@ -1480,7 +1494,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAchievementsTable(list = cachedAchievements) {
         if (!achievementsTableBody) return;
         if (!list || list.length === 0) {
-            achievementsTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No achievements recorded yet. Click "Add Achievement" to publish one.</td></tr>`;
+            achievementsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--admin-text-muted);">No achievements recorded yet. Click "Add Achievement" to publish one.</td></tr>`;
             return;
         }
 
@@ -1493,6 +1507,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (orderA !== orderB) return orderA - orderB;
             return parseInt(metaB.year, 10) - parseInt(metaA.year, 10);
         });
+
+        const catBadges = {
+            global: '<span class="tier-badge tier-board">🌐 Global Corporate</span>',
+            top_bschools: '<span class="tier-badge tier-organizing">🏛️ Top B-Schools</span>',
+            du_circuit: '<span class="tier-badge tier-core">🎓 DU Circuit</span>'
+        };
 
         achievementsTableBody.innerHTML = sorted.map((item, idx) => {
             const meta = parseAchievementMeta(item);
@@ -1517,9 +1537,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                     <td>${logoHtml}</td>
                     <td><strong>${escapeHtml(meta.title)}</strong></td>
+                    <td>${catBadges[meta.category_tier] || catBadges.du_circuit}</td>
                     <td><span class="tier-badge ${badgeClass}">${escapeHtml(meta.position)}</span></td>
                     <td><strong>${escapeHtml(meta.year)}</strong></td>
-                    <td><div style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(detailText)}</div></td>
+                    <td><div style="max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(detailText)}</div></td>
                     <td style="text-align: right;">
                         <div class="action-btns-group" style="justify-content: flex-end;">
                             <button class="btn-icon" onclick="editAchievement('${meta.id}')" title="Edit">✏️</button>
@@ -1553,6 +1574,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const metaObj = {
                 description: meta.description,
                 members: meta.members,
+                category_tier: meta.category_tier,
                 display_order: i,
                 logo: meta.logo
             };
@@ -1588,6 +1610,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const metaObj = {
                 description: meta.description,
                 members: meta.members,
+                category_tier: meta.category_tier,
                 display_order: i,
                 logo: meta.logo
             };
@@ -1610,6 +1633,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const metaObj = {
                     description: meta.description,
                     members: meta.members,
+                    category_tier: meta.category_tier,
                     display_order: i,
                     logo: meta.logo
                 };
@@ -1642,6 +1666,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalTitle = document.getElementById('modal-achievement-title');
         const inputId = document.getElementById('achievement-edit-id');
         const inputTitle = document.getElementById('achievement-title');
+        const inputTier = document.getElementById('achievement-category-tier');
         const inputCat = document.getElementById('achievement-category');
         const inputDate = document.getElementById('achievement-date');
         const inputMembers = document.getElementById('achievement-members');
@@ -1654,6 +1679,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTitle.textContent = "Edit Achievement";
             inputId.value = meta.id;
             inputTitle.value = meta.title;
+            if (inputTier) inputTier.value = meta.category_tier || 'global';
             inputCat.value = meta.position;
             inputDate.value = meta.year;
             if (inputMembers) inputMembers.value = meta.members || '';
@@ -1664,6 +1690,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTitle.textContent = "Add Achievement";
             inputId.value = "";
             inputTitle.value = "";
+            if (inputTier) inputTier.value = "global";
             inputCat.value = "";
             inputDate.value = "2026";
             if (inputMembers) inputMembers.value = "";
@@ -1687,6 +1714,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const editId = document.getElementById('achievement-edit-id').value;
             const title = document.getElementById('achievement-title').value.trim();
+            const category_tier = document.getElementById('achievement-category-tier') ? document.getElementById('achievement-category-tier').value : 'global';
             const position = document.getElementById('achievement-category').value.trim();
             const year = document.getElementById('achievement-date').value.trim();
             const members = document.getElementById('achievement-members') ? document.getElementById('achievement-members').value.trim() : '';
@@ -1707,6 +1735,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const metaObj = {
                 description: description,
                 members: members,
+                category_tier: category_tier,
                 display_order: display_order,
                 logo: logo
             };

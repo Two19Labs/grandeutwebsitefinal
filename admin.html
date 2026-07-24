@@ -335,9 +335,10 @@
                                             <th style="width: 75px; text-align: center;">Order</th>
                                             <th style="width: 60px;">Logo</th>
                                             <th>Event / Host Institute</th>
+                                            <th>Category Tier</th>
                                             <th>Position / Rank</th>
                                             <th>Year</th>
-                                            <th>Description</th>
+                                            <th>Description / Members</th>
                                             <th style="text-align: right;">Actions</th>
                                         </tr>
                                     </thead>
@@ -574,6 +575,14 @@
                     <div class="form-group">
                         <label for="achievement-title">Event / Competition Name *</label>
                         <input type="text" id="achievement-title" class="form-input" placeholder="e.g. SRCC National Case Challenge 2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievement-category-tier">Achievement Category Tier *</label>
+                        <select id="achievement-category-tier" class="form-select" required>
+                            <option value="global">🌐 Global Corporate</option>
+                            <option value="top_bschools">🏛️ IIMs, IITs & Top B-Schools</option>
+                            <option value="du_circuit">🎓 DU Circuit/Others</option>
+                        </select>
                     </div>
                     <div class="grid grid-2" style="gap: 1rem;">
                         <div class="form-group">
