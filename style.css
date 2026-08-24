@@ -2712,21 +2712,6 @@ a.resources-badge:hover {
 }
 
 /* ==========================================================================
-   Admin Footer Link
-   ========================================================================== */
-.footer-admin-link {
-    display: inline-block;
-    color: rgba(255, 255, 255, 0.3) !important;
-    font-size: 0.8rem !important;
-    margin-top: 0.5rem;
-    transition: color 0.2s;
-}
-
-.footer-admin-link:hover {
-    color: var(--gold, #d4af37) !important;
-}
-
-/* ==========================================================================
    Social Media Icon Buttons & Connect Card
    ========================================================================== */
 .social-icons-wrapper {

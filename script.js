@@ -551,17 +551,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------------------------
-    // 6. GRANDEUR CMS DYNAMIC SYNCHRONIZATION & ADMIN ACCESS SHORTCUT
-    // ----------------------------------------------------------------------
-
-    // Admin Access Keyboard Shortcut (Ctrl + Shift + A)
-    window.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-            e.preventDefault();
-            window.location.href = 'admin.html';
-        }
-    });
-
 
 
     async function syncGrandeurCMS() {
@@ -721,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="text-align: center; padding: 4rem 1rem; color: #94a3b8; background: rgba(30, 41, 59, 0.4); border: 1px dashed rgba(212, 175, 55, 0.3); border-radius: 16px; max-width: 600px; margin: 2rem auto;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👥</div>
                     <h3 style="color: #f8fafc; margin-bottom: 0.5rem;">No Active Team Members Listed</h3>
-                    <p style="font-size: 0.95rem;">Use the Grandeur Admin Console to add team members, photos, and roles.</p>
+                    <p style="font-size: 0.95rem;">Team members will appear here.</p>
                 </div>
             `;
             return;
